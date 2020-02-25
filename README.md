@@ -18,7 +18,7 @@ Se volete creare un bot come questo per il vostro corso di laurea, seguite la gu
 	- [Consigli pratici](#consigli-pratici)
 - [Perché Telegram](#perché-telegram)
 
-# Files
+# File
 
 Di seguito, una descrizione dei file che potete trovare in questa repo:
 
