@@ -8,7 +8,7 @@ Se volete creare un bot come questo per il vostro corso di laurea, seguite la gu
 
 # Contenuti
 
-- [Files](#files)
+- [File](#files)
 	- [index.php](#index.php)
 	- [database.json](#database.json)
 		- [Come funziona](#come-funziona) 
@@ -28,7 +28,7 @@ Questo file contiene il codice sorgente del bot. Verrà opportunamente commentat
 
 ## database.json
 
-Questo è forse il file più importante, perché contiene tutti i link, i nomi (e, se esistono, i codici) dei vari gruppi/canali presenti nel bot. Dovrete ovviamente mantenere la struttura inalterata e riempirlo con i vostri link.
+Questo è forse il file più importante, perché conterrà tutti i link, i nomi (e, se esistono, i codici) dei vari gruppi/canali presenti nel bot. Dovrete ovviamente mantenere la struttura inalterata e riempirlo con i vostri link.
 
 ### Come funziona
 
