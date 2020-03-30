@@ -1,5 +1,5 @@
 # @inginf_bot
-
+![Icons](https://i.imgur.com/YLSSaGU.png)
 [@inginf_bot](https://politoinginf.000webhostapp.com) è un bot Telegram creato per gli studenti di Ingegneria Informatica del Politecnico di Torino.
 
 Contiene i link ai vari gruppi relativi al corso di laurea (triennale e magistrale), insieme ad altre risorse utili.
