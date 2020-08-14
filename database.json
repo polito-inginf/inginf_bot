@@ -1,455 +1,748 @@
 {
-  "keyboard":{
-    "type":"dir",
-    "name":"root",
-    "list":[
-      {
-        "frow":1,
-        "type":"dir",
-        "name":"Triennale",
-        "list":[
-          {
-            "frow":1,
-            "type":"dir",
-            "name":"Primo Anno",
-            "list":[
-              {
-                "type":"intlink",
-                "array":"corsi",
-                "link":"corso1"
-              },
-              {
-                "type":"intlink",
-                "array":"corsi",
-                "link":"corso2"
-              }
-            ],
-            "pags":16
-          },
-          {
-            "frow":1,
-            "type":"dir",
-            "name":"Secondo Anno",
-            "list":[
-              {
-                "type":"intlink",
-                "array":"corsi",
-                "link":"corso3"
-              },
-              {
-                "type":"intlink",
-                "array":"corsi",
-                "link":"corso4"
-              }
-            ],
-            "pags":16
-          },
-          {
-            "frow":1,
-            "type":"dir",
-            "name":"Terzo Anno",
-            "list":[
-              {
-                "type":"intlink",
-                "array":"corsi",
-                "link":"corso5"
-              },
-              {
-                "type":"intlink",
-                "array":"corsi",
-                "link":"corso6"
-              }
-            ],
-            "pags":16
-          },
-          {
-            "frow":1,
-            "type":"dir",
-            "name":"ENGLISH",
-            "list":[
-              {
-                "frow":1,
-                "type":"dir",
-                "name":"Year 1",
-                "list":[
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"course1"
-                  },
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"course2"
-                  }
-                ],
-                "pags":16
-              },
-              {
-                "frow":1,
-                "type":"dir",
-                "name":"Year 2",
-                "list":[
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"course3"
-                  },
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"course4"
-                  }
-                ],
-                "pags":16
-              },
-              {
-                "frow":1,
-                "type":"dir",
-                "name":"Year 3",
-                "list":[
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"course5"
-                  },
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"course6"
-                  }
-                ],
-                "pags":16
-              }
-            ],
-            "pags":16
-          }
-        ],
-        "pags":16
-      },
-      {
-        "frow":1,
-        "type":"dir",
-        "name":"Magistrale",
-        "list":[
-          {
-            "frow":1,
-            "type":"dir",
-            "name":"Magistrale 1",
-            "list":[
-              {
-                "frow":1,
-                "type":"intlink",
-                "array":"gen_mag",
-                "link":"mag1"
-              },
-              {
-                "frow":1,
-                "type":"dir",
-                "name":"Primo Anno",
-                "list":[
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"corso7"
-                  },
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"corso8"
-                  }
-                ],
-                "pags":16
-              },
-              {
-                "frow":1,
-                "type":"dir",
-                "name":"Secondo Anno",
-                "list":[
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"corso9"
-                  },
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"corso10"
-                  }
-                ],
-                "pags":16
-              },
-              {
-                "frow":1,
-                "type":"intdir",
-                "array":"corsi",
-                "link":"cliberilm"
-              }
-            ],
-            "pags":16
-          },
-          {
-            "frow":1,
-            "type":"dir",
-            "name":"Magistrale 2",
-            "list":[
-              {
-                "frow":1,
-                "type":"intlink",
-                "array":"gen_mag",
-                "link":"mag2"
-              },
-              {
-                "frow":1,
-                "type":"dir",
-                "name":"Primo Anno",
-                "list":[
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"corso11"
-                  },
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"corso12"
-                  }
-                ],
-                "pags":16
-              },
-              {
-                "frow":1,
-                "type":"dir",
-                "name":"Secondo Anno",
-                "list":[
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"corso13"
-                  },
-                  {
-                    "type":"intlink",
-                    "array":"corsi",
-                    "link":"corso14"
-                  }
-                ],
-                "pags":16
-              },
-              {
-                "frow":1,
-                "type":"intdir",
-                "array":"corsi",
-                "link":"cliberilm"
-              }
-            ],
-            "pags":16
-          }
-        ],
-        "pags":16
-      },
-      {
-        "frow":1,
-        "type":"dir",
-        "name":"Altro",
-        "list":[
-          {
-            "frow":1,
-            "type":"intlink",
-            "array":"altro",
-            "link":"altro1"
-          },
-          {
-            "frow":1,
-            "type":"intlink",
-            "array":"altro",
-            "link":"altro2"
-          },
-          {
-            "frow":1,
-            "type":"dir",
-            "name":"Cartella",
-            "list":[
-              {
-                "type":"intlink",
-                "array":"altro",
-                "link":"altro3"
-              },
-              {
-                "type":"intlink",
-                "array":"altro",
-                "link":"altro4"
-              }
-            ],
-            "pags":0
-          }
-        ],
-        "pags":0
-      }
-    ],
-    "pags":16
-  },
-  "corsi":{
-    "corso1":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso2":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso3":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso4":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso5":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso6":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso7":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso8":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso9":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso10":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso11":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso12":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso13":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "corso14":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "course1":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "course2":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "course3":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "course4":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "course5":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "course6":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "cl1":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "cl2":{
-      "code":"Codice visualizzato nella inline reply",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "cliberilm":{
-      "frow":1,
-      "type":"dir",
-      "name":"Crediti liberi",
-      "list":[
-        {
-          "type":"intlink",
-          "array":"corsi",
-          "link":"cl1"
+	"it": {
+		"keyboard":{
+			"type":"dir",
+			"name":"root",
+			"pags":16,
+			"list":[
+				{
+					"frow":1,
+					"type":"dir",
+					"name":"Triennale",
+					"pags":16,
+					"list":[
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"Primo Anno",
+							"pags":16,
+							"list":[
+								{
+									"type":"intlink",
+									"array":"corsi",
+									"link":"corso1"
+								},
+								{
+									"type":"intlink",
+									"array":"corsi",
+									"link":"corso2"
+								}
+							]
+						},
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"Secondo Anno",
+							"pags":16,
+							"list":[
+								{
+									"type":"intlink",
+									"array":"corsi",
+									"link":"corso3"
+								},
+								{
+									"type":"intlink",
+									"array":"corsi",
+									"link":"corso4"
+								}
+							]
+						},
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"Terzo Anno",
+							"pags":16,
+							"list":[
+								{
+									"type":"intlink",
+									"array":"corsi",
+									"link":"corso5"
+								},
+								{
+									"type":"intlink",
+									"array":"corsi",
+									"link":"corso6"
+								}
+							]
+						},
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"ENGLISH",
+							"pags":16,
+							"list":[
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Year 1",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"course1"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"course2"
+										}
+									]
+								},
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Year 2",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"course3"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"course4"
+										}
+									]
+								},
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Year 3",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"course5"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"course6"
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"frow":1,
+					"type":"dir",
+					"name":"Magistrale",
+					"pags":16,
+					"list":[
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"Magistrale 1",
+							"pags":16,
+							"list":[
+								{
+									"frow":1,
+									"type":"intlink",
+									"array":"gen_mag",
+									"link":"mag1"
+								},
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Primo Anno",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso7"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso8"
+										}
+									]
+								},
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Secondo Anno",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso9"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso10"
+										}
+									]
+								},
+								{
+									"frow":1,
+									"type":"intdir",
+									"array":"corsi",
+									"link":"cliberilm"
+								}
+							]
+						},
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"Magistrale 2",
+							"pags":16,
+							"list":[
+								{
+									"frow":1,
+									"type":"intlink",
+									"array":"gen_mag",
+									"link":"mag2"
+								},
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Primo Anno",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso11"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso12"
+										}
+									]
+								},
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Secondo Anno",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso13"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso14"
+										}
+									]
+								},
+								{
+									"frow":1,
+									"type":"intdir",
+									"array":"corsi",
+									"link":"cliberilm"
+								}
+							]
+						}
+					]
+				},
+				{
+					"frow":1,
+					"type":"dir",
+					"name":"Altro",
+					"pags":0,
+					"list":[
+						{
+							"frow":1,
+							"type":"intlink",
+							"array":"altro",
+							"link":"altro1"
+						},
+						{
+							"frow":1,
+							"type":"intlink",
+							"array":"altro",
+							"link":"altro2"
+						},
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"Cartella",
+							"pags":0,
+							"list":[
+								{
+									"type":"intlink",
+									"array":"altro",
+									"link":"altro3"
+								},
+								{
+									"type":"intlink",
+									"array":"altro",
+									"link":"altro4"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+	},
+	"en": {
+		"keyboard":{
+			"type":"dir",
+			"name":"root",
+			"pags":16,
+			"list":[
+				{
+					"frow":1,
+					"type":"dir",
+					"name":"Triennale",
+					"pags":16,
+					"list":[
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"Primo Anno",
+							"pags":16,
+							"list":[
+								{
+									"type":"intlink",
+									"array":"corsi",
+									"link":"corso1"
+								},
+								{
+									"type":"intlink",
+									"array":"corsi",
+									"link":"corso2"
+								}
+							]
+						},
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"Secondo Anno",
+							"pags":16,
+							"list":[
+								{
+									"type":"intlink",
+									"array":"corsi",
+									"link":"corso3"
+								},
+								{
+									"type":"intlink",
+									"array":"corsi",
+									"link":"corso4"
+								}
+							]
+						},
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"Terzo Anno",
+							"pags":16,
+							"list":[
+								{
+									"type":"intlink",
+									"array":"corsi",
+									"link":"corso5"
+								},
+								{
+									"type":"intlink",
+									"array":"corsi",
+									"link":"corso6"
+								}
+							]
+						},
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"ENGLISH",
+							"pags":16,
+							"list":[
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Year 1",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"course1"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"course2"
+										}
+									]
+								},
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Year 2",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"course3"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"course4"
+										}
+									]
+								},
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Year 3",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"course5"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"course6"
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"frow":1,
+					"type":"dir",
+					"name":"Magistrale",
+					"pags":16,
+					"list":[
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"Magistrale 1",
+							"pags":16,
+							"list":[
+								{
+									"frow":1,
+									"type":"intlink",
+									"array":"gen_mag",
+									"link":"mag1"
+								},
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Primo Anno",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso7"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso8"
+										}
+									]
+								},
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Secondo Anno",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso9"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso10"
+										}
+									]
+								},
+								{
+									"frow":1,
+									"type":"intdir",
+									"array":"corsi",
+									"link":"cliberilm"
+								}
+							]
+						},
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"Magistrale 2",
+							"pags":16,
+							"list":[
+								{
+									"frow":1,
+									"type":"intlink",
+									"array":"gen_mag",
+									"link":"mag2"
+								},
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Primo Anno",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso11"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso12"
+										}
+									]
+								},
+								{
+									"frow":1,
+									"type":"dir",
+									"name":"Secondo Anno",
+									"pags":16,
+									"list":[
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso13"
+										},
+										{
+											"type":"intlink",
+											"array":"corsi",
+											"link":"corso14"
+										}
+									]
+								},
+								{
+									"frow":1,
+									"type":"intdir",
+									"array":"corsi",
+									"link":"cliberilm"
+								}
+							]
+						}
+					]
+				},
+				{
+					"frow":1,
+					"type":"dir",
+					"name":"Altro",
+					"pags":0,
+					"list":[
+						{
+							"frow":1,
+							"type":"intlink",
+							"array":"altro",
+							"link":"altro1"
+						},
+						{
+							"frow":1,
+							"type":"intlink",
+							"array":"altro",
+							"link":"altro2"
+						},
+						{
+							"frow":1,
+							"type":"dir",
+							"name":"Cartella",
+							"pags":0,
+							"list":[
+								{
+									"type":"intlink",
+									"array":"altro",
+									"link":"altro3"
+								},
+								{
+									"type":"intlink",
+									"array":"altro",
+									"link":"altro4"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+	},
+	"corsi":{
+        "corso1":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
         },
-        {
-          "type":"intlink",
-          "array":"corsi",
-          "link":"cl2"
+        "corso2":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "corso3":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "corso4":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "corso5":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "corso6":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "corso7":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "corso8":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "corso9":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "corso10":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "corso11":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "corso12":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "corso13":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "corso14":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "course1":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "course2":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "course3":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "course4":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "course5":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "course6":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "cl1":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "cl2":{
+            "code":"Codice visualizzato nella inline reply",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "cliberilm":{
+            "frow":1,
+            "type":"dir",
+            "name":"Crediti liberi",
+            "list":[
+                {
+                    "type":"intlink",
+                    "array":"corsi",
+                    "link":"cl1"
+                },
+                {
+                    "type":"intlink",
+                    "array":"corsi",
+                    "link":"cl2"
+                }
+            ],
+            "pags":16
         }
-      ],
-      "pags":16
+    },
+    "gen_mag":{
+        "mag1":{
+            "type":"link",
+            "name":"GRUPPO GENERALE MAGISTRALE 1",
+            "link":"Link al gruppo"
+        },
+        "mag2":{
+            "type":"link",
+            "name":"GRUPPO GENERALE MAGISTRALE 2",
+            "link":"Link al gruppo"
+        }
+    },
+    "altro":{
+        "altro1":{
+            "type":"link",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "altro2":{
+            "type":"link",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "altro3":{
+            "type":"link",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        },
+        "altro4":{
+            "type":"link",
+            "name":"Nome visualizzato sul bottone",
+            "link":"Link al gruppo"
+        }
     }
-  },
-  "gen_mag":{
-    "mag1":{
-      "type":"link",
-      "name":"GRUPPO GENERALE MAGISTRALE 1",
-      "link":"Link al gruppo"
-    },
-    "mag2":{
-      "type":"link",
-      "name":"GRUPPO GENERALE MAGISTRALE 2",
-      "link":"Link al gruppo"
-    }
-  },
-  "altro":{
-    "altro1":{
-      "type":"link",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "altro2":{
-      "type":"link",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "altro3":{
-      "type":"link",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    },
-    "altro4":{
-      "type":"link",
-      "name":"Nome visualizzato sul bottone",
-      "link":"Link al gruppo"
-    }
-  }
 }
