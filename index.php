@@ -1,18 +1,15 @@
 <?php
 	/**
+	* Template for creating a Telegram bot in PHP that refers to groups and/or channels.
 	*
-	* Template per la creazione di un bot Telegram in PHP che rimandi a gruppi e/o canali.
+	* The code in this repository is not complete, but it serves to give an idea on how the bot works.
+	* For any questions, please search us on Telegram.
 	*
-	* Il codice presente in questa repository non è completo, ma serve a dare
-	* un'idea sul funzionamento del bot.
-	* Per qualsiasi domanda, cercateci su Telegram.
-	*
-	* È possibile riutilizzare questo template nel rispetto della licenza GNU GPLv3.
+	* This template can be reused in accordance with the GNU GPLv3 license.
 	*
 	* @author     Giorgio Pais
 	* @author     Giulio Coa
 	* @license    https://www.gnu.org/licenses/gpl-3.0.txt
-	*
 	*/
 
 	// Installing the MadelineProto library
@@ -848,6 +845,61 @@
 			// Checking if the language is supported
 			if (isset($this::DB[$language]) == FALSE) {
 				$language = 'en';
+			}
+
+			// Checking if is an @admin tag
+			if (preg_match('/^(\@admin)(\s+(\S+.*)*)?$/miu', $message['message'], $matches)) {
+				// Retrieving the data of the chat
+				$chat = yield $this -> getFullInfo($message['to_id']);
+				$title = isset($chat['Chat']) ? $chat['Chat']['title'] : ''
+				$chat = $chat['full'];
+
+				// Checking if the chat is correct
+				if ($chat['_'] !== 'chatFull') {
+					return;
+				}
+
+				// Checking if the list of partecipants is correct
+				if ($chat['participants']['_'] !== 'chatParticipants') {
+					return;
+				}
+
+				/**
+				* Retrieving the admins list
+				*
+				* array_filter() filter the members list by applying the closures to its elements
+				* array_map() converts the admins list by applying the closures to its elements
+				* array_filter() filter the members list by applying the closures to its elements
+				*/
+				$admins = array_filter($chat['participants']['participants'], function ($n) {
+					return $n['_'] === 'chatParticipantAdmin';
+				});
+				$admins = array_map(function ($n) {
+					return $n['user_id'];
+				}, $admins);
+				$admins = yield $this -> users -> getUsers($admins);
+				$admins = array_filter($admins, function ($n) {
+					return $n['_'] === 'user';
+				});
+
+				// Creating the message to send to the admins
+				$text = "\n<a href=\"tg://user?id=" . $sender['id'] . '\" >' . $sender['first_name'] . '</a> needs your help' . (($matches[3] ?? FALSE) ? ' for ' . $matches[3] : '') . ' into <a href=\"' . $chat['exported_invite'] . '\" >' . $title . '</a>.';
+
+				foreach ($admins as $user) {
+					try {
+						yield $this -> messages -> sendMessage([
+							'no_webpage' => TRUE,
+							'peer' => $user['id'],
+							'message' => '<a href=\"tg://user?id=' . $user['id'] . '\" >' . $user['first_name'] . '</a>,' . $text,
+							'parse_mode' => 'HTML'
+						]);
+					} catch (danog\MadelineProto\RPCErrorException $e) {
+						;
+					}
+				}
+
+				// Sending the report to the channel
+				$this -> report('<a href=\"tg://user?id=' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> has sent an @admin request into <a href=\"' . $chat['exported_invite'] . '\" >' . $title . '</a>.');
 			}
 		}
 
