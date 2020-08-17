@@ -50,7 +50,7 @@ In keyboards, each element has a **type**, defined by `"type"`, which can be:
 
 	The pags and frow attributes are missing because, referring to a dir, they are present in the declaration of the dir in the array.
 
-* `"intlink"`: so called to differentiate it from "link", it is the "terminal" type, which simply indicates a link. It has the following attributes:
+* `"intlink"`: so called to differentiate it from `"link"`, it is the "terminal" type, which simply indicates a link. It has the following attributes:
 
 	- `"array"`: indicates the array containing the link to which it refers.
 	- `"link"`: indicates the link to which it refers.
