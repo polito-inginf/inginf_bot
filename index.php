@@ -931,19 +931,11 @@
 				$language = 'en';
 			}
 
-			/**
-			* Checking if the text of the message starts with '/'
-			*
-			* substr() retrieve the first character of the text
-			*/
-			if (substr($message['message'], 0, 1) === '/') {
-				/**
-				* Retrieving the command
-				*
-				* explode() split the message into substrings using the ' ' like separator
-				* strtolower() convert the text of the message to lowercase
-				*/
-				$command = explode(' ', strtolower($message['message']))[0];
+			// Checking if the text of the message starts with '/'
+			if (preg_match_all('/^(\/[[:alnum:]|\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message'], $matches)) {
+				// Retrieving the command
+				$command = explode('@', $matches[1])[0];
+				$args = $matches[2];
 
 				switch ($command) {
 					case '/faq':
