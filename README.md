@@ -10,6 +10,7 @@ It contains links to the various groups related to the degree course (bachelor a
 	- [index.php](#index.php)
 	- [database.json](#database.json)
 		+ [How does it work](#how-does-it-work)
+		+ [Add a language to the bot](#add-a-language-to-the-bot)
 * [Create a bot like this](#create-a-bot-like-this)
 	- [What is needed](#what-is-needed)
 	- [Practical advice](#practical-advice)
@@ -31,7 +32,7 @@ This is perhaps the most important file, because it will contain all the links, 
 
 **N.B.**: Given the length of the file, I recommend using an editor/IDE or an online JSON viewer, like [this one](https://jsonformatter.curiousconcept.com/), which allows you to hide/expand entire sections without effort.
 
-The interaction with the user takes place via "buttons", called on Telegram _Inline Keyboard_, which I will call **keyboards**. The creation of these keyboards occurs in the first part of the file, inside `"keyboard"`. The various links are present in the other **arrays** at the same level of indentation (`"corsi"`, `"gen_mag"`, `"altro"` and `"temp"`). There is no need to create multiple arrays, it's just a matter of readability.
+The interaction with the user takes place via "buttons", called on Telegram _Inline Keyboard_, which I will call **keyboards**. The creation of these keyboards occurs in the first part of the file, inside `"keyboard"`. The various links are present in the other **arrays** at the same level of indentation (`"corsi"`, `"gen_mag"` and `"altro"`). There is no need to create multiple arrays, it's just a matter of readability.
 
 In keyboards, each element has a **type**, defined by `"type"`, which can be:
 
@@ -54,6 +55,12 @@ In keyboards, each element has a **type**, defined by `"type"`, which can be:
 	- `"array"`: indicates the array containing the link to which it refers.
 	- `"link"`: indicates the link to which it refers.
 	- `"frow"`(optional): is a boolean value that stands for "full row". If set to 1, that button will be on an entire row, otherwise keyboards are created with an automatic layout of 2 buttons per row.
+
+### Add a language to the bot
+
+If you want to add support for another language, you need to copy the path of an existing language (_i.e._ `"it"` or `"en"`) and translate the text of the buttons (_i.e._ First year, Bachelor degree, etc.).
+
+**N.B.**: The reference of the items must not be changed, only their `"name"` parameter.
 
 # Create a bot like this
 
