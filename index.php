@@ -854,22 +854,17 @@
 				$title = isset($chat['Chat']) ? $chat['Chat']['title'] : ''
 				$chat = $chat['full'];
 
-				// Checking if the chat is correct
-				if ($chat['_'] !== 'chatFull') {
-					return;
-				}
-
-				// Checking if the list of partecipants is correct
-				if ($chat['participants']['_'] !== 'chatParticipants') {
+				// Checking if the chat is correct and if the list of partecipants is correct
+				if ($chat['_'] !== 'chatFull' | $chat['participants']['_'] !== 'chatParticipants') {
 					return;
 				}
 
 				/**
 				* Retrieving the admins list
 				*
-				* array_filter() filter the members list by applying the closures to its elements
-				* array_map() converts the admins list by applying the closures to its elements
-				* array_filter() filter the members list by applying the closures to its elements
+				* array_filter() filter the members list by applying the closures to its elements (only admins)
+				* array_map() converts the admins list by applying the closures to its elements (retrieve the id of the admins)
+				* array_filter() filter the members list by applying the closures to its elements (only normal users)
 				*/
 				$admins = array_filter($chat['participants']['participants'], function ($n) {
 					return $n['_'] === 'chatParticipantAdmin';
