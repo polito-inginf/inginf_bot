@@ -1,89 +1,82 @@
 # inginf_bot
 ![Icons](https://i.imgur.com/YLSSaGU.png)
-[@inginf_bot](https://t.me/inginf_bot) è un bot Telegram creato per gli studenti di Ingegneria Informatica del Politecnico di Torino.
+[@inginf_bot](https://t.me/inginf_bot) s a Telegram bot created for the students of Computer Engineering @ Politecnico di Torino.
 
-Contiene i link ai vari gruppi relativi al corso di laurea (triennale e magistrale), insieme ad altre risorse utili.
-Ho creato questa repository per condividere il codice *core* del bot. Potete riutilizzare questo codice liberamente, **nel rispetto della [licenza GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.html)**.
-Se volete creare un bot come questo per il vostro corso di laurea, seguite la guida che trovate sotto.
+It contains links to the various groups related to the degree course (bachelor and master's), together with other useful resources. I created this repository to share the bot's core code. You can reuse this code freely, **in compliance with the [GNU GPLv3 license](https://www.gnu.org/licenses/gpl-3.0.html)**. If you want to create a bot like this for your degree program, follow the guide below.
 
-# Contenuti
+# Contents
 
-- [File](#files)
+* [File](#files)
 	- [index.php](#index.php)
 	- [database.json](#database.json)
-		- [Come funziona](#come-funziona)
-- [Creare un bot simile a questo](#creare-un-bot-simile-a-questo)
-	- [Cosa serve](#cosa-serve)
-	- [Consigli pratici](#consigli-pratici)
-- [Perché Telegram](#perché-telegram)
+		+ [How does it work](#how-does-it-work)
+* [Create a bot like this](#create-a-bot-like-this)
+	- [What is needed](#what-is-needed)
+	- [Practical advice](#practical-advice)
+* [Why Telegram ?](#why-telegram)
 
 # File
 
-Di seguito, una descrizione dei file che potete trovare in questa repo:
+Below is a description of the files you can find in this repo:
 
 ## index.php
 
-Questo file contiene il codice sorgente del bot. Verrà opportunamente commentato e modificato in futuro.
+This file contains the bot's source code. It will be appropriately modified in the future.
 
 ## database.json
 
-Questo è forse il file più importante, perché conterrà tutti i link, i nomi (e, se esistono, i codici) dei vari gruppi/canali presenti nel bot. Dovrete ovviamente mantenere la struttura inalterata e riempirlo con i vostri link.
+This is perhaps the most important file, because it will contain all the links, the names and, if any, the codes of the various groups/channels present in the bot. You will obviously have to keep the structure unchanged and fill it with your links.
 
-### Come funziona
+### How does it work
 
-**N.B.**: vista la lunghezza del file, consiglio l'utilizzo di un editor/IDE o di un visualizzatore di JSON online, come [questo](https://jsonformatter.curiousconcept.com/), che permette di nascondere/espandere intere sezioni senza fatica.
+**N.B.**: Given the length of the file, I recommend using an editor/IDE or an online JSON viewer, like [this one](https://jsonformatter.curiousconcept.com/), which allows you to hide/expand entire sections without effort.
 
-L'interazione con l'utente avviene tramite dei "bottoni", chiamati su Telegram *Inline Keyboard*, che chiamerò **tastiere**. La creazione di queste tastiere avviene nella prima parte del file, dentro `"keyboard"`.
-I vari link sono presenti negli altri **array** allo stesso livello di indentazione (`"corsi"`,`"gen_mag"`,`"altro"` e `"temp"`). Non è necessario creare più array, è solo una questione di leggibilità.
+The interaction with the user takes place via "buttons", called on Telegram _Inline Keyboard_, which I will call **keyboards**. The creation of these keyboards occurs in the first part of the file, inside `"keyboard"`. The various links are present in the other **arrays** at the same level of indentation (`"corsi"`, `"gen_mag"`, `"altro"` and `"temp"`). There is no need to create multiple arrays, it's just a matter of readability.
 
-Nelle tastiere, ogni elemento ha un **tipo**, definito da `"type"`, che può essere:
+In keyboards, each element has a **type**, defined by `"type"`, which can be:
 
-- `"dir"`: indica una "directory". La principale è chiamata **root** e non deve essere modificata. Una directory contiene altre tastiere.
-Ha i seguenti attributi:
+* `"dir"`: indicates a "directory". The main one is called **root** and must not be changed. A directory contains other keyboards. It has the following attributes:
 
-	- `"name"`: indica il nome da visualizzare nella keyboard
-	- `"list"`: elenca gli elementi presenti all'interno della keyboard, che possono a loro volta essere altre dir. Rispettare la sintassi del JSON!
-	- `"frow"`(opzionale): è un valore booleano che sta per "full row". Se viene settato a 1, quel bottone sarà su un'intera riga, altrimenti le tastiere vengono create con un layout automatico di 2 bottoni per riga.
-	- `"pags"`: è un valore intero che indica il numero di elementi per "pagina". Se la dir contiene più elementi di quelli indicati da pags, verrà creata una nuova pagina e i bottoni per scorrere tra le pagine. Può essere settato a 0 se non si vogliono avere limiti
+	- `"name"`: indicates the name to be displayed in the keyboard.
+	- `"list"`: it lists the elements present inside the keyboard, which can in turn be other dir. Respect the JSON syntax!
+	- `"frow"`(optional): is a boolean value that stands for "full row". If set to 1, that button will be on an entire row, otherwise keyboards are created with an automatic layout of 2 buttons per row.
+	- `"pags"`: is an integer value indicating the number of items per "page". If the dir contains more elements than indicated by pags, a new page will be created and buttons to scroll through the pages. It can be set to 0 if you don't want to have limits.
 
-- `"intdir"`: è una directory le cui tastiere vengono create dinamicamente. Fa riferimento a una dir presente dentro un array. Per esempio, c'è una intdir dentro Triennale>Primo Anno che fa riferimento alla dir `"cliberil1"` dentro l'array `"corsi"` (gli attributi sono presenti nella dir, la intdir serve solo a fare riferimento alla dir chiamata). Serve se si vuole creare un "contenitore" di link da poter piazzare più volte dentro `"keyboard"`: basta richiamare la intdir, invece che copiare e incollare la dir n volte.
-Ha i seguenti attributi:
+* `"intdir"`: is a directory whose keyboards are dynamically created. Refers to a dir inside an array (the attributes are present in the dir, the intdir is only used to refer to the called dir). It is needed if you want to create a link "container" that you can place several times inside `"keyboard"`: just call the intdir, instead of copying and pasting the dir n times. It has the following attributes:
 
-	- `"array"`: indica l'array in cui è contenuta la dir a cui fa riferimento
-	- `"link"`: indica la dir a cui fa riferimento
+	- `"array"`: indicates the array in which the dir it refers to is contained.
+	- `"link"`: indicates the dir to which it refers.
 
-	Mancano gli attributi pags e frow perché, facendo riferimento a una dir, sono presenti nella dichiarazione della dir nell'array.
+	The pags and frow attributes are missing because, referring to a dir, they are present in the declaration of the dir in the array.
 
-- `"intlink"`: chiamato così per differenziarlo da `"link"`, è il tipo "terminale", che indica banalmente un link.
-Ha i seguenti attributi:
+* `"intlink"`: so called to differentiate it from "link", it is the "terminal" type, which simply indicates a link. It has the following attributes:
 
-	- `"array"`: indica l'array in cui è contenuto il link a cui fa riferimento
-	- `"link"`: indica il link a cui fa riferimento
-	- `"frow"`(opzionale): è un valore booleano che sta per "full row". Se viene settato a 1, quel bottone sarà su un'intera riga, altrimenti le tastiere vengono create con un layout automatico di 2 bottoni per riga.
+	- `"array"`: indicates the array containing the link to which it refers.
+	- `"link"`: indicates the link to which it refers.
+	- `"frow"`(optional): is a boolean value that stands for "full row". If set to 1, that button will be on an entire row, otherwise keyboards are created with an automatic layout of 2 buttons per row.
 
-# Creare un bot simile a questo
+# Create a bot like this
 
-Prima di cominciare, è necessario avere un server su cui ospitare (hostare) il vostro bot. Esistono molti servizi di hosting gratuiti: se state iniziando, consiglio Heroku.
-Questa guida fa riferimento alla creazione di un bot con Heroku e GitHub.
+Before you start, you need to have a server on which to host (host) your bot. There are many free hosting services - if you're starting out, I recommend Heroku. This guide refers to creating a bot with Heroku and GitHub.
 
-## Cosa serve
+## What is needed
 
-Vi serve un **token**: create un bot su Telegram tramite [BotFather](https://t.me/botfather).
+You need a **token**: create a bot on Telegram via [BotFather](https://t.me/botfather).
 
-Create ora un account su Heroku e un'applicazione. Il nome che darete all'applicazione servirà in futuro per fare riferimento al bot, ma non deve essere necessariamente lo stesso che avete scelto durante la creazione del bot tramite BotFather.
+Now create an account on Heroku and an application. The name you give the application will be used in the future to refer to the bot, but it does not necessarily have to be the same name you chose when creating the bot using BotFather.
 
-Una volta creata l'applicazione, andate su Settings>Config Vars e fate click su Reveal Config Vars. Aggiungete una cvar con nome `BOT_TOKEN` e come valore il token rilasciato da BotFather.
+Once the application is created, go to Settings > Config Vars and click on Reveal Config Vars. Add a cvar with name `BOT_TOKEN` and as value the token issued by BotFather.
 
-Il token NON deve comparire direttamente nel vostro codice se la repository che conterrà i file è pubblica! Chi entra in possesso del token può manipolare il bot a vostra insaputa, e, con esso, anche i dati degli utenti che lo utilizzano. Proprio per questo, invece che scrivere il token "in chiaro" sul main, lo dichiariamo come variabile d'ambiente, "protetta" dall'esterno da Heroku.
+The token must NOT appear directly in your code if the repository that will contain the files is public! Whoever comes into possession of the token can manipulate the bot without your knowledge, and with it, also the data of the users who use it. Precisely for this reason, instead of writing the token "in clear" on the main, we declare it as an environment variable, "protected" from the outside by Heroku.
 
-Create un account e una repository su [GitHub](https://github.com), al cui interno caricherete (almeno) i due file `index.php` e `database.json`. Nella vostra applicazione su Heroku, andate su Deploy e in Deployment Method selezionate GitHub e indicate un branch della repo da cui "pescare" i file. Potete abilitare i deploy automatici a ogni commit sul branch selezionato, cosa abbastanza comoda, altrimenti dovreste fare il deploy manuale ogni volta tramite Heroku, nella sezione Deploy.
+Create an account and a repository on [GitHub](https://github.com), inside which you will load (at least) the two files `index.php` and `database.json`. In your Heroku application, go to Deploy and in Deployment Method select GitHub and indicate a branch of the repo from which to "fetch" files. You can enable automatic deployments at each commit on the selected branch, which is quite convenient, otherwise you would have to manually deploy each time through Heroku, in the Deploy section.
 
-## Consigli pratici
+## Practical advice
 
-Consiglio di utilizzare un editor o un IDE per lavorare con PHP e i JSON. [Atom](https://atom.io), ad esempio, è un editor di testi avanzato con moltissimi plugin, tra cui la gestione di progetti git e il collegamento diretto con GitHub: settato correttamente, a ogni salvataggio carica in automatico il file sulla repo di GitHub e, se avete abilitato i deploy automatici su Heroku, fa partire l'applicazione con il codice aggiornato. Esistono mille editor più o meno avanzati, potete addirittura evitare di utilizzarlo e affidarvi a quello built-in di GitHub, ma se volete lavorare in locale è meglio attrezzarsi di qualcosa di meglio del semplice blocco note! :wink:
+I recommend using an editor or IDE to work with PHP and JSON. [Atom](https://atom.io), for example, is an advanced text editor with many plugins, including the management of git projects and the direct connection with GitHub: set correctly, each time it is saved it automatically loads the file on the GitHub repo and, if you have enabled the automatic deploy on Heroku, starts the application with the updated code. There are a thousand more or less advanced editors, you can even avoid using it and rely on the built-in GitHub one, but if you want to work locally it's better to equip yourself with something better than a simple notepad! :wink:
 
-La velocità di Heroku non è il massimo, così come non lo è con altri servizi di hosting gratuito. Ci sono alternative gratuite o a poco prezzo, ma mi sento di consigliare Heroku perché ha molte comodità, tra cui l'utilizzo tramite command line (`heroku-cli`, cross-platform) e la visualizzazione di log, strumento utilissimo per capire cosa non va nel codice.
+Heroku's speed isn't the best, nor is it with other free hosting services. There are free or cheap alternatives, but I would recommend Heroku because it has many comforts, including use via command line (`heroku-cli`, cross-platform) and log viewing, a very useful tool to understand what is wrong with the code.
 
-# Perché Telegram?
+# Why Telegram ?
 
-Ho scelto di creare i vari gruppi e il bot su Telegram perché la ritengo una piattaforma interessante e in costante sviluppo, decisamente adatta allo scopo. È un servizio di instant messaging e da tale viene utilizzato, ma si può spingere anche oltre: il bot che ho creato ne è un esempio. Non nego che in futuro si possano integrare a Telegram altri strumenti, ma credo che sia comunque il sistema più veloce e completo per la comunicazione tra studenti.
+I chose to create the various groups and the bot on Telegram because I think it is an interesting and constantly developing platform, definitely suitable for the purpose. It is an instant messaging service and is used by it, but you can go even further: the bot I created is an example. I do not deny that in the future other tools can be integrated with Telegram, but I believe that it is still the fastest and most complete system for communication between students.
