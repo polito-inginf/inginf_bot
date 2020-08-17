@@ -716,12 +716,8 @@
 
 			$message['message'] = trim($message['message']);
 
-			/**
-			* Checking if the text of the message starts with '/'
-			*
-			* substr() retrieve the first character of the text
-			*/
-			if (substr($message['message'], 0, 1) !== '/') {
+			// Checking if the text of the message starts with '/'
+			if (preg_match('/^(\/[[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message']) == 0) {
 				return;
 			}
 
@@ -740,12 +736,8 @@
 
 			$message['message'] = trim($message['message']);
 
-			/**
-			* Checking if the text of the message starts with '/'
-			*
-			* substr() retrieve the first character of the text
-			*/
-			if (substr($message['message'], 0, 1) !== '/') {
+			// Checking if the text of the message starts with '/'
+			if (preg_match('/^(\/[[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message']) == 0) {
 				return;
 			}
 
@@ -848,7 +840,7 @@
 			}
 
 			// Checking if is an @admin tag
-			if (preg_match('/^(\@admin)(\s+(\S+.*)*)?$/miu', $message['message'], $matches)) {
+			if (preg_match('/^\@admin([[:blank:]\n]{1}((\n|.)*))?$/miu', $message['message'], $matches)) {
 				// Retrieving the data of the chat
 				$chat = yield $this -> getFullInfo($message['to_id']);
 				$title = isset($chat['Chat']) ? $chat['Chat']['title'] : ''
@@ -878,7 +870,7 @@
 				});
 
 				// Creating the message to send to the admins
-				$text = "\n<a href=\"tg://user?id=" . $sender['id'] . '\" >' . $sender['first_name'] . '</a> needs your help' . (($matches[3] ?? FALSE) ? ' for ' . $matches[3] : '') . ' into <a href=\"' . $chat['exported_invite'] . '\" >' . $title . '</a>.';
+				$text = "\n<a href=\"tg://user?id=" . $sender['id'] . '\" >' . $sender['first_name'] . '</a> needs your help' . (($matches[2] ?? FALSE) ? ' for ' . $matches[2] : '') . ' into <a href=\"' . $chat['exported_invite'] . '\" >' . $title . '</a>.';
 
 				foreach ($admins as $user) {
 					try {
@@ -932,7 +924,7 @@
 			}
 
 			// Checking if the text of the message starts with '/'
-			if (preg_match_all('/^(\/[[:alnum:]|\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message'], $matches)) {
+			if (preg_match('/^(\/[[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message'], $matches)) {
 				// Retrieving the command
 				$command = explode('@', $matches[1])[0];
 				$args = $matches[2];
