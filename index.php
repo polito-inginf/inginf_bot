@@ -151,12 +151,8 @@
 				'title' => $element_name,
 				'description' => $element_code
 			], $tmp) == FALSE) {
-				/**
-				* Adding the response to the array
-				*
-				* array_push() push the response into the array
-				*/
-				array_push($response, $output);
+				// Adding the response to the array
+				$response []= $output;
 			}
 		}
 
@@ -356,31 +352,19 @@
 				* 	array()
 				*/
 				if ($full_row_flag & empty($row) == FALSE) {
-					/**
-					* Adding the row to the keyboard
-					*
-					* array_push() push the row into the keyboard
-					*/
-					array_push($keyboard, $row);
+					// Adding the row to the keyboard
+					$keyboard []= $row;
 					$row = [];
 				}
 
-				/**
-				* Adding the element to the row
-				*
-				* array_push() push the element into the row
-				*/
-				array_push($row, $element);
+				// Adding the element to the row
+				$row []= $element;
 				$n_inserted_element -= -1;
 
 				// Checking if the button must be alone into the row or if the row is full
 				if ($full_row_flag | $n_inserted_element % 2 == 0) {
-					/**
-					* Adding the row to the keyboard
-					*
-					* array_push() push the row into the keyboard
-					*/
-					array_push($keyboard, $row);
+					// Adding the row to the keyboard
+					$keyboard []= $row;
 					$row = [];
 				}
 			}
@@ -401,12 +385,8 @@
 			* 	array()
 			*/
 			if (empty($row) == FALSE) {
-				/**
-				* Adding the row to the keyboard
-				*
-				* array_push() push the row into the keyboard
-				*/
-				array_push($keyboard, $row);
+				// Adding the row to the keyboard
+				$keyboard []= $row;
 			}
 
 			// Checking if there are more then one page
@@ -416,19 +396,15 @@
 				// Setting the "Previous page" button
 				$control_buttons['text'] = $page_num != 0 ? '⬅️️ Pagina precedente' : '';
 				$control_buttons['callback_data'] = $page_num != 0 ? $complete_path . '?p=' . ($page_num - 1) : '';
-				array_push($row, $control_buttons);
+				$row []= $control_buttons;
 
 				// Setting the "Next page" button
 				$control_buttons['text'] = $page_num < $last_page ? 'Pagina successiva ➡️' : '';
 				$control_buttons['callback_data'] = $page_num < $last_page ? $complete_path . '?p=' . ($page_num + 1) : '';
-				array_push($row, $control_buttons);
+				$row []= $control_buttons;
 
-				/**
-				* Adding the control buttons to the keyboard
-				*
-				* array_push() push the buttons into the keyboard
-				*/
-				array_push($keyboard, $row);
+				// Adding the control buttons to the keyboard
+				$keyboard []= $row;
 			}
 
 			// Checking if the actual path isn't empty
@@ -439,12 +415,8 @@
 					'callback_data' => substr($complete_path, 0, strrpos($complete_path, '/'))
 				];
 
-				/**
-				* Adding the control buttons to the keyboard
-				*
-				* array_push() push the buttons into the keyboard
-				*/
-				array_push($keyboard, $back);
+				// Adding the control buttons to the keyboard
+				$keyboard []= $back;
 			}
 			return $keyboard;
 		}
@@ -742,7 +714,7 @@
 							yield $this -> sendMessage([
 								'no_webpage' => TRUE,
 								'peer' => $message['from_id'],
-								'message' => 'Ciao <b>' . $sender['first_name'] . '</b>, benvenut*!\n\n(Resto del messaggio da inviare appena ricevuto il comando /start)',
+								'message' => str_replace('${sender_first_name}', $sender['first_name'], self::DB[$language]['welcome']),
 								'parse_mode' => 'HTML',
 								'reply_markup' => [
 									'inline_keyboard' => $this -> get_keyboard('', $language)
@@ -757,7 +729,7 @@
 							yield $this -> sendMessage([
 								'no_webpage' => TRUE,
 								'peer' => $message['from_id'],
-								'message' => '<b>DOMANDE FREQUENTI</b>\n\n(Lista di FAQ)',
+								'message' => self::DB[$language]['faq'],
 								'parse_mode' => 'HTML',
 								'reply_markup' => [
 									'inline_keyboard' => $this -> get_keyboard('', $language)
@@ -772,7 +744,7 @@
 							yield $this -> sendMessage([
 								'no_webpage' => TRUE,
 								'peer' => $message['from_id'],
-								'message' => '<b>COMANDI INLINE</b>\n\n(Descrizione modalità inline)',
+								'message' => self::DB[$language]['inline'],
 								'parse_mode' => 'HTML',
 								'reply_markup' => [
 									'inline_keyboard' => $this -> get_keyboard('', $language)
@@ -782,12 +754,12 @@
 							;
 						}
 						break;
-					case '/manuale':
+					case '/guide':
 						try {
 							yield $this -> sendMessage([
 								'no_webpage' => TRUE,
 								'peer' => $message['from_id'],
-								'message' => '<a href=\"(link al manuale, senza parentesi)\" >GUIDA TELEGRAM</a>',
+								'message' => self::DB[$language]['guide'],
 								'parse_mode' => 'HTML'
 							]);
 						} catch (danog\MadelineProto\RPCErrorException $e) {
@@ -799,7 +771,7 @@
 							yield $this -> sendMessage([
 								'no_webpage' => TRUE,
 								'peer' => $message['from_id'],
-								'message' => $language == 'it' ? 'Comando non riconosciuto!' : 'Unknown command!',
+								'message' => self::DB[$language]['unknown'],
 								'parse_mode' => 'HTML'
 							]);
 						} catch (danog\MadelineProto\RPCErrorException $e) {
