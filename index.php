@@ -22,6 +22,12 @@
 
 	class inginf_bot extends danog\MadelineProto\EventHandler {
 		const DB = [];
+		const ADMINS = [
+			462875751,		// Giulio Coa
+			23191885,		// Giorgio Pais
+			14868633,		// Marco Smorti
+			668697832		// Marco Smorti
+		];
 
 		/**
 		* Search the Inline Query text into the DB
