@@ -15,19 +15,16 @@
 	*
 	*/
 
+	// Installing the MadelineProto library
 	if (file_exists('madeline.php') == FALSE) {
 		copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 	}
 	require_once 'madeline.php';
 
+	// Creating the bot
 	class inginf_bot extends danog\MadelineProto\EventHandler {
-		const DB = [];
-		const ADMINS = [
-			462875751,		// Giulio Coa
-			23191885,		// Giorgio Pais
-			14868633,		// Marco Smorti
-			668697832		// Marco Smorti
-		];
+		private const DB = [];
+		private const ADMINS = [];
 
 		/**
 		* Search the Inline Query text into the DB
@@ -39,7 +36,7 @@
 		private function database_search(string $query, string $lang) : array {
 			$response = [];
 
-			$this -> database_recursive_search($query, self::DB[$lang]['keyboard'], $response, $lang);
+			$this -> database_recursive_search($query, $this::DB[$lang]['keyboard'], $response, $lang);
 			return $response;
 		}
 
@@ -65,7 +62,7 @@
 					// Retrieving the data of the internal directory
 					$name_array = trim($actual['array']);
 					$internal_link = trim($actual['link']);
-					$obj = self::DB[$lang][$name_array][$internal_link] ?? NULL;
+					$obj = $this::DB[$lang][$name_array][$internal_link] ?? NULL;
 
 					// Checking if the path exists
 					if ($obj ?? FALSE) {
@@ -85,7 +82,7 @@
 					// Retrieving the data of the internal link
 					$name_array = trim($actual['array']);
 					$internal_link = trim($actual['link']);
-					$obj = self::DB[$lang][$name_array][$internal_link] ?? NULL;
+					$obj = $this::DB[$lang][$name_array][$internal_link] ?? NULL;
 
 					// Checking if the path exists
 					if ($obj ?? FALSE) {
@@ -219,9 +216,9 @@
 			}
 
 			// The actual point into the DB
-			$actual = self::DB[$lang]['keyboard']['list'];
+			$actual = $this::DB[$lang]['keyboard']['list'];
 			// The last directory visited
-			$dir = self::DB[$lang]['keyboard'];
+			$dir = $this::DB[$lang]['keyboard'];
 			// The path into the DB
 			$path = '';
 
@@ -252,7 +249,7 @@
 								// Retrieving the data of the internal directory
 								$name_array = trim($dir['array']);
 								$internal_link = trim($dir['link']);
-								$obj = self::DB[$lang][$name_array][$internal_link] ?? NULL;
+								$obj = $this::DB[$lang][$name_array][$internal_link] ?? NULL;
 
 								// Checking if the path exists
 								if ($obj ?? FALSE) {
@@ -260,8 +257,8 @@
 									$dir = $obj;
 								} else {
 									// The path doesn't exists -> reset the path
-									$actual = self::DB[$lang]['keyboard']['list'];
-									$dir = self::DB[$lang]['keyboard'];
+									$actual = $this::DB[$lang]['keyboard']['list'];
+									$dir = $this::DB[$lang]['keyboard'];
 									$path = '';
 									break;
 								}
@@ -271,8 +268,8 @@
 						}
 					} else {
 						// The path doesn't exists -> reset the path
-						$actual = self::DB[$lang]['keyboard']['list'];
-						$dir = self::DB[$lang]['keyboard'];
+						$actual = $this::DB[$lang]['keyboard']['list'];
+						$dir = $this::DB[$lang]['keyboard'];
 						$path = '';
 						break;
 					}
@@ -323,7 +320,7 @@
 					// Retrieving the data of the internal element
 					$name_array = trim($value['array']);
 					$internal_link = trim($value['link']);
-					$obj = self::DB[$lang][$name_array][$internal_link] ?? NULL;
+					$obj = $this::DB[$lang][$name_array][$internal_link] ?? NULL;
 
 					// Checking if the path exists
 					if ($obj ?? FALSE) {
@@ -444,6 +441,55 @@
 		}
 
 		/**
+		* Execute a web request to a URL
+		*
+		* @param string $url The URL
+		* @param bool $parameters The flag that identify if the URL is a GET request with parameters
+		*
+		* @return string
+		*/
+		private function execute_request(string $url, bool $parameters = FALSE) : string {
+			// Replace the special character into the URL
+			$url = str_replace("\t", '%09', $url);
+			$url = str_replace("\n", '%0A%0D', $url);
+			$url = str_replace(' ', '%20', $url);
+			$url = str_replace('\"', '%22', $url);
+			$url = str_replace('#', '%23', $url);
+			$url = str_replace([
+				'$',
+				'\$'
+			], '%24', $url);
+			$url = str_replace('%', '%25', $url);
+			$url = str_replace('\'', '%27', $url);
+			$url = str_replace(',', '%2C', $url);
+			$url = str_replace(';', '%3B', $url);
+			$url = str_replace('@', '%40', $url);
+
+			// Checking if the URL isn't a GET request with parameters
+			if ($parameters == FALSE) {
+				$url = str_replace('=', '%3D', $url);
+				$url = str_replace('?', '%3F', $url);
+			}
+
+			// Opening the connection
+			$curl = curl_init($url);
+
+			// Setting the connection
+			curl_setopt_array($curl, [
+				CURLOPT_HEADER => FALSE,
+				CURLOPT_RETURNTRANSFER => TRUE
+			]);
+
+			// Executing the web request
+			$result = curl_exec($curl);
+
+			// Closing the connection
+			curl_close($curl);
+
+			return $result;
+		}
+
+		/**
 		* Check if the string starts with the substring
 		*
 		* @param string $haystack The string
@@ -477,7 +523,15 @@
 		*/
 		public function onStart() : void {
 			// Retrieving the database
-			self::DB = json_decode(file_get_contents('database.json') , TRUE);
+			$this::DB = json_decode(file_get_contents('database.json'), TRUE);
+
+			// Setting the default admins list
+			$this::ADMINS = [
+				462875751,		// Giulio Coa
+				23191885,		// Giorgio Pais
+				14868633,		// Marco Smorti
+				668697832		// Marco Smorti
+			];
 		}
 
 		/**
@@ -502,7 +556,7 @@
 			// Retrieving the language of the user
 			$language = isset($sender['lang_code']) ? $sender['lang_code'] : 'en';
 			// Checking if the language is supported
-			if (isset(self::DB[$language]) == FALSE) {
+			if (isset($this::DB[$language]) == FALSE) {
 				$language = 'en';
 			}
 
@@ -517,7 +571,7 @@
 			}
 
 			try {
-				yield $this -> editMessage([
+				yield $this -> messages -> editMessage([
 					'no_webpage' => TRUE,
 					'peer' => $user['id'],
 					'id' => $update['msg_id'],
@@ -551,7 +605,7 @@
 			// Retrieving the language of the user
 			$language = isset($sender['lang_code']) ? $sender['lang_code'] : 'en';
 			// Checking if the language is supported
-			if (isset(self::DB[$language]) == FALSE) {
+			if (isset($this::DB[$language]) == FALSE) {
 				$language = 'en';
 			}
 
@@ -574,7 +628,7 @@
 				$answer = $this -> database_search($inline_query, $language);
 
 				try {
-					yield $this -> setInlineBotResults([
+					yield $this -> messages -> setInlineBotResults([
 						'query_id' => $update['query_id'],
 						'results' => $answer,
 						'cache_time' => 1
@@ -593,6 +647,53 @@
 		* @return Generator
 		*/
 		public function onUpdateChatParticipantAdd(array $update) : Generator {
+			// Downloading the user's informations from the Combot Anti-Spam API
+			$result = execute_request('https://api.cas.chat/check?user_id=' . $update['user_id'], TRUE);
+			$result = json_decode($result, TRUE);
+
+			// Retrieving the data of the new member
+			$new_member = yield $this -> getInfo($update['user_id']);
+			$new_member = $new_member['User'];
+
+			// Checking if the user isn't a spammer, isn't a deleted account and is a normal user
+			if ($result['ok'] == FALSE & $new_member['_'] === 'user' & $new_member['scam'] == FALSE & $new_member['deleted'] == FALSE) {
+				return;
+			}
+
+			try {
+				yield $this -> channels -> editBanned([
+					'channel' => $update['chat_id'],
+					'user_id' => $update['user_id'],
+					'banned_rights' => [
+						'_' => 'chatBannedRights',
+						'view_messages' => TRUE,
+						'send_messages' => TRUE,
+						'send_media' => TRUE,
+						'send_stickers' => TRUE,
+						'send_gifs' => TRUE,
+						'send_games' => TRUE,
+						'send_inline' => TRUE,
+						'embed_links' => TRUE,
+						'send_polls' => TRUE,
+						'change_info' => TRUE,
+						'invite_users' => TRUE,
+						'pin_messages' => TRUE,
+						'until_date' => 0
+					]
+				]);
+			} catch (danog\MadelineProto\RPCErrorException $e) {
+				;
+			}
+			try {
+				yield $this -> channels -> deleteMessages([
+					'revoke' => TRUE,
+					'id' => [
+						$update['chat_id']
+					]
+				]);
+			} catch (danog\MadelineProto\RPCErrorException $e) {
+				;
+			}
 		}
 
 		/**
@@ -603,6 +704,7 @@
 		* @return Generator
 		*/
 		public function onUpdateChatParticipantDelete(array $update) : Generator {
+			;
 		}
 
 		/**
@@ -663,8 +765,70 @@
 		public function onUpdateNewChannelMessage(array $update) : Generator {
 			$message = $update['message'];
 
-			// Checking if the message is a normal message or is an incoming message
-			if ($message['_'] !== 'message' | $message['out'] ?? FALSE) {
+			// Checking if the message is an empty message or is an incoming message
+			if ($message['_'] === 'messageEmpty' | $message['out'] ?? FALSE) {
+				return;
+			}
+
+			// Checking if the message is a service message
+			if ($message['_'] === 'messageService') {
+				// Checking if the service message is about new members
+				if ($message['action']['_'] === 'messageActionChatAddUser') {
+					// Cycle on the list of the new member
+					foreach ($message['action']['users'] as $key => $value) {
+						// Downloading the user's informations from the Combot Anti-Spam API
+						$result = execute_request('https://api.cas.chat/check?user_id=' . $value, TRUE);
+						$result = json_decode($result, TRUE);
+
+						// Retrieving the data of the new member
+						$new_member = yield $this -> getInfo($value);
+						$new_member = $new_member['User'];
+
+						// Checking if the user isn't a spammer, isn't a deleted account and is a normal user
+						if ($result['ok'] == FALSE & $new_member['_'] === 'user' & $new_member['scam'] == FALSE & $new_member['deleted'] == FALSE) {
+							continue;
+						}
+
+						try {
+							yield $this -> channels -> editBanned([
+								'channel' => $update['chat_id'],
+								'user_id' => $value,
+								'banned_rights' => [
+									'_' => 'chatBannedRights',
+									'view_messages' => TRUE,
+									'send_messages' => TRUE,
+									'send_media' => TRUE,
+									'send_stickers' => TRUE,
+									'send_gifs' => TRUE,
+									'send_games' => TRUE,
+									'send_inline' => TRUE,
+									'embed_links' => TRUE,
+									'send_polls' => TRUE,
+									'change_info' => TRUE,
+									'invite_users' => TRUE,
+									'pin_messages' => TRUE,
+									'until_date' => 0
+								]
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+					}
+				} else if ($message['action']['_'] === 'messageActionChatDeleteUser') {
+					;
+				}
+
+				try {
+					yield $this -> channels -> deleteMessages([
+						'revoke' => TRUE,
+						'id' => [
+							$message['id']
+						]
+					]);
+				} catch (danog\MadelineProto\RPCErrorException $e) {
+					;
+				}
+
 				return;
 			}
 
@@ -682,7 +846,7 @@
 			// Retrieving the language of the user
 			$language = isset($sender['lang_code']) ? $sender['lang_code'] : 'en';
 			// Checking if the language is supported
-			if (isset(self::DB[$language]) == FALSE) {
+			if (isset($this::DB[$language]) == FALSE) {
 				$language = 'en';
 			}
 		}
@@ -716,7 +880,7 @@
 			// Retrieving the language of the user
 			$language = isset($sender['lang_code']) ? $sender['lang_code'] : 'en';
 			// Checking if the language is supported
-			if (isset(self::DB[$language]) == FALSE) {
+			if (isset($this::DB[$language]) == FALSE) {
 				$language = 'en';
 			}
 
@@ -735,42 +899,12 @@
 				$command = explode(' ', strtolower($message['message']))[0];
 
 				switch ($command) {
-					case '/start':
-						try {
-							yield $this -> sendMessage([
-								'no_webpage' => TRUE,
-								'peer' => $message['from_id'],
-								'message' => str_replace('${sender_first_name}', $sender['first_name'], self::DB[$language]['welcome']),
-								'parse_mode' => 'HTML',
-								'reply_markup' => [
-									'inline_keyboard' => $this -> get_keyboard('', $language)
-								]
-							]);
-						} catch (danog\MadelineProto\RPCErrorException $e) {
-							;
-						}
-						break;
 					case '/faq':
 						try {
-							yield $this -> sendMessage([
+							yield $this -> messages -> sendMessage([
 								'no_webpage' => TRUE,
 								'peer' => $message['from_id'],
-								'message' => self::DB[$language]['faq'],
-								'parse_mode' => 'HTML',
-								'reply_markup' => [
-									'inline_keyboard' => $this -> get_keyboard('', $language)
-								]
-							]);
-						} catch (danog\MadelineProto\RPCErrorException $e) {
-							;
-						}
-						break;
-					case '/inline':
-						try {
-							yield $this -> sendMessage([
-								'no_webpage' => TRUE,
-								'peer' => $message['from_id'],
-								'message' => self::DB[$language]['inline'],
+								'message' => $this::DB[$language]['faq'],
 								'parse_mode' => 'HTML',
 								'reply_markup' => [
 									'inline_keyboard' => $this -> get_keyboard('', $language)
@@ -782,11 +916,41 @@
 						break;
 					case '/guide':
 						try {
-							yield $this -> sendMessage([
+							yield $this -> messages -> sendMessage([
 								'no_webpage' => TRUE,
 								'peer' => $message['from_id'],
-								'message' => self::DB[$language]['guide'],
+								'message' => $this::DB[$language]['guide'],
 								'parse_mode' => 'HTML'
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+						break;
+					case '/inline':
+						try {
+							yield $this -> messages -> sendMessage([
+								'no_webpage' => TRUE,
+								'peer' => $message['from_id'],
+								'message' => $this::DB[$language]['inline'],
+								'parse_mode' => 'HTML',
+								'reply_markup' => [
+									'inline_keyboard' => $this -> get_keyboard('', $language)
+								]
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+						break;
+					case '/start':
+						try {
+							yield $this -> messages -> sendMessage([
+								'no_webpage' => TRUE,
+								'peer' => $message['from_id'],
+								'message' => str_replace('${sender_first_name}', $sender['first_name'], $this::DB[$language]['welcome']),
+								'parse_mode' => 'HTML',
+								'reply_markup' => [
+									'inline_keyboard' => $this -> get_keyboard('', $language)
+								]
 							]);
 						} catch (danog\MadelineProto\RPCErrorException $e) {
 							;
@@ -794,10 +958,10 @@
 						break;
 					default:
 						try {
-							yield $this -> sendMessage([
+							yield $this -> messages -> sendMessage([
 								'no_webpage' => TRUE,
 								'peer' => $message['from_id'],
-								'message' => self::DB[$language]['unknown'],
+								'message' => $this::DB[$language]['unknown'],
 								'parse_mode' => 'HTML'
 							]);
 						} catch (danog\MadelineProto\RPCErrorException $e) {
