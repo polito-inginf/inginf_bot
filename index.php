@@ -30,10 +30,10 @@
 		*
 		* @return array
 		*/
-		private function DB_search(string $query, string $lang) : array {
+		private function database_search(string $query, string $lang) : array {
 			$response = [];
 
-			$this -> DB_recursive_search($query, self::DB[$lang]['keyboard'], $response, $lang);
+			$this -> database_recursive_search($query, self::DB[$lang]['keyboard'], $response, $lang);
 			return $response;
 		}
 
@@ -46,7 +46,7 @@
 		*
 		* @return void
 		*/
-		private function DB_recursive_search(string $query, array $actual, array &$response, string $lang) {
+		private function database_recursive_search(string $query, array $actual, array &$response, string $lang) : void {
 			// The element that match with the query
 			$element_name = '';
 			$element_link = '';
@@ -70,7 +70,7 @@
 
 				// Recurring
 				foreach ($actual['list'] as $key => $value) {
-					$this -> DB_recursive_search($query, $value, $response);
+					$this -> database_recursive_search($query, $value, $response);
 				}
 				return;
 			} else if (preg_match('/^(int)?link$/mu', $actual['type'])) {
@@ -429,7 +429,7 @@
 		*
 		* @return bool
 		*/
-		private function ends_with(string $haystack, string $needle) {
+		private function ends_with(string $haystack, string $needle) : bool {
 			/**
 			* strlen() retrieve the length of $needle
 			* substr() retrieve the last strlen($needle)-th characters of $haystack
@@ -445,7 +445,7 @@
 		*
 		* @return bool
 		*/
-		private function starts_with(string $haystack, string $needle) {
+		private function starts_with(string $haystack, string $needle) : bool {
 			/**
 				* strlen() retrieve the length of $needle
 				* substr() retrieve the first strlen($needle)-th characters of $haystack
@@ -469,7 +469,7 @@
 		*
 		* @return void
 		*/
-		public function onStart() {
+		public function onStart() : void {
 			// Retrieving the database
 			self::DB = json_decode(file_get_contents('database.json') , TRUE);
 		}
@@ -565,7 +565,7 @@
 			* 	array()
 			*/
 			if (empty($inline_query) == FALSE & strlen($inline_query) >= 2) {
-				$answer = $this -> DB_search($inline_query, $language);
+				$answer = $this -> database_search($inline_query, $language);
 
 				try {
 					yield $this -> setInlineBotResults([
@@ -577,6 +577,26 @@
 					;
 				}
 			}
+		}
+
+		/**
+		* Handle updates about new group member
+		*
+		* @param array $update Update
+		*
+		* @return Generator
+		*/
+		public function onUpdateChatParticipantAdd(array $update) : Generator {
+		}
+
+		/**
+		* Handle updates about a member that had left the group
+		*
+		* @param array $update Update
+		*
+		* @return Generator
+		*/
+		public function onUpdateChatParticipantDelete(array $update) : Generator {
 		}
 
 		/**
@@ -779,33 +799,6 @@
 						}
 						break;
 				}
-			}
-		}
-
-		/**
-		* Handle updates from service notification
-		*
-		* @param array $update Update
-		*
-		* @return Generator
-		*/
-		public function onUpdateServiceNotification(array $update) : Generator {
-			$message = $update['message'];
-
-			// Checking if the message is a service message or is an incoming message
-			if ($message['_'] !== 'messageService') {
-				return;
-			}
-
-			try {
-				yield $this -> deleteMessages([
-					'revoke' => TRUE,
-					'id' => [
-						$message['id']
-					]
-				]);
-			} catch (danog\MadelineProto\RPCErrorException $e) {
-				;
 			}
 		}
 	}

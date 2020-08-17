@@ -1,10 +1,10 @@
 {
 	"it": {
-		"welcome": "Ciao <b>${sender_first_name}</b>, benvenut*!\n\n(Resto del messaggio da inviare appena ricevuto il comando /start)",
+		"welcome": "Ciao <b>${sender_first_name}</b>, benvenut* !\n\n(Resto del messaggio da inviare appena ricevuto il comando /start)",
 		"faq": "<b>DOMANDE FREQUENTI</b>\n\n(Lista di FAQ)",
 		"inline": "<b>COMANDI INLINE</b>\n\n(Descrizione modalità inline)",
 		"guide": "<a href=\"(link al manuale, senza parentesi)\" >GUIDA TELEGRAM</a>",
-		"unknown": "Comando non riconosciuto!",
+		"unknown": "Comando non riconosciuto !",
 		"keyboard":{
 			"type":"dir",
 			"name":"root",
@@ -304,11 +304,11 @@
 		}
 	},
 	"en": {
-		"welcome": "Hello <b>${sender_first_name}</b>, welcome!\n\n(Rest of the message to be sent upon receipt of the /start command)",
+		"welcome": "Hello <b>${sender_first_name}</b>, welcome !\n\n(Rest of the message to be sent upon receipt of the /start command)",
 		"faq": "<b>FREQUENTLY ASKED QUESTIONS</b>\n\n(FAQ List)",
 		"inline": "<b>INLINE COMMANDS</b>\n\n(Inline mode description)",
 		"guide": "<a href=\"(link to the manual, without brackets)\" >TELEGRAM GUIDE</a>",
-		"unknown": "Unknown command!",
+		"unknown": "Unknown command !",
 		"keyboard":{
 			"type":"dir",
 			"name":"root",
