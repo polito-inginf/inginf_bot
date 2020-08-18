@@ -527,7 +527,8 @@
 				462875751,		// Giulio Coa
 				23191885,		// Giorgio Pais
 				14868633,		// Marco Smorti
-				668697832		// Marco Smorti
+				668697832,		// Marco Smorti
+				479246580		// Gioele Giachino
 			];
 		}
 
@@ -870,14 +871,14 @@
 				});
 
 				// Creating the message to send to the admins
-				$text = "\n<a href=\"tg://user?id=" . $sender['id'] . '\" >' . $sender['first_name'] . '</a> needs your help' . (($matches[2] ?? FALSE) ? ' for ' . $matches[2] : '') . ' into <a href=\"' . $chat['exported_invite'] . '\" >' . $title . '</a>.';
+				$text = "\n<a href=\"mention:" . $sender['id'] . '\" >' . $sender['first_name'] . '</a> needs your help' . (($matches[2] ?? FALSE) ? ' for ' . $matches[2] : '') . ' into <a href=\"' . $chat['exported_invite'] . '\" >' . $title . '</a>.';
 
 				foreach ($admins as $user) {
 					try {
 						yield $this -> messages -> sendMessage([
 							'no_webpage' => TRUE,
 							'peer' => $user['id'],
-							'message' => '<a href=\"tg://user?id=' . $user['id'] . '\" >' . $user['first_name'] . '</a>,' . $text,
+							'message' => '<a href=\"mention:' . $user['id'] . '\" >' . $user['first_name'] . '</a>,' . $text,
 							'parse_mode' => 'HTML'
 						]);
 					} catch (danog\MadelineProto\RPCErrorException $e) {
@@ -886,7 +887,7 @@
 				}
 
 				// Sending the report to the channel
-				$this -> report('<a href=\"tg://user?id=' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> has sent an @admin request into <a href=\"' . $chat['exported_invite'] . '\" >' . $title . '</a>.');
+				$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> has sent an @admin request into <a href=\"' . $chat['exported_invite'] . '\" >' . $title . '</a>.');
 			// Checking if is a Whatsapp link
 			} else if (preg_match('/^(https?\:\/\/)?chat\.whatsapp\.com\/?.*$/.*$/miu', $message['message'])) {
 				try {
@@ -946,58 +947,94 @@
 			if (preg_match('/^(\/[[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message'], $matches)) {
 				// Retrieving the command
 				$command = explode('@', $matches[1])[0];
+				$command = explode('@', $command)[1];
 				$args = $matches[2] ?? NULL;
 
 				switch ($command) {
-					case '/faq':
-						try {
-							yield $this -> messages -> sendMessage([
-								'no_webpage' => TRUE,
-								'peer' => $message['from_id'],
-								'message' => $this::DB[$language]['faq'],
-								'parse_mode' => 'HTML',
-								'reply_markup' => [
-									'inline_keyboard' => $this -> get_keyboard('', $language)
-								]
-							]);
-						} catch (danog\MadelineProto\RPCErrorException $e) {
-							;
-						}
-						break;
-					case '/guide':
-						try {
-							yield $this -> messages -> sendMessage([
-								'no_webpage' => TRUE,
-								'peer' => $message['from_id'],
-								'message' => $this::DB[$language]['guide'],
-								'parse_mode' => 'HTML'
-							]);
-						} catch (danog\MadelineProto\RPCErrorException $e) {
-							;
-						}
-						break;
-					case '/inline':
-						try {
-							yield $this -> messages -> sendMessage([
-								'no_webpage' => TRUE,
-								'peer' => $message['from_id'],
-								'message' => $this::DB[$language]['inline'],
-								'parse_mode' => 'HTML',
-								'reply_markup' => [
-									'inline_keyboard' => $this -> get_keyboard('', $language)
-								]
-							]);
-						} catch (danog\MadelineProto\RPCErrorException $e) {
-							;
-						}
-						break;
-					case '/report':
+					case 'announce':
 						/**
 						* Checking if the user is an admin
 						*
 						* in_array() check if the array contains an item that match the element
 						*/
 						if (in_array($sender['id'], $this::ADMINS) == FALSE) {
+							try {
+								yield $this -> messages -> sendMessage([
+									'no_webpage' => TRUE,
+									'peer' => $message['from_id'],
+									'message' => 'You can\'t use this command.',
+									'parse_mode' => 'HTML'
+								]);
+							} catch (danog\MadelineProto\RPCErrorException $e) {
+								;
+							}
+
+							return;
+						// Checking if the command has arguments
+						} else if (isset($args) == FALSE) {
+							try {
+								yield $this -> messages -> sendMessage([
+									'no_webpage' => TRUE,
+									'peer' => $message['from_id'],
+									'message' => 'The syntax of the command is: <code>/announce &lt;text&gt;</code>.',
+									'parse_mode' => 'HTML'
+								]);
+							} catch (danog\MadelineProto\RPCErrorException $e) {
+								;
+							}
+
+							return;
+						}
+
+						// Retrieving the list of all chats
+						$chats = yield $this -> getDialogs();
+
+						foreach ($chats as $id) {
+							try {
+								yield $this -> messages -> sendMessage([
+									'no_webpage' => TRUE,
+									'peer' => $id,
+									'message' => $args,
+									'parse_mode' => 'HTML'
+								]);
+							} catch (danog\MadelineProto\RPCErrorException $e) {
+								;
+							}
+						}
+						break;
+					case 'help':
+						try {
+							yield $this -> messages -> sendMessage([
+								'no_webpage' => TRUE,
+								'peer' => $message['from_id'],
+								'message' => $this::DB[$language]['help'],
+								'parse_mode' => 'HTML',
+								'reply_markup' => [
+									'inline_keyboard' => $this -> get_keyboard('', $language)
+								]
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+						break;
+					case 'report':
+						/**
+						* Checking if the user is an admin
+						*
+						* in_array() check if the array contains an item that match the element
+						*/
+						if (in_array($sender['id'], $this::ADMINS) == FALSE) {
+							try {
+								yield $this -> messages -> sendMessage([
+									'no_webpage' => TRUE,
+									'peer' => $message['from_id'],
+									'message' => 'You can\'t use this command.',
+									'parse_mode' => 'HTML'
+								]);
+							} catch (danog\MadelineProto\RPCErrorException $e) {
+								;
+							}
+
 							return;
 						}
 
@@ -1018,7 +1055,7 @@
 							'commands' => $commands
 						]);
 						break;
-					case '/start':
+					case 'start':
 						try {
 							yield $this -> messages -> sendMessage([
 								'no_webpage' => TRUE,
