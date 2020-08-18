@@ -989,6 +989,12 @@
 							}
 						}
 						break;
+					case 'eval':
+						break;
+					case 'exec':
+						break;
+					case 'film':
+						break;
 					case 'help':
 						try {
 							yield $this -> messages -> sendMessage([
