@@ -887,6 +887,25 @@
 
 				// Sending the report to the channel
 				$this -> report('<a href=\"tg://user?id=' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> has sent an @admin request into <a href=\"' . $chat['exported_invite'] . '\" >' . $title . '</a>.');
+			// Checking if is a Whatsapp link
+			} else if (preg_match('/^(https?\:\/\/)?chat\.whatsapp\.com\/?.*$/.*$/miu', $message['message'])) {
+				try {
+					yield $this -> messages -> sendMessage([
+						'no_webpage' => TRUE,
+						'peer' => $message['id'],
+						'message' => $this::DB[$language]['no_whatsapp'],
+						'parse_mode' => 'HTML'
+					]);
+
+					yield $this -> channels -> deleteMessages([
+						'revoke' => TRUE,
+						'id' => [
+							$message['id']
+						]
+					]);
+				} catch (danog\MadelineProto\RPCErrorException $e) {
+					;
+				}
 			}
 		}
 
