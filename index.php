@@ -695,17 +695,6 @@
 		}
 
 		/**
-		* Handle updates about a member that had left the group
-		*
-		* @param array $update Update
-		*
-		* @return Generator
-		*/
-		public function onUpdateChatParticipantDelete(array $update) : Generator {
-			;
-		}
-
-		/**
 		* Handle updates about edited message from supergroups and channels
 		*
 		* @param array $update Update
@@ -717,8 +706,8 @@
 
 			$message['message'] = trim($message['message']);
 
-			// Checking if the text of the message starts with '/'
-			if (preg_match('/^(\/[[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message']) == 0) {
+			// Checking if the message is a command or an @admin tag
+			if (preg_match('/^(\/[[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message']) == 0 | preg_match('/^\@admin([[:blank:]\n]{1}((\n|.)*))?$/miu', $message['message']) == 0) {
 				return;
 			}
 
@@ -737,7 +726,7 @@
 
 			$message['message'] = trim($message['message']);
 
-			// Checking if the text of the message starts with '/'
+			// Checking if the message is a command
 			if (preg_match('/^(\/[[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message']) == 0) {
 				return;
 			}
@@ -804,8 +793,6 @@
 							;
 						}
 					}
-				} else if ($message['action']['_'] === 'messageActionChatDeleteUser') {
-					;
 				}
 
 				try {
@@ -943,7 +930,7 @@
 				$language = 'en';
 			}
 
-			// Checking if the text of the message starts with '/'
+			// Checking if the message is a command
 			if (preg_match('/^(\/[[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message'], $matches)) {
 				// Retrieving the command
 				$command = explode('@', $matches[1])[0];
