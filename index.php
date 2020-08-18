@@ -946,7 +946,7 @@
 			if (preg_match('/^(\/[[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message'], $matches)) {
 				// Retrieving the command
 				$command = explode('@', $matches[1])[0];
-				$args = $matches[2];
+				$args = $matches[2] ?? NULL;
 
 				switch ($command) {
 					case '/faq':
@@ -990,6 +990,33 @@
 						} catch (danog\MadelineProto\RPCErrorException $e) {
 							;
 						}
+						break;
+					case '/report':
+						/**
+						* Checking if the user is an admin
+						*
+						* in_array() check if the array contains an item that match the element
+						*/
+						if (in_array($sender['id'], $this::ADMINS) == FALSE) {
+							return;
+						}
+
+						/**
+						* Retrieving the commands list and converting it into an array which element are a botCommand element
+						*
+						* array_map() converts the array by applying the closures to its elements
+						*/
+						$commands = array_map(function ($n) {
+							return [
+								'_' => 'botCommand',
+								'command' => $n['command'],
+								'description' => $n['description']
+							];
+						}, $this::DB['commands']);
+
+						yield $this -> bots -> setBotCommands([
+							'commands' => $commands
+						]);
 						break;
 					case '/start':
 						try {
