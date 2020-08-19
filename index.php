@@ -638,120 +638,6 @@
 		}
 
 		/**
-		* Handle updates about a pinned message into a supergroup/channel
-		*
-		* @param array $update Update
-		*
-		* @return Generator
-		*/
-		public function onUpdateChannelPinnedMessage(array $update) : Generator {
-			try {
-				yield $this -> channels -> deleteMessages([
-					'revoke' => TRUE,
-					'id' => [
-						$update['id']
-					]
-				]);
-			} catch (danog\MadelineProto\RPCErrorException $e) {
-				;
-			}
-		}
-
-		/**
-		* Handle updates about new group member
-		*
-		* @param array $update Update
-		*
-		* @return Generator
-		*/
-		public function onUpdateChatParticipantAdd(array $update) : Generator {
-			// Downloading the user's informations from the Combot Anti-Spam API
-			$result = execute_request('https://api.cas.chat/check?user_id=' . $update['user_id'], TRUE);
-			$result = json_decode($result, TRUE);
-
-			// Retrieving the data of the new member
-			$new_member = yield $this -> getInfo($update['user_id']);
-			$new_member = $new_member['User'];
-
-			// Checking if the user isn't a spammer, isn't a deleted account and is a normal user
-			if ($result['ok'] == FALSE & $new_member['_'] === 'user' & $new_member['scam'] == FALSE & $new_member['deleted'] == FALSE) {
-				return;
-			}
-
-			try {
-				yield $this -> channels -> editBanned([
-					'channel' => $update['chat_id'],
-					'user_id' => $update['user_id'],
-					'banned_rights' => [
-						'_' => 'chatBannedRights',
-						'view_messages' => TRUE,
-						'send_messages' => TRUE,
-						'send_media' => TRUE,
-						'send_stickers' => TRUE,
-						'send_gifs' => TRUE,
-						'send_games' => TRUE,
-						'send_inline' => TRUE,
-						'embed_links' => TRUE,
-						'send_polls' => TRUE,
-						'change_info' => TRUE,
-						'invite_users' => TRUE,
-						'pin_messages' => TRUE,
-						'until_date' => 0
-					]
-				]);
-
-				yield $this -> channels -> deleteMessages([
-					'revoke' => TRUE,
-					'id' => [
-						$update['chat_id']
-					]
-				]);
-			} catch (danog\MadelineProto\RPCErrorException $e) {
-				;
-			}
-		}
-
-		/**
-		* Handle updates about a member that has left the group
-		*
-		* @param array $update Update
-		*
-		* @return Generator
-		*/
-		public function onUpdateChatParticipantDelete(array $update) : Generator {
-			try {
-				yield $this -> channels -> deleteMessages([
-					'revoke' => TRUE,
-					'id' => [
-						$update['chat_id']
-					]
-				]);
-			} catch (danog\MadelineProto\RPCErrorException $e) {
-				;
-			}
-		}
-
-		/**
-		* Handle updates about a pinned message into a group
-		*
-		* @param array $update Update
-		*
-		* @return Generator
-		*/
-		public function onUpdateChatPinnedMessage(array $update) : Generator {
-			try {
-				yield $this -> channels -> deleteMessages([
-					'revoke' => TRUE,
-					'id' => [
-						$update['id']
-					]
-				]);
-			} catch (danog\MadelineProto\RPCErrorException $e) {
-				;
-			}
-		}
-
-		/**
 		* Handle updates about edited message from supergroups and channels
 		*
 		* @param array $update Update
@@ -759,7 +645,7 @@
 		* @return Generator
 		*/
 		public function onUpdateEditChannelMessage(array $update) : Generator {
-			return $this -> onUpdateNewChannelMessage($update);
+			return $this -> onUpdateNewMessage($update);
 		}
 
 		/**
@@ -781,10 +667,21 @@
 		* @return Generator
 		*/
 		public function onUpdateNewChannelMessage(array $update) : Generator {
+			return $this -> onUpdateNewMessage($update);
+		}
+
+		/**
+		* Handle updates from users and groups
+		*
+		* @param array $update Update
+		*
+		* @return Generator
+		*/
+		public function onUpdateNewMessage(array $update) : Generator {
 			$message = $update['message'];
 
-			// Checking if the message is an empty message or is an incoming message
-			if ($message['_'] === 'messageEmpty' | $message['out'] ?? FALSE) {
+			// Checking if the message is a normal message or is an incoming message
+			if ($message['_'] !== 'message' | $message['out'] ?? FALSE) {
 				return;
 			}
 
@@ -868,7 +765,6 @@
 							;
 						}
 					}
-
 				}
 
 				try {
@@ -905,42 +801,23 @@
 
 			// Checking if is an @admin tag
 			if (preg_match('/^\@admin([[:blank:]\n]{1}((\n|.)*))?$/miu', $message['message'], $matches)) {
-				/**
-				* Retrieving the admins list
-				*
-				* array_map() converts the array by applying the closures to its elements
-				* array_filter() filters the array by applying the closures to its elements
-				*/
-				$admins = $this -> channels -> getParticipants([
-					'channel' => $message['to_id'],
-					'filter' => [
-						'_' => 'channelParticipantsAdmins'
-					],
-					'offset' => 0,
-					'limit' => 100
-				]);
+				// Retrieving the admins list
+				$chat = yield $this -> getPwrChat($message['to_id']);
 
-				// Checking if the list of partecipants is correct
-				if ($admins['_'] !== 'channels.channelParticipants') {
+				if ($chat['type'] != 'supergroup' & $chat['type'] == 'chat') {
 					return;
 				}
 
-				$admins = array_map(function ($n) {
-					return $n['user_id'];
-				}, $admins);
-
-				try {
-					$admins = yield $this -> users -> getUsers($admins);
-				} catch (danog\MadelineProto\RPCErrorException $e) {
-					;
-				}
-
-				$admins = array_filter($admins, function ($n) {
-					return $n['_'] === 'user';
+				$admins = array_filter($chat['participants'], function ($n) {
+					return $n['role'] == 'admin' | $n['role'] == 'creator';
 				});
 
+				$admins = array_map(function ($n) {
+					return $n['user'];
+				}, $admins);
+
 				// Creating the message to send to the admins
-				$text = "\n<a href=\"mention:" . $sender['id'] . '\" >' . $sender['first_name'] . '</a> needs your help' . (($matches[2] ?? FALSE) ? ' for ' . $matches[2] : '') . ' into <a href=\"' . $chat['exported_invite'] . '\" >' . $title . '</a>.';
+				$text = "\n<a href=\"mention:" . $sender['id'] . '\" >' . $sender['first_name'] . '</a> needs your help' . (($matches[2] ?? FALSE) ? ' for ' . $matches[2] : '') . ' into <a href=\"' . $chat['invite'] . '\" >' . $chat['title'] . '</a>.';
 
 				foreach ($admins as $user) {
 					try {
@@ -977,6 +854,7 @@
 				} catch (danog\MadelineProto\RPCErrorException $e) {
 					;
 				}
+			// Checking if is a command
 			} else if (preg_match('/^\/([[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message'], $matches)) {
 				// Retrieving the command
 				$command = explode('@', $matches[1])[0];
@@ -986,42 +864,25 @@
 					case 'announce':
 						// Checking if the chat is correct and if the list of partecipants is correct
 						if (isset($args)) {
-							/**
-							* Retrieving the admins list
-							*
-							* array_map() converts the array by applying the closures to its elements
-							* array_filter() filters the array by applying the closures to its elements
-							* array_map() converts the array by applying the closures to its elements
-							*/
-							$admins = $this -> channels -> getParticipants([
-								'channel' => $message['to_id'],
-								'filter' => [
-									'_' => 'channelParticipantsAdmins'
-								],
-								'offset' => 0,
-								'limit' => 100
-							]);
+							// Retrieving the data of the chat
+							$chat = yield $this -> getPwrChat($message['to_id']);
 
-							// Checking if the list of partecipants is correct
-							if ($admins['_'] !== 'channels.channelParticipants') {
+							// Checking if the chat is a group or a supergroup
+							if ($chat['type'] != 'supergroup' & $chat['type'] == 'chat') {
 								return;
 							}
 
-							$admins = array_map(function ($n) {
-								return $n['user_id'];
-							}, $admins);
-
-							try {
-								$admins = yield $this -> users -> getUsers($admins);
-							} catch (danog\MadelineProto\RPCErrorException $e) {
-								;
-							}
-
-							$admins = array_filter($admins, function ($n) {
-								return $n['_'] === 'user';
+							/**
+							* Retrieving the admins list
+							*
+							* array_filter() filters the array by the role of each member
+							* array_map() convert each admins to its id
+							*/
+							$admins = array_filter($chat['participants'], function ($n) {
+								return $n['role'] == 'admin' | $n['role'] == 'creator';
 							});
 							$admins = array_map(function ($n) {
-								return $n['id'];
+								return $n['user']['id'];
 							}, $admins);
 
 							/**
@@ -1054,6 +915,76 @@
 							;
 						}
 						break;
+					case 'exec':
+						// Checking if the command has arguments
+						if (isset($args) == FALSE) {
+							try {
+								yield $this -> messages -> sendMessage([
+									'no_webpage' => TRUE,
+									'peer' => $message['to_id'],
+									'message' => 'The syntax of the command is: <code>/exec &lt;command&gt;</code>.',
+									'reply_to_msg_id' => $message['id'],
+									'parse_mode' => 'HTML'
+								]);
+							} catch (danog\MadelineProto\RPCErrorException $e) {
+								;
+							}
+
+							return;
+						}
+
+						// Executing the command
+						$output = shell_exec($args);
+
+						try {
+							yield $this -> messages -> sendMessage([
+								'no_webpage' => TRUE,
+								'peer' => $message['to_id'],
+								'message' => '<b>Command:</b>\n\t<code>' . $args . '</code>\n\n<b>Result:</b>\n\t<code>' . $output . '</code>',
+								'reply_to_msg_id' => $message['id'],
+								'parse_mode' => 'HTML'
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+						break;
+					case 'film':
+						try {
+							yield $this -> messages -> sendMessage([
+								'no_webpage' => TRUE,
+								'peer' => $message['to_id'],
+								'message' => $this::DB[$language]['film'],
+								'reply_to_msg_id' => $message['id'],
+								'parse_mode' => 'HTML'
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+						break;
+					case 'help':
+						// Retrieving the data of the chat
+						$chat = yield $this -> getPwrChat($message['to_id']);
+
+						// Checking if the chat is a private chat
+						if ($chat['type'] != 'user') {
+							return;
+						}
+
+						try {
+							yield $this -> messages -> sendMessage([
+								'no_webpage' => TRUE,
+								'peer' => $message['to_id'],
+								'message' => $this::DB[$language]['help'],
+								'reply_to_msg_id' => $message['id'],
+								'parse_mode' => 'HTML',
+								'reply_markup' => [
+									'inline_keyboard' => $this -> get_keyboard('', $language)
+								]
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+						break;
 					case 'link':
 						$chat = yield $this -> getPwrChat($message['to_id']);
 
@@ -1069,161 +1000,15 @@
 							;
 						}
 						break;
-					default:
-						break;
-				}
-			}
-		}
-
-		/**
-		* Handle updates from users
-		*
-		* @param array $update Update
-		*
-		* @return Generator
-		*/
-		public function onUpdateNewMessage(array $update) : Generator {
-			$message = $update['message'];
-
-			// Checking if the message is a normal message or is an incoming message
-			if ($message['_'] !== 'message' | $message['out'] ?? FALSE) {
-				return;
-			}
-
-			$message['message'] = trim($message['message']);
-
-			// Retrieving the data of the sender
-			$sender = yield $this -> getInfo($message['from_id']);
-			$sender = $sender['User'];
-
-			// Checking if the user is a normal user
-			if ($sender['_'] !== 'user') {
-				return;
-			}
-
-			// Retrieving the language of the user
-			$language = isset($sender['lang_code']) ? $sender['lang_code'] : 'en';
-			// Checking if the language is supported
-			if (isset($this::DB[$language]) == FALSE) {
-				$language = 'en';
-			}
-
-			// Checking if the message is a command
-			if (preg_match('/^\/([[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message'], $matches)) {
-				// Retrieving the command
-				$command = explode('@', $matches[1])[0];
-				$args = $matches[2] ?? NULL;
-
-				switch ($command) {
-					case 'announce':
-						/**
-						* Checking if the user is an admin
-						*
-						* in_array() check if the array contains an item that match the element
-						*/
-						if (in_array($sender['id'], $this::ADMINS) == FALSE) {
-							try {
-								yield $this -> messages -> sendMessage([
-									'no_webpage' => TRUE,
-									'peer' => $message['from_id'],
-									'message' => 'You can\'t use this command.',
-									'parse_mode' => 'HTML'
-								]);
-							} catch (danog\MadelineProto\RPCErrorException $e) {
-								;
-							}
-
-							return;
-						// Checking if the command has arguments
-						} else if (isset($args) == FALSE) {
-							try {
-								yield $this -> messages -> sendMessage([
-									'no_webpage' => TRUE,
-									'peer' => $message['from_id'],
-									'message' => 'The syntax of the command is: <code>/announce &lt;text&gt;</code>.',
-									'parse_mode' => 'HTML'
-								]);
-							} catch (danog\MadelineProto\RPCErrorException $e) {
-								;
-							}
-
-							return;
-						}
-
-						// Retrieving the list of all chats
-						$chats = yield $this -> getDialogs();
-
-						foreach ($chats as $id) {
-							try {
-								yield $this -> messages -> sendMessage([
-									'no_webpage' => TRUE,
-									'peer' => $id,
-									'message' => $args,
-									'parse_mode' => 'HTML'
-								]);
-							} catch (danog\MadelineProto\RPCErrorException $e) {
-								;
-							}
-						}
-						break;
-					case 'exec':
-						// Checking if the command has arguments
-						if (isset($args) == FALSE) {
-							try {
-								yield $this -> messages -> sendMessage([
-									'no_webpage' => TRUE,
-									'peer' => $message['from_id'],
-									'message' => 'The syntax of the command is: <code>/exec &lt;command&gt;</code>.',
-									'parse_mode' => 'HTML'
-								]);
-							} catch (danog\MadelineProto\RPCErrorException $e) {
-								;
-							}
-
-							return;
-						}
-
-						$output = shell_exec($args);
-
-						try {
-							yield $this -> messages -> sendMessage([
-								'no_webpage' => TRUE,
-								'peer' => $message['from_id'],
-								'message' => '<b>Command:</b>\n\t<code>' . $args . '</code>\n\n<b>Result:</b>\n\t<code>' . $output . '</code>',
-								'parse_mode' => 'HTML'
-							]);
-						} catch (danog\MadelineProto\RPCErrorException $e) {
-							;
-						}
-						break;
-					case 'film':
-						try {
-							yield $this -> messages -> sendMessage([
-								'no_webpage' => TRUE,
-								'peer' => $message['from_id'],
-								'message' => $this::DB[$language]['film'],
-								'parse_mode' => 'HTML'
-							]);
-						} catch (danog\MadelineProto\RPCErrorException $e) {
-							;
-						}
-						break;
-					case 'help':
-						try {
-							yield $this -> messages -> sendMessage([
-								'no_webpage' => TRUE,
-								'peer' => $message['from_id'],
-								'message' => $this::DB[$language]['help'],
-								'parse_mode' => 'HTML',
-								'reply_markup' => [
-									'inline_keyboard' => $this -> get_keyboard('', $language)
-								]
-							]);
-						} catch (danog\MadelineProto\RPCErrorException $e) {
-							;
-						}
-						break;
 					case 'report':
+						// Retrieving the data of the chat
+						$chat = yield $this -> getPwrChat($message['to_id']);
+
+						// Checking if the chat is a private chat
+						if ($chat['type'] != 'user') {
+							return;
+						}
+
 						/**
 						* Checking if the user is an admin
 						*
@@ -1233,8 +1018,9 @@
 							try {
 								yield $this -> messages -> sendMessage([
 									'no_webpage' => TRUE,
-									'peer' => $message['from_id'],
+									'peer' => $message['to_id'],
 									'message' => 'You can\'t use this command.',
+									'reply_to_msg_id' => $message['id'],
 									'parse_mode' => 'HTML'
 								]);
 							} catch (danog\MadelineProto\RPCErrorException $e) {
@@ -1262,11 +1048,20 @@
 						]);
 						break;
 					case 'start':
+						// Retrieving the data of the chat
+						$chat = yield $this -> getPwrChat($message['to_id']);
+
+						// Checking if the chat is a private chat
+						if ($chat['type'] != 'user') {
+							return;
+						}
+
 						try {
 							yield $this -> messages -> sendMessage([
 								'no_webpage' => TRUE,
-								'peer' => $message['from_id'],
+								'peer' => $message['to_id'],
 								'message' => str_replace('${sender_first_name}', $sender['first_name'], $this::DB[$language]['welcome']),
+								'reply_to_msg_id' => $message['id'],
 								'parse_mode' => 'HTML',
 								'reply_markup' => [
 									'inline_keyboard' => $this -> get_keyboard('', $language)
@@ -1277,16 +1072,6 @@
 						}
 						break;
 					default:
-						try {
-							yield $this -> messages -> sendMessage([
-								'no_webpage' => TRUE,
-								'peer' => $message['from_id'],
-								'message' => $this::DB[$language]['unknown'],
-								'parse_mode' => 'HTML'
-							]);
-						} catch (danog\MadelineProto\RPCErrorException $e) {
-							;
-						}
 						break;
 				}
 			}
