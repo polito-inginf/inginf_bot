@@ -638,6 +638,26 @@
 		}
 
 		/**
+		* Handle updates about a pinned message into a supergroup/channel
+		*
+		* @param array $update Update
+		*
+		* @return Generator
+		*/
+		public function onUpdateChannelPinnedMessage(array $update) : Generator {
+			try {
+				yield $this -> channels -> deleteMessages([
+					'revoke' => TRUE,
+					'id' => [
+						$update['id']
+					]
+				]);
+			} catch (danog\MadelineProto\RPCErrorException $e) {
+				;
+			}
+		}
+
+		/**
 		* Handle updates about new group member
 		*
 		* @param array $update Update
@@ -679,14 +699,51 @@
 						'until_date' => 0
 					]
 				]);
+
+				yield $this -> channels -> deleteMessages([
+					'revoke' => TRUE,
+					'id' => [
+						$update['chat_id']
+					]
+				]);
 			} catch (danog\MadelineProto\RPCErrorException $e) {
 				;
 			}
+		}
+
+		/**
+		* Handle updates about a member that has left the group
+		*
+		* @param array $update Update
+		*
+		* @return Generator
+		*/
+		public function onUpdateChatParticipantDelete(array $update) : Generator {
 			try {
 				yield $this -> channels -> deleteMessages([
 					'revoke' => TRUE,
 					'id' => [
 						$update['chat_id']
+					]
+				]);
+			} catch (danog\MadelineProto\RPCErrorException $e) {
+				;
+			}
+		}
+
+		/**
+		* Handle updates about a pinned message into a group
+		*
+		* @param array $update Update
+		*
+		* @return Generator
+		*/
+		public function onUpdateChatPinnedMessage(array $update) : Generator {
+			try {
+				yield $this -> channels -> deleteMessages([
+					'revoke' => TRUE,
+					'id' => [
+						$update['id']
 					]
 				]);
 			} catch (danog\MadelineProto\RPCErrorException $e) {
@@ -775,6 +832,43 @@
 							;
 						}
 					}
+				} else if ($message['action']['_'] === 'messageActionChatJoinedByLink') {
+					// Downloading the user's informations from the Combot Anti-Spam API
+					$result = execute_request('https://api.cas.chat/check?user_id=' . $message['from_id'], TRUE);
+					$result = json_decode($result, TRUE);
+
+					// Retrieving the data of the new member
+					$new_member = yield $this -> getInfo($message['from_id']);
+					$new_member = $new_member['User'];
+
+					// Checking if the user isn a spammer, isn a deleted account or isn't a normal user
+					if ($result['ok'] | $new_member['_'] !== 'user' | $new_member['scam'] | $new_member['deleted']) {
+						try {
+							yield $this -> channels -> editBanned([
+								'channel' => $update['chat_id'],
+								'user_id' => $message['from_id'],
+								'banned_rights' => [
+									'_' => 'chatBannedRights',
+									'view_messages' => TRUE,
+									'send_messages' => TRUE,
+									'send_media' => TRUE,
+									'send_stickers' => TRUE,
+									'send_gifs' => TRUE,
+									'send_games' => TRUE,
+									'send_inline' => TRUE,
+									'embed_links' => TRUE,
+									'send_polls' => TRUE,
+									'change_info' => TRUE,
+									'invite_users' => TRUE,
+									'pin_messages' => TRUE,
+									'until_date' => 0
+								]
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+					}
+
 				}
 
 				try {
@@ -812,56 +906,25 @@
 			// Checking if is an @admin tag
 			if (preg_match('/^\@admin([[:blank:]\n]{1}((\n|.)*))?$/miu', $message['message'], $matches)) {
 				/**
-				* // Retrieving the admins list
-				* $admins = $this -> channels -> getParticipants([
-				* 	'channel' => $message['to_id'],
-				* 	'filter' => [
-				* 		'_' => 'channelParticipantsAdmins'
-				* 	],
-				* 	'offset' => 0,
-				* 	'limit' => 100
-				* ]);
+				* Retrieving the admins list
 				*
-				* // Checking if the chat is correct and if the list of partecipants is correct
-				* if ($admins['_'] !== 'channels.channelParticipants') {
-				* 	return;
-				* }
-				*
-				* $admins = array_map(function ($n) {
-				* 	return $n['user_id'];
-				* }, $admins);
-				*
-				* try {
-				* 	$admins = yield $this -> users -> getUsers($admins);
-				* } catch (danog\MadelineProto\RPCErrorException $e) {
-				* 	;
-				* }
-				*
-				* $admins = array_filter($admins, function ($n) {
-				* 	return $n['_'] === 'user';
-				* });
+				* array_map() converts the array by applying the closures to its elements
+				* array_filter() filters the array by applying the closures to its elements
 				*/
+				$admins = $this -> channels -> getParticipants([
+					'channel' => $message['to_id'],
+					'filter' => [
+						'_' => 'channelParticipantsAdmins'
+					],
+					'offset' => 0,
+					'limit' => 100
+				]);
 
-				// Retrieving the data of the chat
-				$chat = yield $this -> getFullInfo($message['to_id']);
-				$title = isset($chat['Chat']) ? $chat['Chat']['title'] : ''
-				$chat = $chat['full'];
-
-				// Checking if the chat is correct and if the list of partecipants is correct
-				if ($chat['_'] !== 'chatFull' | $chat['participants']['_'] !== 'chatParticipants') {
+				// Checking if the list of partecipants is correct
+				if ($admins['_'] !== 'channels.channelParticipants') {
 					return;
 				}
 
-				/**
-				* Retrieving the admins list
-				*
-				* array_filter() filter the members list by applying the closures to its elements (only admins)
-				* array_map() converts the admins list by applying the closures to its elements (retrieve the id of the admins)
-				* array_filter() filter the members list by applying the closures to its elements (only normal users)
-				*/
-				$admins = array_filter($chat['participants']['participants'], function ($n) {
-					return $n['_'] === 'chatParticipantAdmin';
-				});
 				$admins = array_map(function ($n) {
 					return $n['user_id'];
 				}, $admins);
@@ -921,52 +984,29 @@
 
 				switch ($command) {
 					case 'announce':
-						$chat = yield $this -> getFullInfo($message['to_id']);
-
 						// Checking if the chat is correct and if the list of partecipants is correct
-						if ($chat['full']['_'] === 'chatFull' & $chat['full']['participants']['_'] === 'chatParticipants' & isset($args)) {
-							/**
-							* // Retrieving the admins list
-							* $admins = $this -> channels -> getParticipants([
-							* 	'channel' => $message['to_id'],
-							* 	'filter' => [
-							* 		'_' => 'channelParticipantsAdmins'
-							* 	],
-							* 	'offset' => 0,
-							* 	'limit' => 100
-							* ]);
-							*
-							* // Checking if the chat is correct and if the list of partecipants is correct
-							* if ($admins['_'] !== 'channels.channelParticipants') {
-							* 	return;
-							* }
-							*
-							* $admins = array_map(function ($n) {
-							* 	return $n['user_id'];
-							* }, $admins);
-							*
-							* try {
-							* 	$admins = yield $this -> users -> getUsers($admins);
-							* } catch (danog\MadelineProto\RPCErrorException $e) {
-							* 	;
-							* }
-							*
-							* $admins = array_filter($admins, function ($n) {
-							* 	return $n['_'] === 'user';
-							* });
-							*/
-
+						if (isset($args)) {
 							/**
 							* Retrieving the admins list
 							*
-							* array_filter() filter the members list by applying the closures to its elements (only admins)
-							* array_map() converts the admins list by applying the closures to its elements (retrieve the id of the admins)
-							* array_filter() filter the members list by applying the closures to its elements (only normal users)
-							* array_map() converts the admins list by applying the closures to its elements (retrieve the id of the admins)
+							* array_map() converts the array by applying the closures to its elements
+							* array_filter() filters the array by applying the closures to its elements
+							* array_map() converts the array by applying the closures to its elements
 							*/
-							$admins = array_filter($chat['full']['participants']['participants'], function ($n) {
-								return $n['_'] === 'chatParticipantAdmin';
-							});
+							$admins = $this -> channels -> getParticipants([
+								'channel' => $message['to_id'],
+								'filter' => [
+									'_' => 'channelParticipantsAdmins'
+								],
+								'offset' => 0,
+								'limit' => 100
+							]);
+
+							// Checking if the list of partecipants is correct
+							if ($admins['_'] !== 'channels.channelParticipants') {
+								return;
+							}
+
 							$admins = array_map(function ($n) {
 								return $n['user_id'];
 							}, $admins);
@@ -1015,18 +1055,13 @@
 						}
 						break;
 					case 'link':
-						$chat = yield $MadelineProto -> getFullInfo($message['to_id']);
-						$chat = $chat['full'];
-
-						if ($chat['_'] !== 'chatFull') {
-							return;
-						}
+						$chat = yield $this -> getPwrChat($message['to_id']);
 
 						try {
 							yield $this -> messages -> sendMessage([
 								'no_webpage' => TRUE,
 								'peer' => $message['to_id'],
-								'message' => '<a href=\"' . $chat['exported_invite'] . '\" >This</a> is the invite link to this chat.',
+								'message' => '<a href=\"' . $chat['invite'] . '\" >This</a> is the invite link to this chat.',
 								'reply_to_msg_id' => $message['id'],
 								'parse_mode' => 'HTML'
 							]);
