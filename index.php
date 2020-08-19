@@ -702,15 +702,6 @@
 		* @return Generator
 		*/
 		public function onUpdateEditChannelMessage(array $update) : Generator {
-			$message = $update['message'];
-
-			$message['message'] = trim($message['message']);
-
-			// Checking if the message is a command or an @admin tag
-			if (preg_match('/^\/([[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message']) == 0 | preg_match('/^\@admin([[:blank:]\n]{1}((\n|.)*))?$/miu', $message['message']) == 0) {
-				return;
-			}
-
 			return $this -> onUpdateNewChannelMessage($update);
 		}
 
@@ -722,15 +713,6 @@
 		* @return Generator
 		*/
 		public function onUpdateEditMessage(array $update) : Generator {
-			$message = $update['message'];
-
-			$message['message'] = trim($message['message']);
-
-			// Checking if the message is a command
-			if (preg_match('/^\/([[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message']) == 0) {
-				return;
-			}
-
 			return $this -> onUpdateNewMessage($update);
 		}
 
@@ -829,6 +811,37 @@
 
 			// Checking if is an @admin tag
 			if (preg_match('/^\@admin([[:blank:]\n]{1}((\n|.)*))?$/miu', $message['message'], $matches)) {
+				/**
+				* // Retrieving the admins list
+				* $admins = $this -> channels -> getParticipants([
+				* 	'channel' => $message['to_id'],
+				* 	'filter' => [
+				* 		'_' => 'channelParticipantsAdmins'
+				* 	],
+				* 	'offset' => 0,
+				* 	'limit' => 100
+				* ]);
+				*
+				* // Checking if the chat is correct and if the list of partecipants is correct
+				* if ($admins['_'] !== 'channels.channelParticipants') {
+				* 	return;
+				* }
+				*
+				* $admins = array_map(function ($n) {
+				* 	return $n['user_id'];
+				* }, $admins);
+				*
+				* try {
+				* 	$admins = yield $this -> users -> getUsers($admins);
+				* } catch (danog\MadelineProto\RPCErrorException $e) {
+				* 	;
+				* }
+				*
+				* $admins = array_filter($admins, function ($n) {
+				* 	return $n['_'] === 'user';
+				* });
+				*/
+
 				// Retrieving the data of the chat
 				$chat = yield $this -> getFullInfo($message['to_id']);
 				$title = isset($chat['Chat']) ? $chat['Chat']['title'] : ''
@@ -852,7 +865,13 @@
 				$admins = array_map(function ($n) {
 					return $n['user_id'];
 				}, $admins);
-				$admins = yield $this -> users -> getUsers($admins);
+
+				try {
+					$admins = yield $this -> users -> getUsers($admins);
+				} catch (danog\MadelineProto\RPCErrorException $e) {
+					;
+				}
+
 				$admins = array_filter($admins, function ($n) {
 					return $n['_'] === 'user';
 				});
@@ -901,8 +920,102 @@
 				$args = $matches[2] ?? NULL;
 
 				switch ($command) {
+					case 'announce':
+						$chat = yield $this -> getFullInfo($message['to_id']);
+
+						// Checking if the chat is correct and if the list of partecipants is correct
+						if ($chat['full']['_'] === 'chatFull' & $chat['full']['participants']['_'] === 'chatParticipants' & isset($args)) {
+							/**
+							* // Retrieving the admins list
+							* $admins = $this -> channels -> getParticipants([
+							* 	'channel' => $message['to_id'],
+							* 	'filter' => [
+							* 		'_' => 'channelParticipantsAdmins'
+							* 	],
+							* 	'offset' => 0,
+							* 	'limit' => 100
+							* ]);
+							*
+							* // Checking if the chat is correct and if the list of partecipants is correct
+							* if ($admins['_'] !== 'channels.channelParticipants') {
+							* 	return;
+							* }
+							*
+							* $admins = array_map(function ($n) {
+							* 	return $n['user_id'];
+							* }, $admins);
+							*
+							* try {
+							* 	$admins = yield $this -> users -> getUsers($admins);
+							* } catch (danog\MadelineProto\RPCErrorException $e) {
+							* 	;
+							* }
+							*
+							* $admins = array_filter($admins, function ($n) {
+							* 	return $n['_'] === 'user';
+							* });
+							*/
+
+							/**
+							* Retrieving the admins list
+							*
+							* array_filter() filter the members list by applying the closures to its elements (only admins)
+							* array_map() converts the admins list by applying the closures to its elements (retrieve the id of the admins)
+							* array_filter() filter the members list by applying the closures to its elements (only normal users)
+							* array_map() converts the admins list by applying the closures to its elements (retrieve the id of the admins)
+							*/
+							$admins = array_filter($chat['full']['participants']['participants'], function ($n) {
+								return $n['_'] === 'chatParticipantAdmin';
+							});
+							$admins = array_map(function ($n) {
+								return $n['user_id'];
+							}, $admins);
+
+							try {
+								$admins = yield $this -> users -> getUsers($admins);
+							} catch (danog\MadelineProto\RPCErrorException $e) {
+								;
+							}
+
+							$admins = array_filter($admins, function ($n) {
+								return $n['_'] === 'user';
+							});
+							$admins = array_map(function ($n) {
+								return $n['id'];
+							}, $admins);
+
+							/**
+							* Checking if the user is an admin and if the command has arguments
+							*
+							* in_array() check if the array contains an item that match the element
+							*/
+							if (in_array($sender['id'], $admins)) {
+								try {
+									yield $this -> messages -> sendMessage([
+										'no_webpage' => TRUE,
+										'peer' => $message['to_id'],
+										'message' => $args,
+										'parse_mode' => 'HTML'
+									]);
+								} catch (danog\MadelineProto\RPCErrorException $e) {
+									;
+								}
+							}
+						}
+
+						try {
+							yield $this -> channels -> deleteMessages([
+								'revoke' => TRUE,
+								'id' => [
+									$message['id']
+								]
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+						break;
 					case 'link':
-						$chat = yield $MadelineProto->getFullInfo($message['to_id']);
+						$chat = yield $MadelineProto -> getFullInfo($message['to_id']);
 						$chat = $chat['full'];
 
 						if ($chat['_'] !== 'chatFull') {
