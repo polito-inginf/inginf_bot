@@ -1,9 +1,10 @@
 {
 	"it": {
-		"welcome": "Ciao <b>${sender_first_name}</b>, benvenut* !\n\n(Resto del messaggio da inviare appena ricevuto il comando /start)",
+		"film": "Trovate la guida su come modificare la lista dei film a questo <a href=\"https://telegra.ph/Liste-varie-come-modificare-03-21\" >link</a>, mentre trovate la lista dei film a quest&#x27;altro <a href=\"https://docs.google.com/spreadsheets/d/1WgYLvHz8x77Ov4XRQzzVyd-FP8z2CcVidzk7kaf3MyY/edit?usp=sharing\" >link</a>.",
 		"help": "<b>DOMANDE FREQUENTI</b>\n(Lista di FAQ)\n\n<a href=\"(link al manuale, senza parentesi)\" >GUIDA TELEGRAM</a>\n\n<b>COMANDI INLINE</b>\n(Descrizione modalità inline)",
-		"unknown": "Comando non riconosciuto !",
 		"no_whatsapp": "<b>PERCHÉ QUEST&#x27;ODIO PER WHATSAPP ?</b>\n\nNon è assolutamente odio, semplicemente non riteniamo WhatsApp la giusta piattaforma per i nostri scopi (gruppi tra studenti universitari). Crediamo che i pro di Telegram siano oggettivi:\n\n&gt; Si evita la frammentazione.\n&gt; Privacy: gli altri utenti non vedono il vostro numero di telefono, in quanto l&#x27;utente è identificato da un id assegnatogli alla registrazione, che si traduce, lato human-friendly, in uno username che viene scelto dall&#x27;utente.\n&gt; Fino a 200.000 utenti per gruppo.\n&gt; I file restano sui server di Telegram e, pertanto, possono essere eliminati dai propri dispositivi rimanendo sempre disponibili.\n&gt; Telegram Desktop è, indubbiamente, utile (soprattutto per scaricamento/caricamento di file da PC).\n&gt; È possibile modificare i messaggi.\n&gt; I gruppi possono essere gestiti molto meglio dagli amministratori.\n\nPotremmo continuare all&#x27;infinito, ma ci limitiamo a dire che Telegram consente di fare le stesse cose che si possono fare con WhatsApp e molto altro, mantenendo alti standard in merito a semplicità, qualità e privacy.\nVi chiediamo, quindi, di non usare i gruppi presenti in questo bot come contenitori per link a gruppi WhatsApp, ribadento, però, che ognuno è libero di usare la piattaforma che preferisce.\nLa diretta conseguenza del non rispettare questa richiesta sarebbe uno spopolamento dei gruppi Telegram, evento che comporterebbe, ovviamente, la frammentazione del materiale (i gruppi su WhatsApp non sono minimamente organizzati) e tutta una serie di problemi di privacy legati alla condivisione del proprio numero di telefono.\nVi informiamo che eventuali (inutili) discussioni su questa decisione porteranno all&#x27;allontanamento degli interessati dai gruppi e dal bot.\nVi ringraziamo per la collaborazione.",
+		"unknown": "Comando non riconosciuto !",
+		"welcome": "Ciao <b>${sender_first_name}</b>, benvenut* !\n\n(Resto del messaggio da inviare appena ricevuto il comando /start)",
 		"keyboard": {
 			"type": "dir",
 			"name": "root",
@@ -303,10 +304,11 @@
 		}
 	},
 	"en": {
-		"welcome": "Hello <b>${sender_first_name}</b>, welcome !\n\n(Rest of the message to be sent upon receipt of the /start command)",
+		"film": "Find the guide on how to edit the movie list at this <a href=\"https://telegra.ph/Liste-varie-come-modifica-03-21\" >link</a>, while you find the list of movies to this other <a href=\"https://docs.google.com/spreadsheets/d/1WgYLvHz8x77Ov4XRQzzVyd-FP8z2CcVidzk7kaf3MyY/edit?usp=sharing\" >link</a>.",
 		"help": "<b>FREQUENTLY ASKED QUESTIONS</b>\n(FAQ List)\n\n<a href=\"(link to the manual, without brackets)\" >TELEGRAM GUIDE</a>\n\n<b>INLINE COMMANDS</b>\n(Inline mode description)",
-		"unknown": "Unknown command !",
 		"no_whatsapp": "<b>WHY THIS HATE FOR WHATSAPP ?</b>\n\nIt&#x27;s absolutely not hate, we just don&#x27;t think WhatsApp is the right platform for our purposes (college student groups). We believe that Telegram&#x27;s pros are objective:\n\n&gt; It avoids fragmentation.\n&gt; Privacy: other users do not see your phone number, as the user is identified by an id assigned to him during registration, which translates, on the human-friendly side, into a username that is chosen by the user.\n&gt; Up to 200.000 users per group.\n&gt; The files remain on the Telegram servers and, therefore, can be deleted from their devices while remaining available.\n&gt; Telegram Desktop is, undoubtedly, useful (especially for downloading/uploading files from PC).\n&gt; You can edit messages.\n&gt; Groups can be managed much better by administrators.\n\nWe could continue indefinitely, but we limit ourselves to saying that Telegram allows you to do the same things you can do with WhatsApp and much more, while maintaining high standards regarding simplicity, quality and privacy.\nWe therefore ask you not to use groups present in this bot as containers for the ink to WhatsApp groups, I reiterate, however, that everyone is free to use the platform they prefer.\nThe direct consequence of not respecting this request would be a depopulation of the Telegram groups, an event that would obviously involve the fragmentation of the material (the groups on WhatsApp are not organized in the least) and a whole series of privacy problems related to sharing your phone number.\nWe inform you that any (useless) discussions on this decision will lead to the removal of the interested parties from the groups and from the bot.\nThank you for the collaboration.",
+		"unknown": "Unknown command !",
+		"welcome": "Hello <b>${sender_first_name}</b>, welcome !\n\n(Rest of the message to be sent upon receipt of the /start command)",
 		"keyboard": {
 			"type": "dir",
 			"name": "root",
@@ -851,10 +853,6 @@
 			"name": "banall",
 			"description": "Ban a user from all chats",
 			"domain": "admin"
-		},
-		{
-			"name": "evaluate",
-			"description": "Evaluate a command"
 		},
 		{
 			"name": "exec",

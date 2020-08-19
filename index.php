@@ -707,7 +707,7 @@
 			$message['message'] = trim($message['message']);
 
 			// Checking if the message is a command or an @admin tag
-			if (preg_match('/^(\/[[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message']) == 0 | preg_match('/^\@admin([[:blank:]\n]{1}((\n|.)*))?$/miu', $message['message']) == 0) {
+			if (preg_match('/^\/([[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message']) == 0 | preg_match('/^\@admin([[:blank:]\n]{1}((\n|.)*))?$/miu', $message['message']) == 0) {
 				return;
 			}
 
@@ -727,7 +727,7 @@
 			$message['message'] = trim($message['message']);
 
 			// Checking if the message is a command
-			if (preg_match('/^(\/[[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message']) == 0) {
+			if (preg_match('/^\/([[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message']) == 0) {
 				return;
 			}
 
@@ -931,10 +931,9 @@
 			}
 
 			// Checking if the message is a command
-			if (preg_match('/^(\/[[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message'], $matches)) {
+			if (preg_match('/^\/([[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message'], $matches)) {
 				// Retrieving the command
 				$command = explode('@', $matches[1])[0];
-				$command = explode('@', $command)[1];
 				$args = $matches[2] ?? NULL;
 
 				switch ($command) {
@@ -989,11 +988,47 @@
 							}
 						}
 						break;
-					case 'eval':
-						break;
 					case 'exec':
+						// Checking if the command has arguments
+						if (isset($args) == FALSE) {
+							try {
+								yield $this -> messages -> sendMessage([
+									'no_webpage' => TRUE,
+									'peer' => $message['from_id'],
+									'message' => 'The syntax of the command is: <code>/exec &lt;command&gt;</code>.',
+									'parse_mode' => 'HTML'
+								]);
+							} catch (danog\MadelineProto\RPCErrorException $e) {
+								;
+							}
+
+							return;
+						}
+
+						$output = shell_exec($args);
+
+						try {
+							yield $this -> messages -> sendMessage([
+								'no_webpage' => TRUE,
+								'peer' => $message['from_id'],
+								'message' => '<b>Command:</b>\n\t<code>' . $args . '</code>\n\n<b>Result:</b>\n\t<code>' . $output . '</code>',
+								'parse_mode' => 'HTML'
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
 						break;
 					case 'film':
+						try {
+							yield $this -> messages -> sendMessage([
+								'no_webpage' => TRUE,
+								'peer' => $message['from_id'],
+								'message' => $this::DB[$language]['film'],
+								'parse_mode' => 'HTML'
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
 						break;
 					case 'help':
 						try {
