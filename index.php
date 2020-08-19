@@ -880,8 +880,9 @@
 				try {
 					yield $this -> messages -> sendMessage([
 						'no_webpage' => TRUE,
-						'peer' => $message['id'],
+						'peer' => $message['to_id'],
 						'message' => $this::DB[$language]['no_whatsapp'],
+						'reply_to_msg_id' => $message['id'],
 						'parse_mode' => 'HTML'
 					]);
 
@@ -893,6 +894,35 @@
 					]);
 				} catch (danog\MadelineProto\RPCErrorException $e) {
 					;
+				}
+			} else if (preg_match('/^\/([[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message'], $matches)) {
+				// Retrieving the command
+				$command = explode('@', $matches[1])[0];
+				$args = $matches[2] ?? NULL;
+
+				switch ($command) {
+					case 'link':
+						$chat = yield $MadelineProto->getFullInfo($message['to_id']);
+						$chat = $chat['full'];
+
+						if ($chat['_'] !== 'chatFull') {
+							return;
+						}
+
+						try {
+							yield $this -> messages -> sendMessage([
+								'no_webpage' => TRUE,
+								'peer' => $message['to_id'],
+								'message' => '<a href=\"' . $chat['exported_invite'] . '\" >This</a> is the invite link to this chat.',
+								'reply_to_msg_id' => $message['id'],
+								'parse_mode' => 'HTML'
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+						break;
+					default:
+						break;
 				}
 			}
 		}
