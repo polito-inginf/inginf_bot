@@ -508,7 +508,7 @@
 		*/
 		public function getReportPeers() : array {
 			return [
-				-1001459204463		// The log channel
+				0		// The log channel
 			];
 		}
 
@@ -979,7 +979,7 @@
 						}
 
 						// Sending the report to the channel
-						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> has banned <a href=\"mention:' . $banned_user['id'] . '\" >' . $banned_user['first_name'] . '</a>.');
+						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> banned <a href=\"mention:' . $banned_user['id'] . '\" >' . $banned_user['first_name'] . '</a>.');
 						break;
 					case 'exec':
 						// Checking if the command has arguments
@@ -1140,13 +1140,26 @@
 					case 'unban':
 						// Retrieving the data of the chat
 						$chat = yield $this -> getInfo($message['to_id']);
+						$chat = $chat['Chat'] ?? NULL;
 
-						// Checking if the chat is a private chat
-						if ($chat['Chat'] ?? TRUE) {
+						/*
+						* Checking if the chat is setted
+						*
+						* empty() check if the argument is empty
+						* 	''
+						* 	""
+						* 	'0'
+						* 	"0"
+						* 	0
+						* 	0.0
+						* 	NULL
+						* 	FALSE
+						* 	[]
+						* 	array()
+						*/
+						if (empty($chat)) {
 							return;
 						}
-
-						$chat = $chat['Chat'];
 
 						// Checking if the result is valid
 						if ($chat['_'] !== 'chat' | $chat['_'] !== 'channel') {
@@ -1167,12 +1180,12 @@
 
 						$reply_message = $reply_message['messages'][0];
 
-						// Retrieving the data of the banned user
-						$banned_user = yield $this -> getInfo($reply_message['from_id']);
-						$banned_user = $banned_user['User'];
+						// Retrieving the data of the unbanned user
+						$unbanned_user = yield $this -> getInfo($reply_message['from_id']);
+						$unbanned_user = $unbanned_user['User'];
 
 						// Checking if the user is a normal user
-						if ($banned_user['_'] !== 'user') {
+						if ($unbanned_user['_'] !== 'user') {
 							return;
 						}
 
@@ -1186,7 +1199,7 @@
 						}
 
 						// Sending the report to the channel
-						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> has banned <a href=\"mention:' . $banned_user['id'] . '\" >' . $banned_user['first_name'] . '</a>.');
+						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> unbanned <a href=\"mention:' . $unbanned_user['id'] . '\" >' . $unbanned_user['first_name'] . '</a>.');
 						break;
 					default:
 						break;
