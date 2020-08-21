@@ -906,5 +906,10 @@
 			"description": "Unsilence a chat",
 			"domain": "admin"
 		}
-	]
+	],
+	"admins": [
+		0,
+		0
+	],
+	"staff_group": 0
 }

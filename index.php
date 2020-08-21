@@ -21,7 +21,6 @@
 	// Creating the bot
 	class inginf_bot extends danog\MadelineProto\EventHandler {
 		private const DB = [];
-		private const ADMINS = [];
 
 		/**
 		* Search the Inline Query text into the DB
@@ -521,15 +520,6 @@
 		public function onStart() : void {
 			// Retrieving the database
 			$this::DB = json_decode(file_get_contents('database.json'), TRUE);
-
-			// Setting the default admins list
-			$this::ADMINS = [
-				462875751,		// Giulio Coa
-				23191885,		// Giorgio Pais
-				14868633,		// Marco Smorti
-				668697832,		// Marco Smorti
-				479246580		// Gioele Giachino
-			];
 		}
 
 		/**
@@ -864,6 +854,30 @@
 					case 'announce':
 						// Checking if the chat is correct and if the list of partecipants is correct
 						if (isset($args)) {
+							/**
+							* Checking if is a serious use of the /announce command (command runned in the staff group) and if the user is an admin of the bot
+							*
+							* in_array() check if the array contains an item that match the element
+							*/
+							if ($message['to_id'] == $this::DB['staff_group'] & in_array($sender['id'], $this::DB['admins'])) {
+								$chats = yield $this -> getDialogs();
+
+								// Cycle on the chats where the bot is present
+								foreach ($chats as $peer) {
+									try {
+										yield $this -> messages -> sendMessage([
+											'no_webpage' => TRUE,
+											'peer' => $peer,
+											'message' => $args,
+											'parse_mode' => 'HTML'
+										]);
+									} catch (danog\MadelineProto\RPCErrorException $e) {
+										;
+									}
+								}
+								return;
+							}
+
 							// Retrieving the data of the chat
 							$chat = yield $this -> getPwrChat($message['to_id']);
 
@@ -1014,7 +1028,7 @@
 						*
 						* in_array() check if the array contains an item that match the element
 						*/
-						if (in_array($sender['id'], $this::ADMINS) == FALSE) {
+						if (in_array($sender['id'], $this::DB['admins']) == FALSE) {
 							try {
 								yield $this -> messages -> sendMessage([
 									'no_webpage' => TRUE,
