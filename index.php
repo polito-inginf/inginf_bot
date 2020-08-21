@@ -671,7 +671,7 @@
 			$message = $update['message'];
 
 			// Checking if the message is a normal message or is an incoming message
-			if ($message['_'] !== 'message' | $message['out'] ?? FALSE) {
+			if ($message['_'] === 'messageEmpty' | $message['out'] ?? FALSE) {
 				return;
 			}
 
@@ -929,6 +929,58 @@
 							;
 						}
 						break;
+					case 'ban':
+						// Retrieving the message this message replies to
+						$reply_message = yield $this -> messages -> getMessages([
+							'id' => [
+								$message['reply_to_msg_id']
+							]
+						]);
+
+						// Checking if the result is valid
+						if ($reply_message['_'] === 'messages.messagesNotModified') {
+							return;
+						}
+
+						$reply_message = $reply_message['messages'][0];
+
+						// Retrieving the data of the banned user
+						$banned_user = yield $this -> getInfo($reply_message['from_id']);
+						$banned_user = $banned_user['User'];
+
+						// Checking if the user is a normal user
+						if ($banned_user['_'] !== 'user') {
+							return;
+						}
+
+						try {
+							yield $this -> channels -> editBanned([
+								'channel' => $message['to_id'],
+								'user_id' => $reply_message['from_id'],
+								'banned_rights' => [
+									'_' => 'chatBannedRights',
+									'view_messages' => TRUE,
+									'send_messages' => TRUE,
+									'send_media' => TRUE,
+									'send_stickers' => TRUE,
+									'send_gifs' => TRUE,
+									'send_games' => TRUE,
+									'send_inline' => TRUE,
+									'embed_links' => TRUE,
+									'send_polls' => TRUE,
+									'change_info' => TRUE,
+									'invite_users' => TRUE,
+									'pin_messages' => TRUE,
+									'until_date' => 0
+								]
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+
+						// Sending the report to the channel
+						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> has banned <a href=\"mention:' . $banned_user['id'] . '\" >' . $banned_user['first_name'] . '</a>.');
+						break;
 					case 'exec':
 						// Checking if the command has arguments
 						if (isset($args) == FALSE) {
@@ -1084,6 +1136,57 @@
 						} catch (danog\MadelineProto\RPCErrorException $e) {
 							;
 						}
+						break;
+					case 'unban':
+						// Retrieving the data of the chat
+						$chat = yield $this -> getInfo($message['to_id']);
+
+						// Checking if the chat is a private chat
+						if ($chat['Chat'] ?? TRUE) {
+							return;
+						}
+
+						$chat = $chat['Chat'];
+
+						// Checking if the result is valid
+						if ($chat['_'] !== 'chat' | $chat['_'] !== 'channel') {
+							return;
+						}
+
+						// Retrieving the message this message replies to
+						$reply_message = yield $this -> messages -> getMessages([
+							'id' => [
+								$message['reply_to_msg_id']
+							]
+						]);
+
+						// Checking if the result is valid
+						if ($reply_message['_'] === 'messages.messagesNotModified') {
+							return;
+						}
+
+						$reply_message = $reply_message['messages'][0];
+
+						// Retrieving the data of the banned user
+						$banned_user = yield $this -> getInfo($reply_message['from_id']);
+						$banned_user = $banned_user['User'];
+
+						// Checking if the user is a normal user
+						if ($banned_user['_'] !== 'user') {
+							return;
+						}
+
+						try {
+							yield $this -> channels -> editBanned([
+								'channel' => $message['to_id'],
+								'user_id' => $reply_message['from_id'],
+								'banned_rights' => $chat['default_banned_rights']
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+
+						// Sending the report to the channel
+						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> has banned <a href=\"mention:' . $banned_user['id'] . '\" >' . $banned_user['first_name'] . '</a>.');
 						break;
 					default:
 						break;
