@@ -1141,6 +1141,89 @@
 							;
 						}
 						break;
+					case 'kick':
+						// Retrieving the data of the chat
+						$chat = yield $this -> getInfo($message['to_id']);
+						$chat = $chat['Chat'] ?? NULL;
+
+						/*
+						* Checking if the chat is setted
+						*
+						* empty() check if the argument is empty
+						* 	''
+						* 	""
+						* 	'0'
+						* 	"0"
+						* 	0
+						* 	0.0
+						* 	NULL
+						* 	FALSE
+						* 	[]
+						* 	array()
+						*/
+						if (empty($chat) || $chat['_'] !== 'chat' || $chat['_'] !== 'channel') {
+							return;
+						}
+
+						// Retrieving the message this message replies to
+						$reply_message = yield $this -> messages -> getMessages([
+							'id' => [
+								$message['reply_to_msg_id']
+							]
+						]);
+
+						// Checking if the result is valid
+						if ($reply_message['_'] === 'messages.messagesNotModified') {
+							return;
+						}
+
+						$reply_message = $reply_message['messages'][0];
+
+						// Retrieving the data of the kicked user
+						$kicked_user = yield $this -> getInfo($reply_message['from_id']);
+						$kicked_user = $kicked_user['User'];
+
+						// Checking if the user is a normal user
+						if ($kicked_user['_'] !== 'user') {
+							return;
+						}
+
+						try {
+							yield $this -> channels -> editBanned([
+								'channel' => $message['to_id'],
+								'user_id' => $reply_message['from_id'],
+								'banned_rights' => [
+									'_' => 'chatBannedRights',
+									'view_messages' => TRUE,
+									'send_messages' => TRUE,
+									'send_media' => TRUE,
+									'send_stickers' => TRUE,
+									'send_gifs' => TRUE,
+									'send_games' => TRUE,
+									'send_inline' => TRUE,
+									'embed_links' => TRUE,
+									'send_polls' => TRUE,
+									'change_info' => TRUE,
+									'invite_users' => TRUE,
+									'pin_messages' => TRUE,
+									'until_date' => 0
+								]
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+						try {
+							yield $this -> channels -> editBanned([
+								'channel' => $message['to_id'],
+								'user_id' => $reply_message['from_id'],
+								'banned_rights' => $chat['default_banned_rights']
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+
+						// Sending the report to the channel
+						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> kicked <a href=\"mention:' . $kicked_user['id'] . '\" >' . $kicked_user['first_name'] . '</a>.');
+						break;
 					case 'link':
 						$chat = yield $this -> getPwrChat($message['to_id']);
 
