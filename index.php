@@ -1239,6 +1239,116 @@
 							;
 						}
 						break;
+					case 'mute':
+						// Setting limit to forever
+						$limit = 0;
+
+						// Checking if the command has arguments
+						if (isset($args) && preg_match('/^([[:digit:]]+)[[:blank:]]?([[:alpha:]]+)$/miu', $args, $matches)) {
+							$limit = $matches[1];
+
+							switch ($matches[2]) {
+								case 'm':
+								case 'min':
+								case 'minuto':
+								case 'minute':
+								case 'minuti':
+								case 'minutes':
+									$limit *= 60;
+									break;
+								case 'h':
+								case 'ora':
+								case 'hour':
+								case 'ore':
+								case 'hours':
+									$limit *= 60 * 60;
+									break;
+								case 'g':
+								case 'd':
+								case 'giorno':
+								case 'day':
+								case 'giorni':
+								case 'days':
+									$limit *= 60 * 60 * 24;
+									break;
+								case 'M':
+								case 'mese':
+								case 'month':
+								case 'mesi':
+								case 'months':
+								case 'a':
+								case 'y':
+								case 'anno':
+								case 'year':
+									$limit *= 60 * 60 * 24 * 12;
+									break;
+								default:
+									try {
+										yield $this -> messages -> sendMessage([
+											'no_webpage' => TRUE,
+											'peer' => $message['to_id'],
+											'message' => "The syntax of the command is: <code>/mute [time]</code>.\nThe <code>time</code> option must be more then 30 seconds and less of 366 days.",
+											'reply_to_msg_id' => $message['id'],
+											'parse_mode' => 'HTML'
+										]);
+									} catch (danog\MadelineProto\RPCErrorException $e) {
+										;
+									}
+									break;
+							}
+						}
+
+						// Retrieving the message this message replies to
+						$reply_message = yield $this -> messages -> getMessages([
+							'id' => [
+								$message['reply_to_msg_id']
+							]
+						]);
+
+						// Checking if the result is valid
+						if ($reply_message['_'] === 'messages.messagesNotModified') {
+							return;
+						}
+
+						$reply_message = $reply_message['messages'][0];
+
+						// Retrieving the data of the muted user
+						$muted_user = yield $this -> getInfo($reply_message['from_id']);
+						$muted_user = $muted_user['User'];
+
+						// Checking if the user is a normal user
+						if ($muted_user['_'] !== 'user') {
+							return;
+						}
+
+						try {
+							yield $this -> channels -> editBanned([
+								'channel' => $message['to_id'],
+								'user_id' => $reply_message['from_id'],
+								'banned_rights' => [
+									'_' => 'chatBannedRights',
+									'view_messages' => FALSE,
+									'send_messages' => TRUE,
+									'send_media' => TRUE,
+									'send_stickers' => TRUE,
+									'send_gifs' => TRUE,
+									'send_games' => TRUE,
+									'send_inline' => TRUE,
+									'embed_links' => TRUE,
+									'send_polls' => TRUE,
+									'change_info' => TRUE,
+									'invite_users' => FALSE,
+									'pin_messages' => TRUE,
+									'until_date' => $limit
+								]
+							]);
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+
+						// Sending the report to the channel
+						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> muted <a href=\"mention:' . $muted_user['id'] . '\" >' . $muted_user['first_name'] . '</a>.');
+						break;
 					case 'report':
 						// Retrieving the data of the chat
 						$chat = yield $this -> getPwrChat($message['to_id']);
@@ -1466,6 +1576,65 @@
 
 						// Sending the report to the channel
 						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> unbanned <a href=\"mention:' . $unbanned_user['id'] . '\" >' . $unbanned_user['first_name'] . '</a>.');
+						break;
+					case 'unmute':
+						// Retrieving the data of the chat
+						$chat = yield $this -> getInfo($message['to_id']);
+						$chat = $chat['Chat'] ?? NULL;
+
+						/*
+						* Checking if the chat is setted
+						*
+						* empty() check if the argument is empty
+						* 	''
+						* 	""
+						* 	'0'
+						* 	"0"
+						* 	0
+						* 	0.0
+						* 	NULL
+						* 	FALSE
+						* 	[]
+						* 	array()
+						*/
+						if (empty($chat) || $chat['_'] !== 'chat' || $chat['_'] !== 'channel') {
+							return;
+						}
+
+						// Retrieving the message this message replies to
+						$reply_message = yield $this -> messages -> getMessages([
+							'id' => [
+								$message['reply_to_msg_id']
+							]
+						]);
+
+						// Checking if the result is valid
+						if ($reply_message['_'] === 'messages.messagesNotModified') {
+							return;
+						}
+
+						$reply_message = $reply_message['messages'][0];
+
+						// Retrieving the data of the unmuted user
+						$unmuted_user = yield $this -> getInfo($reply_message['from_id']);
+						$unmuted_user = $unmuted_user['User'];
+
+						// Checking if the user is a normal user
+						if ($unmuted_user['_'] !== 'user') {
+							return;
+						}
+
+						try {
+							yield $this -> channels -> editBanned([
+								'channel' => $message['to_id'],
+								'user_id' => $reply_message['from_id'],
+								'banned_rights' => $chat['default_banned_rights']
+						} catch (danog\MadelineProto\RPCErrorException $e) {
+							;
+						}
+
+						// Sending the report to the channel
+						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> unmuted <a href=\"mention:' . $unmuted_user['id'] . '\" >' . $unmuted_user['first_name'] . '</a>.');
 						break;
 					default:
 						break;
