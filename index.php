@@ -1193,6 +1193,20 @@
 							}
 						}
 
+						if ($command == 'mute' && ($limit < 30 || $limit > 60 * 60 * 24 * 366)) {
+							try {
+								yield $this -> messages -> sendMessage([
+									'no_webpage' => TRUE,
+									'peer' => $message['to_id'],
+									'message' => 'You have muted <a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> forever.',
+									'reply_to_msg_id' => $message['id'],
+									'parse_mode' => 'HTML'
+								]);
+							} catch (danog\MadelineProto\RPCErrorException $e) {
+								;
+							}
+						}
+
 						// Setting the verb of the report
 						$verb = $command;
 
@@ -1209,7 +1223,7 @@
 						$verb .= 'd';
 
 						// Sending the report to the channel
-						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> ' . $verb . ' <a href=\"mention:' . $user['id'] . '\" >' . $user['first_name'] . '</a>.');
+						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> ' . $verb . ' <a href=\"mention:' . $user['id'] . '\" >' . $user['first_name'] . '</a>' . $command == 'mute' && ($limit < 30 || $limit > 60 * 60 * 24 * 366) ? ' for ' . $args : '' . '.');
 						break;
 					case 'exec':
 						// Checking if the command has arguments
