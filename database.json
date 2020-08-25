@@ -844,17 +844,15 @@
 		},
 		{
 			"name": "ban",
-			"description": "Ban a user",
-			"domain": "admin"
-		},
-		{
-			"name": "banall",
-			"description": "Ban a user from all chats",
-			"domain": "admin"
+			"description": "Ban a user"
 		},
 		{
 			"name": "exec",
 			"description": "Exec a Shell command"
+		},
+		{
+			"name": "film",
+			"description": "Show the film list"
 		},
 		{
 			"name": "help",
@@ -862,30 +860,19 @@
 		},
 		{
 			"name": "kick",
-			"description": "Kick a user",
-			"domain": "admin"
+			"description": "Kick a user"
 		},
 		{
 			"name": "link",
 			"description": "Retrieve the invite link to the chat"
 		},
 		{
-			"name": "lista",
-			"description": "Show the film list",
-		},
-		{
 			"name": "mute",
-			"description": "Mute a player",
-			"domain": "admin"
+			"description": "Mute a player"
 		},
 		{
 			"name": "report",
 			"description": "Send a report on the list of the commands"
-		},
-		{
-			"name": "silence",
-			"description": "Silence a chat",
-			"domain": "admin"
 		},
 		{
 			"name": "start",
@@ -893,18 +880,11 @@
 		},
 		{
 			"name": "unban",
-			"description": "Unban a user",
-			"domain": "admin"
+			"description": "Unban a user"
 		},
 		{
 			"name": "unmute",
-			"description": "Unmute a player",
-			"domain": "admin"
-		},
-		{
-			"name": "unsilence",
-			"description": "Unsilence a chat",
-			"domain": "admin"
+			"description": "Unmute a player"
 		}
 	],
 	"admins": [
