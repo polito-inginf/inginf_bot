@@ -57,7 +57,7 @@ In keyboards, each element has a **type**, defined by `"type"`, which can be:
 
 If you want to add support for another language, you need to copy the path of an existing language (_i.e._ `"it"` or `"en"`) and translate the `"name"` parameter of the `"dir"` elements (_i.e._ First year, Bachelor degree, etc.).
 
-**N.B.**: The other sections and the other parameters must not be changed. The other section (`"courses"`, `"general_master"`, `"commands"` and `"other"`) are setted by default with allt the groups existing in all the languages; while the other parameters are a reference to them.
+**N.B.**: The other sections (`"courses"`, `"general_master"`, `"commands"` and `"other"`) and the other parameters must not be changed, because they are setted, by default, with all the groups existing in all the languages and the other parameters are a reference to them.
 
 # Create a bot like this
 
