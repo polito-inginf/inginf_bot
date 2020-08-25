@@ -20,7 +20,14 @@
 
 	// Creating the bot
 	class inginf_bot extends danog\MadelineProto\EventHandler {
-		private const DB = [];
+		private $DB;
+
+		/**
+		* The constructor of the class
+		*/
+		public function __construct() {
+			$this -> DB = json_decode(file_get_contents('database.json'), TRUE);
+		}
 
 		/**
 		* Search the Inline Query text into the DB
@@ -32,7 +39,7 @@
 		private function database_search(string $query, string $lang) : array {
 			$response = [];
 
-			$this -> database_recursive_search($query, $this::DB[$lang]['keyboard'], $response, $lang);
+			$this -> database_recursive_search($query,  $this -> DB[$lang]['keyboard'], $response, $lang);
 			return $response;
 		}
 
@@ -58,7 +65,7 @@
 					// Retrieving the data of the internal directory
 					$name_array = trim($actual['array']);
 					$internal_link = trim($actual['link']);
-					$obj = $this::DB[$lang][$name_array][$internal_link] ?? NULL;
+					$obj =  $this -> DB[$lang][$name_array][$internal_link] ?? NULL;
 
 					// Checking if the path exists
 					if ($obj ?? FALSE) {
@@ -78,7 +85,7 @@
 					// Retrieving the data of the internal link
 					$name_array = trim($actual['array']);
 					$internal_link = trim($actual['link']);
-					$obj = $this::DB[$lang][$name_array][$internal_link] ?? NULL;
+					$obj =  $this -> DB[$lang][$name_array][$internal_link] ?? NULL;
 
 					// Checking if the path exists
 					if ($obj ?? FALSE) {
@@ -164,7 +171,7 @@
 		*/
 		private function get_keyboard(string $input, string $lang) : array {
 			// Checking if the input to search isn't empty and if the input ends with '/'
-			if (strlen($input) == 0 == FALSE && $this -> ends_with($input, '/')) {
+			if (strlen($input) == 0 && $this -> ends_with($input, '/')) {
 				$input = substr($input, 0, strlen($input) - 1);
 			}
 
@@ -212,9 +219,9 @@
 			}
 
 			// The actual point into the DB
-			$actual = $this::DB[$lang]['keyboard']['list'];
+			$actual =  $this -> DB[$lang]['keyboard']['list'];
 			// The last directory visited
-			$dir = $this::DB[$lang]['keyboard'];
+			$dir =  $this -> DB[$lang]['keyboard'];
 			// The path into the DB
 			$path = '';
 
@@ -245,7 +252,7 @@
 								// Retrieving the data of the internal directory
 								$name_array = trim($dir['array']);
 								$internal_link = trim($dir['link']);
-								$obj = $this::DB[$lang][$name_array][$internal_link] ?? NULL;
+								$obj =  $this -> DB[$lang][$name_array][$internal_link] ?? NULL;
 
 								// Checking if the path exists
 								if ($obj ?? FALSE) {
@@ -253,8 +260,8 @@
 									$dir = $obj;
 								} else {
 									// The path doesn't exists -> reset the path
-									$actual = $this::DB[$lang]['keyboard']['list'];
-									$dir = $this::DB[$lang]['keyboard'];
+									$actual =  $this -> DB[$lang]['keyboard']['list'];
+									$dir =  $this -> DB[$lang]['keyboard'];
 									$path = '';
 									break;
 								}
@@ -264,8 +271,8 @@
 						}
 					} else {
 						// The path doesn't exists -> reset the path
-						$actual = $this::DB[$lang]['keyboard']['list'];
-						$dir = $this::DB[$lang]['keyboard'];
+						$actual =  $this -> DB[$lang]['keyboard']['list'];
+						$dir =  $this -> DB[$lang]['keyboard'];
 						$path = '';
 						break;
 					}
@@ -316,7 +323,7 @@
 					// Retrieving the data of the internal element
 					$name_array = trim($value['array']);
 					$internal_link = trim($value['link']);
-					$obj = $this::DB[$lang][$name_array][$internal_link] ?? NULL;
+					$obj =  $this -> DB[$lang][$name_array][$internal_link] ?? NULL;
 
 					// Checking if the path exists
 					if ($obj ?? FALSE) {
@@ -518,8 +525,6 @@
 		* @return void
 		*/
 		public function onStart() : void {
-			// Retrieving the database
-			$this::DB = json_decode(file_get_contents('database.json'), TRUE);
 		}
 
 		/**
@@ -544,7 +549,7 @@
 			// Retrieving the language of the user
 			$language = isset($sender['lang_code']) ? $sender['lang_code'] : 'en';
 			// Checking if the language is supported
-			if (isset($this::DB[$language]) == FALSE) {
+			if (isset( $this -> DB[$language]) == FALSE) {
 				$language = 'en';
 			}
 
@@ -553,9 +558,9 @@
 			// Checking if is a known query
 			if ($this -> starts_with($callback_data, 'kb=')) {
 				$callback_data = str_replace('kb=', '', $callback_data);
-				$keyboard = ['inline_keyboard'] =  $this -> get_keyboard($callback_data, $language);
+				$keyboard['inline_keyboard'] =  $this -> get_keyboard($callback_data, $language);
 			} else {
-				$keyboard = ['inline_keyboard'] =  $this -> get_keyboard('', $language);
+				$keyboard['inline_keyboard'] =  $this -> get_keyboard('', $language);
 			}
 
 			try {
@@ -593,7 +598,7 @@
 			// Retrieving the language of the user
 			$language = isset($sender['lang_code']) ? $sender['lang_code'] : 'en';
 			// Checking if the language is supported
-			if (isset($this::DB[$language]) == FALSE) {
+			if (isset( $this -> DB[$language]) == FALSE) {
 				$language = 'en';
 			}
 
@@ -785,7 +790,7 @@
 			// Retrieving the language of the user
 			$language = isset($sender['lang_code']) ? $sender['lang_code'] : 'en';
 			// Checking if the language is supported
-			if (isset($this::DB[$language]) == FALSE) {
+			if (isset( $this -> DB[$language]) == FALSE) {
 				$language = 'en';
 			}
 
@@ -830,7 +835,7 @@
 					yield $this -> messages -> sendMessage([
 						'no_webpage' => TRUE,
 						'peer' => $message['to_id'],
-						'message' => $this::DB[$language]['no_whatsapp'],
+						'message' =>  $this -> DB[$language]['no_whatsapp'],
 						'reply_to_msg_id' => $message['id'],
 						'parse_mode' => 'HTML'
 					]);
@@ -859,7 +864,7 @@
 							*
 							* in_array() check if the array contains an item that match the element
 							*/
-							if ($message['to_id'] == $this::DB['staff_group'] && in_array($sender['id'], $this::DB['admins'])) {
+							if ($message['to_id'] ==  $this -> DB['staff_group'] && in_array($sender['id'],  $this -> DB['admins'])) {
 								$chats = yield $this -> getDialogs();
 
 								// Cycle on the chats where the bot is present
@@ -939,7 +944,7 @@
 						*
 						* in_array() check if the array contains an item that match the element
 						*/
-						if (preg_match('/^(un)?ban/miu', $command) && $message['to_id'] == $this::DB['staff_group'] && in_array($sender['id'], $this::DB['admins'])) {
+						if (preg_match('/^(un)?ban/miu', $command) && $message['to_id'] ==  $this -> DB['staff_group'] && in_array($sender['id'],  $this -> DB['admins'])) {
 							$chats = yield $this -> getDialogs();
 
 							// Checking if the command has arguments
@@ -1188,6 +1193,7 @@
 									'channel' => $message['to_id'],
 									'user_id' => $reply_message['from_id'],
 									'banned_rights' => $chat['default_banned_rights']
+								]);
 							} catch (danog\MadelineProto\RPCErrorException $e) {
 								;
 							}
@@ -1263,7 +1269,7 @@
 							yield $this -> messages -> sendMessage([
 								'no_webpage' => TRUE,
 								'peer' => $message['to_id'],
-								'message' => $this::DB[$language]['film'],
+								'message' =>  $this -> DB[$language]['film'],
 								'reply_to_msg_id' => $message['id'],
 								'parse_mode' => 'HTML'
 							]);
@@ -1284,7 +1290,7 @@
 							yield $this -> messages -> sendMessage([
 								'no_webpage' => TRUE,
 								'peer' => $message['to_id'],
-								'message' => $this::DB[$language]['help'],
+								'message' =>  $this -> DB[$language]['help'],
 								'reply_to_msg_id' => $message['id'],
 								'parse_mode' => 'HTML',
 								'reply_markup' => [
@@ -1324,7 +1330,7 @@
 						*
 						* in_array() check if the array contains an item that match the element
 						*/
-						if (in_array($sender['id'], $this::DB['admins']) == FALSE) {
+						if (in_array($sender['id'],  $this -> DB['admins']) == FALSE) {
 							try {
 								yield $this -> messages -> sendMessage([
 									'no_webpage' => TRUE,
@@ -1351,7 +1357,7 @@
 								'command' => $n['command'],
 								'description' => $n['description']
 							];
-						}, $this::DB['commands']);
+						},  $this -> DB['commands']);
 
 						yield $this -> bots -> setBotCommands([
 							'commands' => $commands
@@ -1370,7 +1376,7 @@
 							yield $this -> messages -> sendMessage([
 								'no_webpage' => TRUE,
 								'peer' => $message['to_id'],
-								'message' => str_replace('${sender_first_name}', $sender['first_name'], $this::DB[$language]['welcome']),
+								'message' => str_replace('${sender_first_name}', $sender['first_name'],  $this -> DB[$language]['welcome']),
 								'reply_to_msg_id' => $message['id'],
 								'parse_mode' => 'HTML',
 								'reply_markup' => [
@@ -1400,8 +1406,8 @@
 	]);
 
 	// Setting the bot
-	yield $MadelineProto -> botLogin(getenv('BOT_TOKEN'));
-	yield $MadelineProto -> async(TRUE);
+	$MadelineProto -> botLogin('1114884021:AAEbfsZqyNJk0RPLg_bVgJ0_N4I9ZI8l4BA');
+	$MadelineProto -> async(TRUE);
 
 	// Starting the bot
 	$MadelineProto -> startAndLoop(inginf_bot::class);
