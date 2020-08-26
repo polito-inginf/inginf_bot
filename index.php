@@ -164,7 +164,7 @@
 		*/
 		private function get_keyboard(string $input, string $lang) : array {
 			// Checking if the input to search isn't empty and if the input ends with '/'
-			if (strlen($input) == 0 && $this -> ends_with($input, '/')) {
+			if ($this -> ends_with($input, '/')) {
 				$input = substr($input, 0, strlen($input) - 1);
 			}
 
@@ -219,7 +219,7 @@
 			$path = '';
 
 			// Checking if the path to search isn't empty
-			if (strlen($input) == 0) {
+			if (strlen($input) != 0) {
 				$input = explode('/', $input);
 
 				// Cycle on the path
@@ -236,12 +236,12 @@
 						$actual = $actual[$value];
 
 						// Checking if is a directory
-						if (preg_match('/^(int)?dir$/mu', $actual[$value]['type'])) {
+						if (preg_match('/^(int)?dir$/mu', $actual['type'])) {
 							// Updating the last directory visited
-							$dir = $actual[$value];
+							$dir = $actual;
 
 							// Checking if the directory is an internal directory (directories that redirect to another path into the DB)
-							if ($actual[$value]['type'] == 'intdir') {
+							if ($actual['type'] == 'intdir') {
 								// Retrieving the data of the internal directory
 								$name_array = trim($dir['array']);
 								$internal_link = trim($dir['link']);
@@ -312,7 +312,7 @@
 				} else if ($value['type'] == 'link') {
 					$element['text'] = trim($value['name']);
 					$element['url'] = trim($value['link']);
-				} else if (preg_match('/^int(dir|link)$/mu', $actual[$value]['type'])) {
+				} else if (preg_match('/^int(dir|link)$/mu', $value['type'])) {
 					// Retrieving the data of the internal element
 					$name_array = trim($value['array']);
 					$internal_link = trim($value['link']);
@@ -531,7 +531,7 @@
 		* @return Generator
 		*/
 		public function onUpdateBotCallbackQuery(array $update) : Generator {
-			$callback_data = trim($update['data']);
+			$callback_data = trim((string) $update['data']);
 
 			// Retrieving the data of the user that pressed the button
 			$user = yield $this -> getInfo($update['user_id']);
@@ -900,7 +900,7 @@
 							if (in_array($sender['id'], $admins)) {
 								yield $this -> messages -> sendMessage([
 									'no_webpage' => TRUE,
-									'peer' => $message['to_id']['_'] === 'peerUser' ? $sender['id'] : $message['to_id']['_'] === 'peerChat' ? $message['to_id']['chat_id'] : $message['to_id']['channel_id'],
+									'peer' => $message['to_id']['_'] === 'peerChat' ? $message['to_id']['chat_id'] : $message['to_id']['channel_id'],
 									'message' => $args,
 									'parse_mode' => 'HTML'
 								]);
@@ -1238,7 +1238,7 @@
 						]);
 						break;
 					case 'help':
-						// Checking if the chat is a private chat
+						// Checking if the chat isn't a private chat
 						if ($message['to_id']['_'] !== 'peerUser') {
 							return;
 						}
@@ -1247,7 +1247,6 @@
 							'no_webpage' => TRUE,
 							'peer' => $message['to_id']['user_id'],
 							'message' => $this -> DB[$language]['help'],
-							'reply_to_msg_id' => $message['id'],
 							'parse_mode' => 'HTML',
 							'reply_markup' => [
 								'inline_keyboard' => $this -> get_keyboard('', $language)
@@ -1271,7 +1270,7 @@
 						]);
 						break;
 					case 'report':
-						// Checking if the chat is a private chat
+						// Checking if the chat isn't a private chat
 						if ($message['to_id']['_'] !== 'peerUser') {
 							return;
 						}
@@ -1286,7 +1285,6 @@
 								'no_webpage' => TRUE,
 								'peer' => $sender['id'],
 								'message' => 'You can\'t use this command.',
-								'reply_to_msg_id' => $message['id'],
 								'parse_mode' => 'HTML'
 							]);
 							return;
@@ -1310,7 +1308,7 @@
 						]);
 						break;
 					case 'start':
-						// Checking if the chat is a private chat
+						// Checking if the chat isn't a private chat
 						if ($message['to_id']['_'] !== 'peerUser') {
 							return;
 						}
@@ -1319,7 +1317,6 @@
 							'no_webpage' => TRUE,
 							'peer' => $sender['id'],
 							'message' => str_replace('${sender_first_name}', $sender['first_name'], $this -> DB[$language]['welcome']),
-							'reply_to_msg_id' => $message['id'],
 							'parse_mode' => 'HTML',
 							'reply_markup' => [
 								'inline_keyboard' => $this -> get_keyboard('', $language)
