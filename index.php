@@ -103,9 +103,9 @@
 			}
 
 			// Creating the response
-			$answe['no_webpage'] = TRUE;
+			$answer['no_webpage'] = TRUE;
 			$answer['message'] = '<a href=\"' . $element_link . '\" >' . $element_name . '</a>';
-			$answe['reply_markup'] = [
+			$answer['reply_markup'] = [
 				'rows' => [
 					'buttons' => [
 						'text' => $element_name,
@@ -393,12 +393,12 @@
 				$row = [];
 
 				// Setting the "Previous page" button
-				$control_buttons['text'] = $page_num != 0 ? '⬅️️ Pagina precedente' : '';
+				$control_buttons['text'] = $page_num != 0 ? $this -> DB[$lang]['buttons']['previous_page'] : '';
 				$control_buttons['callback_data'] = $page_num != 0 ? $complete_path . '?p=' . ($page_num - 1) : '';
 				$row []= $control_buttons;
 
 				// Setting the "Next page" button
-				$control_buttons['text'] = $page_num < $last_page ? 'Pagina successiva ➡️' : '';
+				$control_buttons['text'] = $page_num < $last_page ? $this -> DB[$lang]['buttons']['next_page'] : '';
 				$control_buttons['callback_data'] = $page_num < $last_page ? $complete_path . '?p=' . ($page_num + 1) : '';
 				$row []= $control_buttons;
 
@@ -411,7 +411,7 @@
 				// Setting the "Back" button
 				$back = [
 					[
-						'text' => '↩ Indietro',
+						'text' => $this -> DB[$lang]['buttons']['back'],
 						'callback_data' => substr($complete_path, 0, strrpos($complete_path, '/'))
 					]
 				];
