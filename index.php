@@ -32,7 +32,7 @@
 		private function database_search(string $query, string $lang) : array {
 			$response = [];
 
-			$this -> database_recursive_search($query, $this -> DB[$lang]['keyboard'], $response, $lang);
+			$this -> database_recursive_search($query, $this -> DB[$lang]['keyboard'], $response);
 			return $response;
 		}
 
@@ -45,7 +45,7 @@
 		*
 		* @return void
 		*/
-		private function database_recursive_search(string $query, array $actual, array &$response, string $lang) : void {
+		private function database_recursive_search(string $query, array $actual, array &$response) : void {
 			// The element that match with the query
 			$element_name = '';
 			$element_link = '';
@@ -58,7 +58,7 @@
 					// Retrieving the data of the internal directory
 					$name_array = trim($actual['array']);
 					$internal_link = trim($actual['link']);
-					$obj = $this -> DB[$lang][$name_array][$internal_link] ?? NULL;
+					$obj = $this -> DB[$name_array][$internal_link] ?? NULL;
 
 					// Checking if the path exists
 					if ($obj ?? FALSE) {
@@ -78,7 +78,7 @@
 					// Retrieving the data of the internal link
 					$name_array = trim($actual['array']);
 					$internal_link = trim($actual['link']);
-					$obj = $this -> DB[$lang][$name_array][$internal_link] ?? NULL;
+					$obj = $this -> DB[$name_array][$internal_link] ?? NULL;
 
 					// Checking if the path exists
 					if ($obj ?? FALSE) {
@@ -245,7 +245,7 @@
 								// Retrieving the data of the internal directory
 								$name_array = trim($dir['array']);
 								$internal_link = trim($dir['link']);
-								$obj = $this -> DB[$lang][$name_array][$internal_link] ?? NULL;
+								$obj = $this -> DB[$name_array][$internal_link] ?? NULL;
 
 								// Checking if the path exists
 								if ($obj ?? FALSE) {
@@ -316,7 +316,7 @@
 					// Retrieving the data of the internal element
 					$name_array = trim($value['array']);
 					$internal_link = trim($value['link']);
-					$obj = $this -> DB[$lang][$name_array][$internal_link] ?? NULL;
+					$obj = $this -> DB[$name_array][$internal_link] ?? NULL;
 
 					// Checking if the path exists
 					if ($obj ?? FALSE) {
@@ -389,7 +389,7 @@
 			}
 
 			// Checking if there are more then one page
-			if ($page_dimension != 0) {
+			if ($page_dimension != 0 && $n_inserted_element < $count) {
 				$row = [];
 
 				// Setting the "Previous page" button
@@ -1209,7 +1209,7 @@
 						if (isset($args) == FALSE) {
 							yield $this -> messages -> sendMessage([
 								'no_webpage' => TRUE,
-								'peer' => $message['to_id']['_'] === 'peerUser' ? $sender['id'] : $message['to_id']['_'] === 'peerChat' ? $message['to_id']['chat_id'] : $message['to_id']['channel_id'],
+								'peer' => $message['to_id']['_'] === 'peerUser' ? $sender['id'] : ($message['to_id']['_'] === 'peerChat' ? $message['to_id']['chat_id'] : $message['to_id']['channel_id']),
 								'message' => 'The syntax of the command is: <code>/exec &lt;command&gt;</code>.',
 								'reply_to_msg_id' => $message['id'],
 								'parse_mode' => 'HTML'
@@ -1219,11 +1219,12 @@
 
 						// Executing the command
 						$output = shell_exec($args);
+						$output = str_replace("\n", "</code>\n\t<code>", $output);
 
 						yield $this -> messages -> sendMessage([
 							'no_webpage' => TRUE,
-							'peer' => $message['to_id']['_'] === 'peerUser' ? $sender['id'] : $message['to_id']['_'] === 'peerChat' ? $message['to_id']['chat_id'] : $message['to_id']['channel_id'],
-							'message' => '<b>Command:</b>\n\t<code>' . $args . '</code>\n\n<b>Result:</b>\n\t<code>' . $output . '</code>',
+							'peer' => $message['to_id']['_'] === 'peerUser' ? $sender['id'] : ($message['to_id']['_'] === 'peerChat' ? $message['to_id']['chat_id'] : $message['to_id']['channel_id']),
+							'message' => "<b>Command:</b>\n\t<code>" . $args . "</code>\n\n<b>Result:</b>\n\t<code>" . $output . '</code>',
 							'reply_to_msg_id' => $message['id'],
 							'parse_mode' => 'HTML'
 						]);
@@ -1231,7 +1232,7 @@
 					case 'film':
 						yield $this -> messages -> sendMessage([
 							'no_webpage' => TRUE,
-							'peer' => $message['to_id']['_'] === 'peerUser' ? $sender['id'] : $message['to_id']['_'] === 'peerChat' ? $message['to_id']['chat_id'] : $message['to_id']['channel_id'],
+							'peer' => $message['to_id']['_'] === 'peerUser' ? $sender['id'] : ($message['to_id']['_'] === 'peerChat' ? $message['to_id']['chat_id'] : $message['to_id']['channel_id']),
 							'message' => $this -> DB[$language]['film'],
 							'reply_to_msg_id' => $message['id'],
 							'parse_mode' => 'HTML'
@@ -1245,7 +1246,7 @@
 
 						yield $this -> messages -> sendMessage([
 							'no_webpage' => TRUE,
-							'peer' => $message['to_id']['user_id'],
+							'peer' => $sender['id'],
 							'message' => $this -> DB[$language]['help'],
 							'parse_mode' => 'HTML',
 							'reply_markup' => [
@@ -1298,7 +1299,7 @@
 						$commands = array_map(function ($n) {
 							return [
 								'_' => 'botCommand',
-								'command' => $n['command'],
+								'command' => $n['name'],
 								'description' => $n['description']
 							];
 						}, $this -> DB['commands']);
