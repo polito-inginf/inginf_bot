@@ -578,7 +578,7 @@
 		*/
 		public function onUpdateBotInlineQuery(array $update) : Generator {
 			$inline_query = trim($update['query']);
-			$inline_query = htmlentities($inline_query);
+			$inline_query = htmlentities($inline_query, ENT_QUOTES | ENT_SUBSTITUTE | ENT_DISALLOWED | ENT_HTML5);
 
 			// Retrieving the data of the user that sent the query
 			$user = yield $this -> getInfo($update['user_id']);
@@ -757,7 +757,7 @@
 			}
 
 			$message['message'] = trim($message['message']);
-			$message['message'] = htmlentities($message['message']);
+			$message['message'] = htmlentities($message['message'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_DISALLOWED | ENT_HTML5);
 
 			// Checking if the chat is a channel
 			if (isset($message['from_id']) == FALSE) {
@@ -848,6 +848,8 @@
 					case 'announce':
 						// Checking if the command has arguments
 						if (isset($args)) {
+							$args = html_entity_decode($args, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+							
 							// Checking if the chat is a private chat
 							if ($message['to_id']['_'] === 'peerUser') {
 								return;
@@ -1032,7 +1034,7 @@
 						$limit = 0;
 
 						// Checking if the command is /mute, if it has arguments and if the arguments are correct
-						if ($command == 'mute' && isset($args) && preg_match('/^([[:digit:]]+)[[:blank:]]?([[:alpha:]]+)$/miu', $args, $matches)) {
+						if ($command == 'mute' && isset($args) && preg_match('/^([[:digit:]]+)[[:blank:]]?([[:alpha:]]+)$/miu', html_entity_decode($args, ENT_QUOTES | ENT_HTML5, 'UTF-8'), $matches)) {
 							$limit = $matches[1];
 
 							// Converting the units to seconds
@@ -1220,7 +1222,7 @@
 						}
 
 						// Executing the command
-						$output = shell_exec($args);
+						$output = shell_exec(html_entity_decode($args, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 						$output = str_replace("\n", "</code>\n\t<code>", $output);
 
 						yield $this -> messages -> sendMessage([
