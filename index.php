@@ -578,6 +578,7 @@
 		*/
 		public function onUpdateBotInlineQuery(array $update) : Generator {
 			$inline_query = trim($update['query']);
+			$inline_query = htmlentities($inline_query);
 
 			// Retrieving the data of the user that sent the query
 			$user = yield $this -> getInfo($update['user_id']);
@@ -756,6 +757,7 @@
 			}
 
 			$message['message'] = trim($message['message']);
+			$message['message'] = htmlentities($message['message']);
 
 			// Checking if the chat is a channel
 			if (isset($message['from_id']) == FALSE) {
