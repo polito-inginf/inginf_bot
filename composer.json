@@ -1,0 +1,15 @@
+{
+	"name": "polito-inginf/inginf_bot",
+	"description": "PHP template for a Bot that manage some groups",
+	"type": "project",
+	"require": {
+		"amphp/mysql": "^2.0",
+		"danog/madelineproto": "dev-master"
+	},
+	"license": "GPL-3.0-only",
+	"autoload": {
+		"psr-0": {
+			"path_to_the_bot_directory\\": "src/"
+		}
+	}
+}
