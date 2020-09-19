@@ -1733,7 +1733,7 @@
 						* 	[]
 						* 	array()
 						*/
-						if (empty($message['reply_to_msg_id'] ?? NULL)) {
+						if (empty($message['reply_to_msg_id'])) {
 							// Retrieving the query
 							$sql_query = $command == 'add' ? 'INSERT INTO `Chats` (`id`, `type`, `title`, `username`, `invite_link`) VALUES (?, ?, ?, ?, ?);' : 'DELETE FROM `Chats` WHERE `id`=?;';
 
@@ -2293,7 +2293,7 @@
 							* 	[]
 							* 	array()
 							*/
-							if (empty($message['reply_to_msg_id'] ?? NULL)) {
+							if (empty($message['reply_to_msg_id'])) {
 								$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because wasn\'t a message that replies to another message (/' . $command . ' section).');
 								return;
 							}
@@ -2738,7 +2738,7 @@
 						* 	[]
 						* 	array()
 						*/
-						if (empty($message['reply_to_msg_id'] ?? NULL)) {
+						if (empty($message['reply_to_msg_id'])) {
 							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because wasn\'t a message that replies to another message (/' . $command . ' section).');
 							return;
 						}
