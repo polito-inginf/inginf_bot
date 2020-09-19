@@ -9,6 +9,7 @@ For contribute at this bot, open an Issue or a Pull request.
 * If possible, prefer the operator instead of the function (_i.e._ use `[]=` instead of `array_push()`)
 * Every special character (`'`, `"`, `\`, etc.) must be preceded by `\`, also if not necessary
 * Use of keyword `global` instead of `$GLOBALS` array if there is a reference to a global variable
+* Use of `empty($var ?? NULL) == FALSE` instead of `isset($var)` if you want check if a variable is setted, beacuse `empty()` execute more controls
 
 ### Util links
 
