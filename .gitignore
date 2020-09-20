@@ -54,3 +54,5 @@ tags
 *_LOCAL_*.txt
 *_REMOTE_*.txt
 
+### Log files ###
+log/
