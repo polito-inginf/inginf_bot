@@ -5,7 +5,6 @@ For contribute at this bot, open an Issue or a Pull request.
 
 * For indentation, use Tabs instead Spaces
 * If possible, prefer the operator instead of the function (_i.e._ use `[]=` instead of `array_push()`)
-* Every special character must be inserted like HTMl code (_i.e._ use `&apos;` instead of `'`)
 * Use of `empty($var) === FALSE` instead of `isset($var)` if you want check if a variable is set, because `empty()` executes more controls
 
 ### Util links
