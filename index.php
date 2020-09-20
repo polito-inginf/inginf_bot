@@ -81,7 +81,7 @@
 			* 	array()
 			*/
 			if (empty($sender) || $sender['_'] !== 'user') {
-				$this -> logger('The CallbackQuery ' . $update['query_id'] . ' wasn&apos;t managed because the sender isn&apos;t a normal user.');
+				$this -> logger('The CallbackQuery ' . $update['query_id'] . ' wasn\'t managed because the sender isn\'t a normal user.');
 				return;
 			/**
 			* Checking if the query is empty
@@ -99,7 +99,7 @@
 			* 	array()
 			*/
 			} else if (empty($callback_data)) {
-				$this -> logger('The CallbackQuery ' . $update['query_id'] . ' wasn&apos;t managed because was empty.');
+				$this -> logger('The CallbackQuery ' . $update['query_id'] . ' wasn\'t managed because was empty.');
 				return;
 			}
 
@@ -127,7 +127,7 @@
 
 			// Checking if the result is valid
 			if ($message['_'] === 'messages.messagesNotModified' || $message['messages'][0]['_'] !== 'message') {
-				$this -> logger('The CallbackQuery ' . $update['query_id'] . ' wasn&apos;t managed because isn&apos;t associated to a message.');
+				$this -> logger('The CallbackQuery ' . $update['query_id'] . ' wasn\'t managed because isn\'t associated to a message.');
 				return;
 			}
 
@@ -160,7 +160,7 @@
 						$this -> logger('Failed to make the query, because ' . $e -> getMessage(), \danog\MadelineProto\Logger::ERROR);
 						return;
 					} catch (Amp\Sql\FailureException $e) {
-						$this -> logger('The CallbackQuery ' . $update['query_id'] . ' wasn&apos;t managed because was a message from an unauthorized user (/' . $command . ' section).');
+						$this -> logger('The CallbackQuery ' . $update['query_id'] . ' wasn\'t managed because was a message from an unauthorized user (/' . $command . ' section).');
 						return;
 					}
 
@@ -396,7 +396,7 @@
 							* array_key_exists() check if the key exists
 							*/
 							if (array_key_exists('staff_group', $this -> tmp) == FALSE || array_key_exists($update['peer'], $this -> tmp['staff_group']) == FALSE) {
-								$this -> logger('The CallbackQuery ' . $update['query_id'] . ' wasn&apos;t managed because the sender have pressed the wrong button (/' . $command . ' section).');
+								$this -> logger('The CallbackQuery ' . $update['query_id'] . ' wasn\'t managed because the sender have pressed the wrong button (/' . $command . ' section).');
 								return;
 							}
 
@@ -637,7 +637,7 @@
 			* 	array()
 			*/
 			if (empty($sender) || $sender['_'] !== 'user') {
-				$this -> logger('The InlineQuery ' . $update['query_id'] . ' wasn&apos;t managed because the sender isn&apos;t a normal user.');
+				$this -> logger('The InlineQuery ' . $update['query_id'] . ' wasn\'t managed because the sender isn\'t a normal user.');
 				return;
 			/**
 			* Checking if the query is empty
@@ -655,7 +655,7 @@
 			* 	array()
 			*/
 			} else if (empty($inline_query)) {
-				$this -> logger('The InlineQuery ' . $update['query_id'] . ' wasn&apos;t managed because was empty.');
+				$this -> logger('The InlineQuery ' . $update['query_id'] . ' wasn\'t managed because was empty.');
 				return;
 			/**
 			* Checking if the query is long enough
@@ -663,7 +663,7 @@
 			* strlen() return the length of the string
 			*/
 			} else if (strlen($inline_query) < 3) {
-				$this -> logger('The InlineQuery ' . $update['query_id'] . ' wasn&apos;t managed because was too short.');
+				$this -> logger('The InlineQuery ' . $update['query_id'] . ' wasn\'t managed because was too short.');
 				return;
 			}
 
@@ -768,11 +768,11 @@
 
 			// Checking if the message is a normal message
 			if ($message['_'] === 'messageEmpty') {
-				$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was empty.');
+				$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was empty.');
 				return;
 			// Checking if the message is an incoming message
 			} else if ($message['out'] ?? FALSE) {
-				$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was an incoming message.');
+				$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was an incoming message.');
 				return;
 			}
 
@@ -799,7 +799,7 @@
 			* 	array()
 			*/
 			if (empty($sender) || $sender['_'] !== 'user') {
-				$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because the sender isn&apos;t a normal user.');
+				$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because the sender isn\'t a normal user.');
 				return;
 			}
 
@@ -875,7 +875,7 @@
 							$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 							return;
 						} catch (Amp\Sql\FailureException $e) {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from an unauthorized chat.');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from an unauthorized chat.');
 
 							// Leaving the chat
 							if ($chat['type'] == 'chat') {
@@ -1161,7 +1161,7 @@
 			} catch (Amp\Sql\FailureException $e) {
 				// Checking if the chat is a (super)group or a channel
 				if ($chat['type'] != 'user' && $chat['type'] != 'bot') {
-					$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from an unauthorized chat.');
+					$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from an unauthorized chat.');
 
 					// Leaving the chat
 					if ($chat['type'] == 'chat') {
@@ -1186,7 +1186,7 @@
 
 			// Checking if the chat is a (super)group or a private chat
 			if ($chat['type'] != 'user' && $chat['type'] != 'supergroup' && $chat['type'] != 'chat') {
-				$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from a bot or a channel.');
+				$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from a bot or a channel.');
 				return;
 			}
 
@@ -1241,7 +1241,7 @@
 			if (preg_match('/^\@admin([[:blank:]\n]{1}((\n|.)*))?$/miu', $message['message'], $matches)) {
 				// Checking if the chat is a private chat
 				if ($message['to_id']['_'] === 'peerUser') {
-					$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from a private chat (@admin section).');
+					$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from a private chat (@admin section).');
 					return;
 				}
 
@@ -1350,7 +1350,7 @@
 							$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 							return;
 						} catch (Amp\Sql\FailureException $e) {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from an unauthorized user (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from an unauthorized user (/' . $command . ' section).');
 							return;
 						}
 
@@ -1482,7 +1482,7 @@
 											'parse_mode' => 'HTML'
 										]);
 
-										$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because the command have a wrong syntax (/' . $command . ' section).');
+										$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because the command have a wrong syntax (/' . $command . ' section).');
 										return;
 									}
 
@@ -1651,7 +1651,7 @@
 										'parse_mode' => 'HTML'
 									]);
 
-									$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because the command have a wrong syntax (/' . $command . ' section).');
+									$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because the command have a wrong syntax (/' . $command . ' section).');
 								}
 							}
 							return;
@@ -1806,7 +1806,7 @@
 
 						// Checking if the result is valid
 						if ($reply_message['_'] === 'messages.messagesNotModified' || $reply_message['messages'][0]['_'] !== 'message') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because wasn&apos;t a message that replies to another message (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because wasn\'t a message that replies to another message (/' . $command . ' section).');
 							return;
 						}
 
@@ -1832,7 +1832,7 @@
 						* 	array()
 						*/
 						if (empty($user) || $user['_'] !== 'user') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because the user of the reply_message isn&apos;t a normal user (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because the user of the reply_message isn\'t a normal user (/' . $command . ' section).');
 							return;
 						}
 
@@ -1954,12 +1954,12 @@
 						]);
 
 						// Sending the report to the channel
-						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> ' . $command == 'add' ? 'assigned' : 'removed' . ' <a href=\"mention:' . $user['id'] . '\" >' . $user['first_name'] . '</a> as bot&apos;s admin.');
+						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> ' . $command == 'add' ? 'assigned' : 'removed' . ' <a href=\"mention:' . $user['id'] . '\" >' . $user['first_name'] . '</a> as bot\'s admin.');
 						break;
 					case 'announce':
 						// Checking if the chat is a private chat
 						if ($message['to_id']['_'] === 'peerUser') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from a private chat (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from a private chat (/' . $command . ' section).');
 							return;
 						}
 
@@ -2007,7 +2007,7 @@
 								* in_array() check if the array contains an item that match the element
 								*/
 								if (in_array($sender['id'], $admins) == FALSE) {
-									$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because the sender isn&apos;t an admin of the chat (/' . $command . ' section).');
+									$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because the sender isn\'t an admin of the chat (/' . $command . ' section).');
 									return;
 								}
 
@@ -2048,7 +2048,7 @@
 								* in_array() check if the array contains an item that match the element
 								*/
 								if (in_array($sender['id'], $admins) == FALSE) {
-									$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because the sender isn&apos;t an admin of the chat (/' . $command . ' section).');
+									$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because the sender isn\'t an admin of the chat (/' . $command . ' section).');
 									return;
 								}
 
@@ -2094,7 +2094,7 @@
 					case 'unsilence':
 						// Checking if the chat is a private chat
 						if ($message['to_id']['_'] === 'peerUser') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from a private chat (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from a private chat (/' . $command . ' section).');
 							return;
 						}
 
@@ -2233,7 +2233,7 @@
 							* 	array()
 							*/
 							if (empty($message['reply_to_msg_id'])) {
-								$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because wasn&apos;t a message that replies to another message (/' . $command . ' section).');
+								$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because wasn\'t a message that replies to another message (/' . $command . ' section).');
 								return;
 							}
 
@@ -2246,7 +2246,7 @@
 
 							// Checking if the result is valid
 							if ($reply_message['_'] === 'messages.messagesNotModified' || $reply_message['messages'][0]['_'] !== 'message') {
-								$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because wasn&apos;t a message that replies to another message (/' . $command . ' section).');
+								$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because wasn\'t a message that replies to another message (/' . $command . ' section).');
 								return;
 							}
 
@@ -2272,7 +2272,7 @@
 							* 	array()
 							*/
 							if (empty($user) || $user['_'] !== 'user') {
-								$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because the user of the reply_message isn&apos;t a normal user (/' . $command . ' section).');
+								$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because the user of the reply_message isn\'t a normal user (/' . $command . ' section).');
 								return;
 							}
 
@@ -2502,7 +2502,7 @@
 									'parse_mode' => 'HTML'
 								]);
 
-								$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because the command have a wrong syntax (/' . $command . ' section).');
+								$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because the command have a wrong syntax (/' . $command . ' section).');
 								return;
 							}
 
@@ -2579,7 +2579,7 @@
 									'parse_mode' => 'HTML'
 								]);
 
-								$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because the command have a wrong syntax (/' . $command . ' section).');
+								$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because the command have a wrong syntax (/' . $command . ' section).');
 								return;
 							}
 
@@ -2645,7 +2645,7 @@
 					case 'unblacklist':
 						// Checking if the chat is a private chat
 						if ($message['to_id']['_'] === 'peerUser') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from a private chat (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from a private chat (/' . $command . ' section).');
 							return;
 						}
 
@@ -2658,7 +2658,7 @@
 							$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 							return;
 						} catch (Amp\Sql\FailureException $e) {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from an unauthorized user (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from an unauthorized user (/' . $command . ' section).');
 							return;
 						}
 
@@ -2678,7 +2678,7 @@
 						* 	array()
 						*/
 						if (empty($message['reply_to_msg_id'])) {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because wasn&apos;t a message that replies to another message (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because wasn\'t a message that replies to another message (/' . $command . ' section).');
 							return;
 						}
 
@@ -2691,7 +2691,7 @@
 
 						// Checking if the result is valid
 						if ($reply_message['_'] === 'messages.messagesNotModified' || $reply_message['messages'][0]['_'] !== 'message') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because wasn&apos;t a message that replies to another message (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because wasn\'t a message that replies to another message (/' . $command . ' section).');
 							return;
 						}
 
@@ -2717,7 +2717,7 @@
 						* 	array()
 						*/
 						if (empty($user) || $user['_'] !== 'user') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because the user of the reply_message isn&apos;t a normal user (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because the user of the reply_message isn\'t a normal user (/' . $command . ' section).');
 							return;
 						}
 
@@ -2841,7 +2841,7 @@
 					case 'help':
 						// Checking if the chat isn't a private chat
 						if ($message['to_id']['_'] !== 'peerUser') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because wasn&apos;t a message from a private chat (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because wasn\'t a message from a private chat (/' . $command . ' section).');
 							return;
 						}
 
@@ -2893,7 +2893,7 @@
 					case 'link':
 						// Checking if the chat is a private chat
 						if ($message['to_id']['_'] === 'peerUser') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from a private chat (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from a private chat (/' . $command . ' section).');
 							return;
 						}
 
@@ -2953,7 +2953,7 @@
 					case 'report':
 						// Checking if the chat isn't a private chat
 						if ($message['to_id']['_'] !== 'peerUser') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because wasn&apos;t a message from a private chat (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because wasn\'t a message from a private chat (/' . $command . ' section).');
 							return;
 						}
 
@@ -2966,7 +2966,7 @@
 							$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 							return;
 						} catch (Amp\Sql\FailureException $e) {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from an unauthorized user (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from an unauthorized user (/' . $command . ' section).');
 							return;
 						}
 
@@ -2975,22 +2975,22 @@
 								[
 									'_' => 'botCommand',
 									'command' => 'add',
-									'description' => 'Assign a user as bot&apos;s admin or add a chat or a language to the database'
+									'description' => 'Assign a user as bot\'s admin or add a chat or a language to the database'
 								],
 								[
 									'_' => 'botCommand',
 									'command' => 'announce',
-									'description' => 'If it&apos;s used into the staff group, send an announce in all the (super)groups, otherwise only in the (super)group where it&apos;s used'
+									'description' => 'If it\'s used into the staff group, send an announce in all the (super)groups, otherwise only in the (super)group where it\'s used'
 								],
 								[
 									'_' => 'botCommand',
 									'command' => 'ban',
-									'description' => 'If it&apos;s used into the staff group, ban a user from all the (super)groups, otherwise only from the (super)group where it&apos;s used'
+									'description' => 'If it\'s used into the staff group, ban a user from all the (super)groups, otherwise only from the (super)group where it\'s used'
 								],
 								[
 									'_' => 'botCommand',
 									'command' => 'blacklist',
-									'description' => 'Insert a user in the bot&apos;s blacklist'
+									'description' => 'Insert a user in the bot\'s blacklist'
 								],
 								[
 									'_' => 'botCommand',
@@ -3015,7 +3015,7 @@
 								[
 									'_' => 'botCommand',
 									'command' => 'remove',
-									'description' => 'Remove a user as bot&apos;s admin or a chat or a language to the database'
+									'description' => 'Remove a user as bot\'s admin or a chat or a language to the database'
 								],
 								[
 									'_' => 'botCommand',
@@ -3040,12 +3040,12 @@
 								[
 									'_' => 'botCommand',
 									'command' => 'unban',
-									'description' => 'If it&apos;s used into the staff group, unban a user from all the (super)groups, otherwise only from the (super)group where it&apos;s used'
+									'description' => 'If it\'s used into the staff group, unban a user from all the (super)groups, otherwise only from the (super)group where it\'s used'
 								],
 								[
 									'_' => 'botCommand',
 									'command' => 'unblacklist',
-									'description' => 'Remove a user from the bot&apos;s blacklist'
+									'description' => 'Remove a user from the bot\'s blacklist'
 								],
 								[
 									'_' => 'botCommand',
@@ -3114,7 +3114,7 @@
 					case 'staff_group':
 						// Checking if the chat is a private chat
 						if ($message['to_id']['_'] === 'peerUser') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from a private chat (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from a private chat (/' . $command . ' section).');
 							return;
 						}
 
@@ -3127,7 +3127,7 @@
 							$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 							return;
 						} catch (Amp\Sql\FailureException $e) {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from an unauthorized user (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from an unauthorized user (/' . $command . ' section).');
 							return;
 						}
 
@@ -3305,7 +3305,7 @@
 					case 'start':
 						// Checking if the chat isn't a private chat
 						if ($message['to_id']['_'] !== 'peerUser') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because wasn&apos;t a message from a private chat (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because wasn\'t a message from a private chat (/' . $command . ' section).');
 							return;
 						}
 
@@ -3365,7 +3365,7 @@
 					case 'update':
 						// Checking if the chat isn't a private chat
 						if ($message['to_id']['_'] !== 'peerUser') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because wasn&apos;t a message from a private chat (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because wasn\'t a message from a private chat (/' . $command . ' section).');
 							return;
 						}
 
@@ -3378,7 +3378,7 @@
 							$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 							return;
 						} catch (Amp\Sql\FailureException $e) {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from an unauthorized user (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from an unauthorized user (/' . $command . ' section).');
 							return;
 						}
 
@@ -3763,7 +3763,7 @@
 					default:
 						// Checking if the chat isn't a private chat
 						if ($message['to_id']['_'] !== 'peerUser') {
-							$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because wasn&apos;t a message from a private chat (/' . $command . ' section).');
+							$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because wasn\'t a message from a private chat (/' . $command . ' section).');
 							return;
 						}
 
@@ -3774,9 +3774,9 @@
 							]);
 						} catch (Amp\Sql\QueryError $e) {
 							$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
-							$answer = 'This command isn&apos;t supported.';
+							$answer = 'This command isn\'t supported.';
 						} catch (Amp\Sql\FailureException $e) {
-							$answer = 'This command isn&apos;t supported.';
+							$answer = 'This command isn\'t supported.';
 						}
 
 						// Checking if the query has product a result
@@ -3802,7 +3802,7 @@
 						* 	array()
 						*/
 						if (empty($answer)) {
-							$answer = 'This command isn&apos;t supported.';
+							$answer = 'This command isn\'t supported.';
 						}
 
 						yield $this -> messages -> sendMessage([
@@ -3838,7 +3838,7 @@
 					$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 					return;
 				} catch (Amp\Sql\FailureException $e) {
-					$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because was a message from an unauthorized user (add language section).');
+					$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because was a message from an unauthorized user (add language section).');
 					return;
 				}
 
@@ -3867,7 +3867,7 @@
 				* 	array()
 				*/
 				if (empty($primary_key)) {
-					$this -> logger('The Message ' . $update['id'] . ' wasn&apos;t managed because have a wrong syntax (add language section).');
+					$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because have a wrong syntax (add language section).');
 					return;
 				}
 
