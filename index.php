@@ -20,75 +20,6 @@
 		private $button_InlineKeyboard;
 
 		/**
-		* Execute a web request to a URL
-		*
-		* @param string $url The URL
-		* @param bool $parameters The flag that identify if the URL is a GET request with parameters
-		*
-		* @return string
-		*/
-		private function execute_request(string $url, bool $parameters = FALSE) : string {
-			/**
-			* Replace the special characters into the URL
-			*
-			* str_replace() replace the special characters with their code
-			*/
-			$url = str_replace("\t", '%09', $url);
-			$url = str_replace("\n", '%0A%0D', $url);
-			$url = str_replace(' ', '%20', $url);
-			$url = str_replace('\"', '%22', $url);
-			$url = str_replace('#', '%23', $url);
-			$url = str_replace([
-				'$',
-				'\$'
-			], '%24', $url);
-			$url = str_replace('%', '%25', $url);
-			$url = str_replace('\'', '%27', $url);
-			$url = str_replace(',', '%2C', $url);
-			$url = str_replace(';', '%3B', $url);
-			$url = str_replace('@', '%40', $url);
-
-			// Checking if the URL isn't a GET request with parameters
-			if ($parameters == FALSE) {
-				$url = str_replace('=', '%3D', $url);
-				$url = str_replace('?', '%3F', $url);
-			}
-
-			/**
-			* Opening the connection
-			*
-			* curl_init() initialize the cURL session
-			*/
-			$curl = curl_init($url);
-
-			/**
-			* Setting the connection
-			*
-			* curl_setopt_array() set the options for the cURL transfer
-			*/
-			curl_setopt_array($curl, [
-				CURLOPT_HEADER => FALSE,
-				CURLOPT_RETURNTRANSFER => TRUE
-			]);
-
-			/**
-			* Executing the web request
-			*
-			* curl_exec() perform the cURL session
-			*/
-			$result = curl_exec($curl);
-
-			/**
-			* Closing the connection
-			*
-			* curl_close() close the cURL session
-			*/
-			curl_close($curl);
-
-			return $result;
-		}
-
-		/**
 		* Get peer(s) where to report errors
 		*
 		* @return array
@@ -970,7 +901,11 @@
 						*
 						* json_decode() convert a JSON string into a PHP variables
 						*/
-						$result = execute_request('https://api.cas.chat/check?user_id=' . $new_member, TRUE);
+						$result = yield $this -> getHttpClient() -> request(new Amp\Http\Client\Request('https://api.cas.chat/check?user_id=' . $new_member));
+
+						// Retrieving the result
+						$result = yield $result -> getBody() -> buffer();
+
 						$result = json_decode($result, TRUE);
 
 						// Retrieving the data of the new member
@@ -1079,7 +1014,11 @@
 					*
 					* json_decode() convert a JSON string into a PHP variables
 					*/
-					$result = execute_request('https://api.cas.chat/check?user_id=' . $message['from_id'], TRUE);
+					$result = yield $this -> getHttpClient() -> request(new Amp\Http\Client\Request('https://api.cas.chat/check?user_id=' . $message['from_id']));
+
+					// Retrieving the result
+					$result = yield $result -> getBody() -> buffer();
+
 					$result = json_decode($result, TRUE);
 
 					// Retrieving the data of the new member
@@ -3603,7 +3542,11 @@
 								*
 								* json_decode() convert a JSON string into a PHP variables
 								*/
-								$result = execute_request('https://api.cas.chat/check?user_id=' . $member, TRUE);
+								$result = yield $this -> getHttpClient() -> request(new Amp\Http\Client\Request('https://api.cas.chat/check?user_id=' . $member));
+
+								// Retrieving the result
+								$result = yield $result -> getBody() -> buffer();
+
 								$result = json_decode($result, TRUE);
 
 								// Retrieving the data of the new member
