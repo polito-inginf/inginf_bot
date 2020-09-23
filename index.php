@@ -558,7 +558,7 @@
 													$this -> tmp['staff_group'] []= [
 														$update['peer'] => [
 															$query
-														];
+														]
 													];
 												}
 											} else {
@@ -1301,11 +1301,11 @@
 				*
 				* str_replace() replace the tags with their value
 				*/
-				$answer = str_replace('${sender_id}', $sender['id'], $answer)
-				$answer = str_replace('${sender_first_name}', $sender['first_name'], $answer)
-				$answer = str_replace('${motive}', ($matches[2] ?? FALSE) ? ' for ' . $matches[2] : '', $answer)
-				$answer = str_replace('${chat_invite}', $chat['invite'], $answer)
-				$answer = str_replace('${chat_title}', $chat['title'], $answer)
+				$answer = str_replace('${sender_id}', $sender['id'], $answer);
+				$answer = str_replace('${sender_first_name}', $sender['first_name'], $answer);
+				$answer = str_replace('${motive}', ($matches[2] ?? FALSE) ? ' for ' . $matches[2] : '', $answer);
+				$answer = str_replace('${chat_invite}', $chat['invite'], $answer);
+				$answer = str_replace('${chat_title}', $chat['title'], $answer);
 
 				$message = [
 					'multiple' => true
@@ -1641,7 +1641,7 @@
 									*
 									* str_replace() replace the tags with their value
 									*/
-									$answer = str_replace('${syntax}', '/' . $command . ' &lt;lang_code&gt;', $answer),
+									$answer = str_replace('${syntax}', '/' . $command . ' &lt;lang_code&gt;', $answer);
 
 									yield $this -> messages -> sendMessage([
 										'no_webpage' => TRUE,
@@ -3993,7 +3993,7 @@
 				'password' => 'password',
 				'database' => 'database_name'
 			]
-		]
+			],
 		'logger' => [
 			'logger' => danog\MadelineProto\Logger::FILE_LOGGER,
 			'logger_level' => danog\MadelineProto\Logger::ULTRA_VERBOSE,
