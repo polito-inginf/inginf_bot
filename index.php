@@ -1641,7 +1641,7 @@
 									*
 									* str_replace() replace the tags with their value
 									*/
-									$answer = str_replace('${syntax}', '/' . $command . ' &lt;lang_code&gt;', $answer),
+									$answer = str_replace('${syntax}', '/' . $command . ' &lt;lang_code&gt;', $answer);
 
 									yield $this -> messages -> sendMessage([
 										'no_webpage' => TRUE,
@@ -3993,7 +3993,7 @@
 				'password' => 'password',
 				'database' => 'database_name'
 			]
-		]
+			],
 		'logger' => [
 			'logger' => danog\MadelineProto\Logger::FILE_LOGGER,
 			'logger_level' => danog\MadelineProto\Logger::ULTRA_VERBOSE,
