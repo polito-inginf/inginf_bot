@@ -8,6 +8,7 @@ It contains links to the various groups related to the degree course (bachelor a
 
 * [File](#files)
 	- [index.php](#index.php)
+	- [How to install the dependencies](#how-to-install-the-dependencies)
 * [Practical advice](#practical-advice)
 * [Why Telegram ?](#why-telegram)
 
@@ -20,6 +21,11 @@ Below is a description of the most important files you can find in this repo:
 This file contains the bot's source code; it is continuosly in update.
 
 This bot was created through the [MadelineProto](https://docs.madelineproto.xyz/) library (v5.1.24), an async PHP client/server API for the Telegram MTProto protocol.
+
+## How to install the dependencies
+
+To install the dependencies locally, install [composer](https://nekobin.com/sagumirohe.bash) and use: `composer update`
+
 
 # Practical advice
 
