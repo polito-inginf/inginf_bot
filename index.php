@@ -31,7 +31,7 @@
 		}
 
 		/**
-		* Called on startup, can contain async calls for initialization of the bot
+		* Called on startup, can contain async calls for initialization of the bot 
 		*
 		* @return void
 		*/
