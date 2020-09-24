@@ -1,6 +1,6 @@
 <?php
 	/**
-	* Template for creating a Telegram bot in PHP.
+	* Template for the creation of a Telegram bot in PHP.
 	*
 	* This template can be reused in accordance with the GNU GPLv3 license.
 	*
@@ -10,10 +10,10 @@
 	* @license		https://choosealicense.com/licenses/gpl-3.0/
 	*/
 
-	// Installing the libraries
+	// Installing libraries
 	require_once 'vendor/autoload.php';
 
-	// Creating the bot
+	// Creating bot
 	class inginf_bot extends danog\MadelineProto\EventHandler {
 		private $DB;
 		private $tmp;
@@ -31,12 +31,12 @@
 		}
 
 		/**
-		* Called on startup, can contain async calls for initialization of the bot 
+		* Called on startup, can contain async calls for initialization of the bot
 		*
 		* @return void
 		*/
 		public function onStart() : Generator {
-			// Setting the database
+			// Setting database
 			try {
 				$this -> DB = yield Amp\Mysql\connect(Amp\Mysql\ConnectionConfig::fromString('host=localhost;user=username;pass=password;db=database_name'));
 			} catch (Amp\Sql\ConnectionException $e) {
@@ -44,17 +44,17 @@
 				exit(1);
 			}
 
-			// Set the character set
+			// Set character set
 			$this -> DB -> setCharset('utf8', 'utf8_general_ci');
 
 			$this -> tmp = [];
 
-			// Setting how many buttons an InlineKeyboard must contains (#row = button_InlineKeyboard / 2)
+			// Setting how many buttons an InlineKeyboard contains (#row = button_InlineKeyboard / 2)
 			$this -> button_InlineKeyboard = 8;
 		}
 
 		/**
-		* Handle updates from CallbackQuery
+		* Handles updates from CallbackQuery
 		*
 		* @param array $update Update
 		*
@@ -68,7 +68,7 @@
 			/**
 			* Checking if the sender is a normal user
 			*
-			* empty() check if the argument is empty
+			* empty() checks if the argument is empty
 			* 	''
 			* 	""
 			* 	'0'
@@ -86,7 +86,7 @@
 			/**
 			* Checking if the query is empty
 			*
-			* empty() check if the query is empty
+			* empty() checks if the query is empty
 			* 	''
 			* 	""
 			* 	'0'
@@ -106,15 +106,15 @@
 			/**
 			* Retrieving the callback data
 			*
-			* trim() strip whitespaces from the begin and the end of the string
-			* base64_decode() decode the string
+			* trim() strips whitespaces from the begin and the end of the string
+			* base64_decode() decodes the string
 			*/
 			$callback_data = trim(base64_decode($update['data']));
 
 			/**
-			* Retrieving the command that have generated the CallbackQuery
+			* Retrieving the command that generated the CallbackQuery
 			*
-			* explode() convert a string into an array
+			* explode() converts a string into an array
 			*/
 			$command = explode('/', $callback_data)[0];
 
@@ -182,7 +182,7 @@
 					/**
 					* Retrieving the query
 					*
-					* explode() convert a string into an array
+					* explode() converts a string into an array
 					*/
 					$query = explode('/', $callback_data)[1];
 
@@ -191,21 +191,21 @@
 							/**
 							* Retrieving the page
 							*
-							* explode() convert a string into an array
+							* explode() converts a string into an array
 							*/
 							$actual_page = (int) explode('/', $callback_data)[2];
 
 							/**
 							* Retrieving the button in the page
 							*
-							* array_splice() extract the sub-array from the main array
+							* array_splice() extracts the sub-array from the main array
 							*/
 							$chats = array_slice($chats, $actual_page * $this -> button_InlineKeyboard,  $this -> button_InlineKeyboard);
 
 							/**
 							* Setting the InlineKeyboard
 							*
-							* array_map() convert each chat to a keyboardButtonCallback
+							* array_map() converts each chat to a keyboardButtonCallback
 							*/
 							$chats = array_map(function ($n) {
 								return [
@@ -214,7 +214,7 @@
 									/**
 									* Generating the keyboardButtonCallback data
 									*
-									* base64_encode() encode the string
+									* base64_encode() encodes the string
 									*/
 									'data' => base64_encode($command . '/' . $n['id'] . '/no')
 								];
@@ -234,7 +234,7 @@
 								/**
 								* Retrieving the length of the row
 								*
-								* count() retrieve the length of the array
+								* count() retrieves the length of the array
 								*/
 								if (count($row['buttons']) == 2) {
 									// Saving the row
@@ -257,7 +257,7 @@
 										/**
 										* Generating the keyboardButtonCallback data
 										*
-										* base64_encode() encode the string
+										* base64_encode() encodes the string
 										*/
 										'data' => base64_encode($actual_page != 0 ? $command . '/page/' . $actual_page - 1 : '')
 									],
@@ -267,7 +267,7 @@
 										/**
 										* Generating the keyboardButtonCallback data
 										*
-										* base64_encode() encode the string
+										* base64_encode() encodes the string
 										*/
 										'data' => base64_encode(($actual_page + 1) * $this -> button_InlineKeyboard > $total ? $command . '/page/' . $actual_page + 1 : '')
 									]
@@ -284,7 +284,7 @@
 										/**
 										* Generating the keyboardButtonCallback data
 										*
-										* base64_encode() encode the string
+										* base64_encode() encodes the string
 										*/
 										'data' => base64_encode($command . '/reject')
 									],
@@ -294,7 +294,7 @@
 										/**
 										* Generating the keyboardButtonCallback data
 										*
-										* base64_encode() encode the string
+										* base64_encode() encodes the string
 										*/
 										'data' => base64_encode($command . '/confirm')
 									]
@@ -302,7 +302,7 @@
 							];
 							break;
 						case 'reject':
-							// Retrieving the reject message
+							// Retrieving the 'reject' message
 							try {
 								$answer = yield $this -> DB -> execute('SELECT `reject_message` FROM `Languages` WHERE `lang_code`=?;', [
 									$language
@@ -314,7 +314,7 @@
 								$answer = 'Operation deleted.';
 							}
 
-							// Checking if the query has product a result
+							// Checking if the query produced results
 							if ($answer instanceof Amp\Mysql\ResultSet) {
 								yield $answer -> advance();
 								$answer = $answer -> getCurrent();
@@ -322,9 +322,9 @@
 							}
 
 							/**
-							* Checking if the reject message isn't setted
+							* Checking if the reject message isn't set
 							*
-							* empty() check if the argument is empty
+							* empty() checks if the argument is empty
 							* 	''
 							* 	""
 							* 	'0'
@@ -341,23 +341,23 @@
 							}
 
 							/**
-							* Checking if is an abort
+							* Checking if it's an abort
 							*
-							* array_key_exists() check if the key exists
+							* array_key_exists() checks if the key exists
 							*/
 							if (array_key_exists('staff_group', $this -> tmp) && array_key_exists($update['peer'], $this -> tmp['staff_group'])) {
 								/**
 								* Removing the id from the array
 								*
-								* array_search() search the id into the array
-								* array_splice() extract the sub-array from the main array
+								* array_search() searches the id into the array
+								* array_splice() extracts the sub-array from the main array
 								*/
 								array_splice($this -> tmp, array_search($update['peer'], $this -> tmp['staff_group']), 1);
 
 								/**
-								* Checking if there isn't other request for the /staff_group command
+								* Checking if there aren't any other request for the /staff_group command
 								*
-								* empty() check if the argument is empty
+								* empty() checks if the argument is empty
 								* 	''
 								* 	""
 								* 	'0'
@@ -373,8 +373,8 @@
 									/**
 									* Removing the 'staff_group' key from the array
 									*
-									* array_search() search the 'staff_group' key into the array
-									* array_splice() extract the sub-array from the main array
+									* array_search() searches the 'staff_group' key into the array
+									* array_splice() extracts the sub-array from the main array
 									*/
 									array_splice($this -> tmp, array_search('staff_group', $this -> tmp), 1);
 								}
@@ -391,16 +391,16 @@
 							return;
 						case 'confirm':
 							/**
-							* Checking if the confirm is pressed for error
+							* Checking if 'confirm' was accidentaly pressed
 							*
-							* array_key_exists() check if the key exists
+							* array_key_exists() checks if the key exists
 							*/
 							if (array_key_exists('staff_group', $this -> tmp) == FALSE || array_key_exists($update['peer'], $this -> tmp['staff_group']) == FALSE) {
 								$this -> logger('The CallbackQuery ' . $update['query_id'] . ' wasn\'t managed because the sender have pressed the wrong button (/' . $command . ' section).');
 								return;
 							}
 
-							// Opening a transaction
+							// Opening transaction
 							$transaction = yield $this -> DB -> beginTransaction();
 
 							// Updating the staff_group for the selected chats
@@ -423,27 +423,27 @@
 								}
 							}
 
-							// Closing the statement
+							// Closing statement
 							$statement -> close();
 
-							// Commit the change
+							// Commit changes
 							yield $transaction -> commit();
 
-							// Closing the transaction
+							// Closing transaction
 							yield $transaction -> close();
 
 							/**
 							* Removing the id from the array
 							*
-							* array_search() search the id into the array
-							* array_splice() extract the sub-array from the main array
+							* array_search() searches the id into the array
+							* array_splice() extracts the sub-array from the main array
 							*/
 							array_splice($this -> tmp, array_search($update['peer'], $this -> tmp['staff_group']), 1);
 
 							/**
-							* Checking if there isn't other request for the /staff_group command
+							* Checking if there aren't any other request for the /staff_group command
 							*
-							* empty() check if the argument is empty
+							* empty() checks if the argument is empty
 							* 	''
 							* 	""
 							* 	'0'
@@ -459,13 +459,13 @@
 								/**
 								* Removing the 'staff_group' key from the array
 								*
-								* array_search() search the 'staff_group' key into the array
-								* array_splice() extract the sub-array from the main array
+								* array_search() searches the 'staff_group' key into the array
+								* array_splice() extracts the sub-array from the main array
 								*/
 								array_splice($this -> tmp, array_search('staff_group', $this -> tmp), 1);
 							}
 
-							// Retrieving the confirm message
+							// Retrieving the 'confirm' message
 							try {
 								$answer = yield $this -> DB -> execute('SELECT `confirm_message` FROM `Languages` WHERE `lang_code`=?;', [
 									$language
@@ -477,7 +477,7 @@
 								$answer = 'Operation completed.';
 							}
 
-							// Checking if the query has product a result
+							// Checking if the query produced results
 							if ($answer instanceof Amp\Mysql\ResultSet) {
 								yield $answer -> advance();
 								$answer = $answer -> getCurrent();
@@ -485,9 +485,9 @@
 							}
 
 							/**
-							* Checking if the confirm message isn't setted
+							* Checking if the confirm message isn't set
 							*
-							* empty() check if the argument is empty
+							* empty() checks if the argument is empty
 							* 	''
 							* 	""
 							* 	'0'
@@ -519,7 +519,7 @@
 							/**
 							* Retrieving the type of the request
 							*
-							* explode() convert a string into an array
+							* explode() converts a string into an array
 							*/
 							$type = explode('/', $callback_data)[2];
 
@@ -532,25 +532,25 @@
 										/**
 										* Commuting the button
 										*
-										* base64_encode() encode the string
-										* str_replace() replace the special characters with their code
+										* base64_encode() encodes the string
+										* str_replace() replaces the special characters with their code
 										*/
 										$button['data'] = base64_encode($type == 'yes' ? $command . '/' . $query . '/no' : $command . '/' . $query . '/yes');
 
 										$button['text'] = $type == 'yes' ? str_replace(' ✅', '', $button['text']) : $button['text'] . ' ✅';
 
-										// Checking if is a select request
+										// Checking if it's a select request
 										if ($type == 'yes') {
 											/**
-											* Checking if the first /staff_group request
+											* Checking if it's the first /staff_group request
 											*
-											* array_key_exists() check if the 'staff_group' key exists
+											* array_key_exists() checks if the 'staff_group' key exists
 											*/
 											if (array_key_exists('staff_group', $this -> tmp)) {
 												/**
-												* Checking if the first /staff_group request for this staff group
+												* Checking if it's the first /staff_group request for this staff group
 												*
-												* array_key_exists() check if the id exists
+												* array_key_exists() checks if the id exists
 												*/
 												if (array_key_exists($update['peer'], $this -> tmp['staff_group'])) {
 													$this -> tmp['staff_group'][$update['peer']] []= $query;
@@ -574,8 +574,8 @@
 											/**
 											* Removing the query from the array
 											*
-											* array_search() search the query into the array
-											* array_splice() extract the sub-array from the main array
+											* array_search() searches the query into the array
+											* array_splice() extracts the sub-array from the main array
 											*/
 											array_splice($this -> tmp['staff_group'][$update['peer']], array_search($query, $this -> tmp['staff_group'][$update['peer']]), 1);
 										}
@@ -601,7 +601,7 @@
 		}
 
 		/**
-		* Handle updates from InlineQuery
+		* Handles updates from InlineQuery
 		*
 		* @param array $update Update
 		*
@@ -609,22 +609,22 @@
 		*/
 		public function onUpdateBotInlineQuery(array $update) : Generator {
 			/**
-			* Encode the text
+			* Encoding the text
 			*
-			* trim() strip whitespaces from the begin and the end of the string
-			* htmlentities() convert all HTML character to its safe value
+			* trim() strips whitespaces from the begin and the end of the string
+			* htmlentities() converts all HTML character to its safe value
 			*/
 			$inline_query = trim($update['query']);
 			$inline_query = htmlentities($inline_query, ENT_QUOTES | ENT_SUBSTITUTE | ENT_DISALLOWED | ENT_HTML5, 'UTF-8');
 
-			// Retrieving the data of the user that sent the query
+			// Retrieving the user's data that sent the query
 			$sender = yield $this -> getInfo($update['user_id']);
 			$sender = $sender['User'] ?? NULL;
 
 			/**
 			* Checking if the user is a normal user
 			*
-			* empty() check if the argument is empty
+			* empty() checks if the argument is empty
 			* 	''
 			* 	""
 			* 	'0'
@@ -642,7 +642,7 @@
 			/**
 			* Checking if the query is empty
 			*
-			* empty() check if the query is empty
+			* empty() checks if the query is empty
 			* 	''
 			* 	""
 			* 	'0'
@@ -660,7 +660,7 @@
 			/**
 			* Checking if the query is long enough
 			*
-			* strlen() return the length of the string
+			* strlen() returns the length of the string
 			*/
 			} else if (strlen($inline_query) < 3) {
 				$this -> logger('The InlineQuery ' . $update['query_id'] . ' wasn\'t managed because was too short.');
@@ -668,7 +668,7 @@
 			}
 
 
-			// Retrieving the language of the user
+			// Retrieving the user's language
 			$language = isset($sender['lang_code']) ? $sender['lang_code'] : 'en';
 
 			// Checking if the language is supported
@@ -690,7 +690,7 @@
 					/**
 					* Generating the inputBotInlineResult id
 					*
-					* uniqid() generate a random string
+					* uniqid() generates a random string
 					*/
 					'id' => uniqid(),
 					'type' => 'article',
@@ -710,7 +710,7 @@
 				/**
 				* Generating the query id
 				*
-				* mt_rand() generate a random integer number
+				* mt_rand() generates a random integer number
 				*/
 				'query_id' => mt_rand(),
 				'results' => $answer,
@@ -724,7 +724,7 @@
 		}
 
 		/**
-		* Handle updates about edited message from supergroups and channels
+		* Handles updates about edited message from supergroups and channels
 		*
 		* @param array $update Update
 		*
@@ -735,7 +735,7 @@
 		}
 
 		/**
-		* Handle updates about edited message from users
+		* Handles updates about edited message from users
 		*
 		* @param array $update Update
 		*
@@ -746,7 +746,7 @@
 		}
 
 		/**
-		* Handle updates from supergroups and channels
+		* Handles updates from supergroups and channels
 		*
 		* @param array $update Update
 		*
@@ -757,7 +757,7 @@
 		}
 
 		/**
-		* Handle updates from users and groups
+		* Handles updates from users and groups
 		*
 		* @param array $update Update
 		*
@@ -779,7 +779,7 @@
 			// Retrieving the chat's data
 			$chat = yield $this -> getPwrChat($message['to_id']['_'] === 'peerUser' ? $message['from_id'] : ($message['to_id']['_'] === 'peerChat' ? $message['to_id']['chat_id'] : $message['to_id']['channel_id']));
 
-			// Retrieving the data of the sender
+			// Retrieving the sender's data
 			$sender = yield $this -> getInfo($message['from_id']);
 			$sender = $sender['User'] ?? NULL;
 
@@ -807,7 +807,7 @@
 			if ($message['_'] === 'messageService') {
 				$answer = NULL;
 
-				// Retrieving the welcome message
+				// Retrieving the 'welcome' message
 				try {
 					$answer = yield $this -> DB -> execute('SELECT `welcome` FROM `Chats` WHERE `id`=?;', [
 						$chat['id']
@@ -817,7 +817,7 @@
 				} catch (Amp\Sql\FailureException $e) {
 				}
 
-				// Checking if the query has product a result
+				// Checking if the query produced results
 				if ($answer instanceof Amp\Mysql\ResultSet) {
 					yield $answer -> advance();
 					$answer = $answer -> getCurrent();
@@ -831,10 +831,9 @@
 					];
 
 					/**
-					* 
-					* Checking if the welcome message is setted
+					* Checking if the welcome message is set
 					*
-					* empty() check if the argument is empty
+					* empty() checks if the argument is empty
 					* 	''
 					* 	""
 					* 	'0'
@@ -854,20 +853,20 @@
 					$bot = yield $this -> getSelf();
 
 					/**
-					* Checking if the bot have joined the (super)group
+					* Checking if the bot joined the (super)group
 					*
-					* in_array() check if the bot id is into the array
+					* in_array() checks if the bot id is into the array
 					*/
 					if (in_array($bot['id'], $message['action']['users'])) {
 						/**
 						* Removing the bot id from the new members list
 						*
-						* array_search() search the bot id into the array
-						* array_splice() extract the sub-array from the main array
+						* array_search() searches the bot id into the array
+						* array_splice() extracts the sub-array from the main array
 						*/
 						array_splice($message['action']['users'], array_search($bot['id'], $message['action']['users']), 1);
 
-						// Checking if who added the bot is a bot's admin
+						// Checking if a bot's admin added the bot to the group
 						try {
 							yield $this -> DB -> execute('SELECT NULL FROM `Admins` WHERE `id`=?;', [
 								$sender['id']
@@ -900,7 +899,7 @@
 						/**
 						* Downloading the user's informations from the Combot Anti-Spam API
 						*
-						* json_decode() convert a JSON string into a PHP variables
+						* json_decode() converts a JSON string into a PHP variables
 						*/
 						$result = yield $this -> getHttpClient() -> request(new Amp\Http\Client\Request('https://api.cas.chat/check?user_id=' . $new_member));
 
@@ -914,9 +913,9 @@
 						$new_member = $new_member['User'] ?? NULL;
 
 						/**
-						* Checking if the user isn't a spammer, isn't a deleted account and is a normal user
+						* Checking if the user is a normal user and not a spammer or a deleted account
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -930,9 +929,9 @@
 						*/
 						if ($result['ok'] == FALSE && empty($new_member) && $new_member['_'] === 'user' && $new_member['scam'] == FALSE && $new_member['deleted'] == FALSE) {
 							/**
-							* Checking if the welcome message is setted
+							* Checking if the 'welcome' message is set
 							*
-							* empty() check if the argument is empty
+							* empty() checks if the argument is empty
 							* 	''
 							* 	""
 							* 	'0'
@@ -975,9 +974,9 @@
 					yield $this -> channels -> editBanned($banned);
 
 					/**
-					* Checking if the welcome message is setted
+					* Checking if the 'welcome' message is set
 					*
-					* empty() check if the argument is empty
+					* empty() checks if the argument is empty
 					* 	''
 					* 	""
 					* 	'0'
@@ -993,9 +992,9 @@
 						/**
 						* Personalizing the message
 						*
-						* array_map() convert each new member into it's tag
-						* implode() convert the array into a string
-						* str_replace() replace the 'mentions' tag with the string
+						* array_map() converts each new member into it's tag
+						* implode() converts the array into a string
+						* str_replace() replaces the 'mentions' tag with the string
 						*/
 						$members = array_map(function ($n) {
 							return '<a href=\"mention:' . $n['id'] . '\" >' . $n['first_name'] . '</a>';
@@ -1013,7 +1012,7 @@
 					/**
 					* Downloading the user's informations from the Combot Anti-Spam API
 					*
-					* json_decode() convert a JSON string into a PHP variables
+					* json_decode() converts a JSON string into a PHP variables
 					*/
 					$result = yield $this -> getHttpClient() -> request(new Amp\Http\Client\Request('https://api.cas.chat/check?user_id=' . $message['from_id']));
 
@@ -1022,14 +1021,14 @@
 
 					$result = json_decode($result, TRUE);
 
-					// Retrieving the data of the new member
+					// Retrieving the new member's data
 					$new_member = yield $this -> getInfo($message['from_id']);
 					$new_member = $new_member['User'] ?? NULL;
 
 					/**
-					* Checking if the user is a spammer, is a deleted account or isn't a normal user
+					* Checking if the user is a spammer, a deleted account or not a normal user
 					*
-					* empty() check if the argument is empty
+					* empty() checks if the argument is empty
 					* 	''
 					* 	""
 					* 	'0'
@@ -1065,9 +1064,9 @@
 					}
 
 					/**
-					* Checking if the welcome message is setted
+					* Checking if the welcome message is set
 					*
-					* empty() check if the argument is empty
+					* empty() checks if the argument is empty
 					* 	''
 					* 	""
 					* 	'0'
@@ -1083,7 +1082,7 @@
 						/**
 						* Personalizing the message
 						*
-						* str_replace() replace the 'mentions' tag with the string
+						* str_replace() replaces the 'mentions' tag with the string
 						*/
 						$answer = str_replace('${mentions}', '<a href=\"mention:' . $new_member['id'] . '\" >' . $new_member['first_name'] . '</a>', $answer);
 
@@ -1095,10 +1094,10 @@
 						]);
 					}
 				} else if ($message['action']['_'] === 'messageActionChatMigrateTo') {
-					// Opening a transaction
+					// Opening transaction
 					$transaction = yield $this -> DB -> beginTransaction();
 
-					// Updating the chat's data
+					// Updating chat's data
 					try {
 						yield $transaction -> execute('UPDATE `Chats` SET `id`=? WHERE `id`=?;', [
 							$message['action']['channel_id'],
@@ -1107,21 +1106,21 @@
 					} catch (Amp\Sql\QueryError | Amp\Sql\FailureException $e) {
 						$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 
-						// Closing the transaction
+						// Closing transaction
 						yield $transaction -> close();
 						return;
 					}
 
-					// Commit the change
+					// Commit changes
 					yield $transaction -> commit();
 
-					// Closing the transaction
+					// Closing transaction
 					yield $transaction -> close();
 				} else if ($message['action']['_'] === 'messageActionChannelMigrateFrom') {
-					// Opening a transaction
+					// Opening transaction
 					$transaction = yield $this -> DB -> beginTransaction();
 
-					// Updating the chat's data
+					// Updating chat's data
 					try {
 						yield $transaction -> execute('UPDATE `Chats` SET `id`=? WHERE `id`=?;', [
 							$chat['id'],
@@ -1130,15 +1129,15 @@
 					} catch (Amp\Sql\QueryError | Amp\Sql\FailureException $e) {
 						$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 
-						// Closing the transaction
+						// Closing transaction
 						yield $transaction -> close();
 						return;
 					}
 
-					// Commit the change
+					// Commit change
 					yield $transaction -> commit();
 
-					// Closing the transaction
+					// Closing transaction
 					yield $transaction -> close();
 				}
 
@@ -1151,7 +1150,7 @@
 				return;
 			}
 
-			// Checking if the chat is an allowed chat
+			// Checking if the chat is allowed
 			try {
 				yield $this -> DB -> execute('SELECT NULL FROM `Chats` WHERE `id`=?;', [
 					$chat['id']
@@ -1194,8 +1193,8 @@
 			/**
 			* Encode the text
 			*
-			* trim() strip whitespaces from the begin and the end of the string
-			* htmlentities() convert all HTML character to its safe value
+			* trim() strips whitespaces from the begin and the end of the string
+			* htmlentities() converts all HTML character to its safe value
 			*/
 			$message['message'] = trim($message['message']);
 			$message['message'] = htmlentities($message['message'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_DISALLOWED | ENT_HTML5, 'UTF-8');
@@ -1213,13 +1212,13 @@
 			} catch (Amp\Sql\FailureException $e) {
 			}
 
-			// Checking if the query has product a result
+			// Checking if the query produced results
 			if ($result instanceof Amp\Mysql\ResultSet) {
 				$this -> logger('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> tried to use the bot.');
 				return;
 			}
 
-			// Retrieving the language of the user
+			// Retrieving the user's language
 			$language = isset($sender['lang_code']) ? $sender['lang_code'] : 'en';
 
 			// Checking if the language is supported
@@ -1235,9 +1234,9 @@
 			}
 
 			/**
-			* Checking if is an @admin tag
+			* Checking if it's an @admin tag
 			*
-			* preg_match() perform a RegEx match
+			* preg_match() performs a RegEx match
 			*/
 			if (preg_match('/^\@admin([[:blank:]\n]{1}((\n|.)*))?$/miu', $message['message'], $matches)) {
 				// Checking if the chat is a private chat
@@ -1250,7 +1249,7 @@
 				* Retrieving the admins list
 				*
 				* array_filter() filters the array by the role of each member
-				* array_map() convert each admins to its id
+				* array_map() converts each admins to its id
 				*/
 				$admins = array_filter($chat['participants'], function ($n) {
 					return $n['role'] == 'admin' || $n['role'] == 'creator';
@@ -1259,7 +1258,7 @@
 					return $n['user'];
 				}, $admins);
 
-				// Retrieving the admin message
+				// Retrieving the 'admin' message
 				try {
 					$answer = yield $this -> DB -> execute('SELECT `admin_message` FROM `Languages` WHERE `lang_code`=?;', [
 						$language
@@ -1271,7 +1270,7 @@
 					$answer = '<a href=\"mention:${admin_id}\" >${admin_first_name}</a>,\n<a href=\"mention:${sender_id}\" >${sender_first_name}</a> needs your help${motive} into <a href=\"${chat_invite}\" >${chat_title}</a>.';
 				}
 
-				// Checking if the query has product a result
+				// Checking if the query produced results
 				if ($answer instanceof Amp\Mysql\ResultSet) {
 					yield $answer -> advance();
 					$answer = $answer -> getCurrent();
@@ -1279,9 +1278,9 @@
 				}
 
 				/**
-				* Checking if the admin message isn't setted
+				* Checking if the 'admin' message isn't set
 				*
-				* empty() check if the argument is empty
+				* empty() checks if the argument is empty
 				* 	''
 				* 	""
 				* 	'0'
@@ -1298,9 +1297,9 @@
 				}
 
 				/**
-				* Personalizing the admin message
+				* Personalizing the 'admin' message
 				*
-				* str_replace() replace the tags with their value
+				* str_replace() replaces the tags with their value
 				*/
 				$answer = str_replace('${sender_id}', $sender['id'], $answer);
 				$answer = str_replace('${sender_first_name}', $sender['first_name'], $answer);
@@ -1328,13 +1327,13 @@
 			/**
 			* Checking if is a bot command
 			*
-			* preg_match() perform a RegEx match
+			* preg_match() performs a RegEx match
 			*/
 			} else if (preg_match('/^\/([[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $message['message'], $matches)) {
 				/**
 				* Retrieving the command
 				*
-				* explode() convert a string into an array
+				* explode() converts a string into an array
 				*/
 				$command = explode('@', $matches[1])[0];
 				$args = $matches[2] ?? NULL;
@@ -1357,7 +1356,7 @@
 
 						// Checking if the chat is a private chat
 						if ($message['to_id']['_'] === 'peerUser') {
-							// Checking if is an add request
+							// Checking if it's an add request
 							if ($command == 'add') {
 								// Retrieving the add_lang message
 								try {
@@ -1371,7 +1370,7 @@
 									$answer = 'Send me a message with this format:' . "\n\n" . '<code>lang_code: &lt;insert here the lang_code of the language&gt;' . "\n" . 'add_lang_message: &lt;insert here the message for the /add command when a user want add a language&gt;' . "\n" . 'admin_message: &lt;insert here the message for the @admin tag&gt;' . "\n" . 'confirm_message: &lt;insert here a generic confirm message&gt;' . "\n" . 'help_message: &lt;insert here the message for the /help command&gt;' . "\n" . 'invalid_parameter_message: &lt;insert here the message that will be sent when a user insert an invalid parameter into a command&gt;' . "\n" . 'invalid_syntax_message: &lt;insert here the message that will be sent when a user send a command with an invalid syntax&gt;' . "\n" . 'mute_message: &lt;insert here the message for the /mute command&gt;' . "\n" . 'mute_advert_message: &lt;insert here the message for when the /mute command is used with time set to forever&gt;' . "\n" . 'link_message: &lt;insert here the message for the /link command&gt;' . "\n" . 'reject_message: &lt;insert here a generic reject message&gt;' . "\n" . 'staff_group_message: &lt;insert here the message for the /staff_group command&gt;' . "\n" . 'start_message: &lt;insert here the message for the /start command&gt;' . "\n" . 'unknown_message: &lt;insert here the message for the unknown commands&gt;' . "\n" . 'update_message: &lt;insert here the message for the /update command&gt;</code>' . "\n\n" . '<b>N.B.</b>: If you want insert a new line in the messages, you must codify it as <code>\n</code>.';
 								}
 
-								// Checking if the query has product a result
+								// Checking if the query produced results
 								if ($answer instanceof Amp\Mysql\ResultSet) {
 									yield $answer -> advance();
 									$answer = $answer -> getCurrent();
@@ -1379,9 +1378,9 @@
 								}
 
 								/**
-								* Checking if the add_lang message is setted
+								* Checking if the 'add_lang' message is set
 								*
-								* empty() check if the argument is empty
+								* empty() checks if the argument is empty
 								* 	''
 								* 	""
 								* 	'0'
@@ -1406,9 +1405,9 @@
 								]);
 							} else {
 								/**
-								* Checking if the command have arguments
+								* Checking if the command has arguments
 								*
-								* empty() check if the argument is empty
+								* empty() checks if the argument is empty
 								* 	''
 								* 	""
 								* 	'0'
@@ -1421,7 +1420,7 @@
 								* 	array()
 								*/
 								if (empty($args) == FALSE) {
-									// Checking if the language is into the database
+									// Checking if the language is in the database
 									try {
 										yield $this -> DB -> execute('SELECT NULL FROM `Languages` WHERE `lang_code`=?;', [
 											$args
@@ -1430,7 +1429,7 @@
 										$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 										return;
 									} catch (Amp\Sql\FailureException $e) {
-										// Retrieving the invalid_parameter message
+										// Retrieving the 'invalid_parameter' message
 										try {
 											$answer = yield $this -> DB -> execute('SELECT `invalid_parameter_message` FROM `Languages` WHERE `lang_code`=?;', [
 												$language
@@ -1442,7 +1441,7 @@
 											$answer = 'The ${parameter} is invalid.';
 										}
 
-										// Checking if the query has product a result
+										// Checking if the query produced results
 										if ($answer instanceof Amp\Mysql\ResultSet) {
 											yield $answer -> advance();
 											$answer = $answer -> getCurrent();
@@ -1450,9 +1449,9 @@
 										}
 
 										/**
-										* Checking if the invalid_parameter message isn't setted
+										* Checking if the 'invalid_parameter' message isn't set
 										*
-										* empty() check if the argument is empty
+										* empty() checks if the argument is empty
 										* 	''
 										* 	""
 										* 	'0'
@@ -1469,9 +1468,9 @@
 										}
 
 										/**
-										* Personalizing the invalid_parameter message
+										* Personalizing the 'invalid_parameter' message
 										*
-										* str_replace() replace the tags with their value
+										* str_replace() replaces the tags with their value
 										*/
 										$answer = str_replace('${parameter}', 'lang_code', $answer);
 
@@ -1487,7 +1486,7 @@
 										return;
 									}
 
-									// Opening a transaction
+									// Opening transaction
 									$transaction = yield $this -> DB -> beginTransaction();
 
 									// Removing the language
@@ -1498,7 +1497,7 @@
 									} catch (Amp\Sql\QueryError | Amp\Sql\FailureException $e) {
 										$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 
-										// Retrieving the reject message
+										// Retrieving 'reject' message
 										try {
 											$answer = yield $this -> DB -> execute('SELECT `reject_message` FROM `Languages` WHERE `lang_code`=?;', [
 												$language
@@ -1510,7 +1509,7 @@
 											$answer = 'Operation deleted.';
 										}
 
-										// Checking if the query has product a result
+										// Checking if the query produced results
 										if ($answer instanceof Amp\Mysql\ResultSet) {
 											yield $answer -> advance();
 											$answer = $answer -> getCurrent();
@@ -1518,9 +1517,9 @@
 										}
 
 										/**
-										* Checking if the reject message isn't setted
+										* Checking if the 'reject' message isn't set
 										*
-										* empty() check if the argument is empty
+										* empty() checks if the argument is empty
 										* 	''
 										* 	""
 										* 	'0'
@@ -1547,13 +1546,13 @@
 										return;
 									}
 
-									// Commit the change
+									// Commit changes
 									yield $transaction -> commit();
 
-									// Closing the transaction
+									// Closing transaction
 									yield $transaction -> close();
 
-									// Retrieving the confirm message
+									// Retrieving'confirm' message
 									try {
 										$answer = yield $this -> DB -> execute('SELECT `confirm_message` FROM `Languages` WHERE `lang_code`=?;', [
 											$language
@@ -1565,7 +1564,7 @@
 										$answer = 'Operation completed.';
 									}
 
-									// Checking if the query has product a result
+									// Checking if the query produced results
 									if ($answer instanceof Amp\Mysql\ResultSet) {
 										yield $answer -> advance();
 										$answer = $answer -> getCurrent();
@@ -1573,9 +1572,9 @@
 									}
 
 									/**
-									* Checking if the confirm message isn't setted
+									* Checking if the 'confirm' message isn't set
 									*
-									* empty() check if the argument is empty
+									* empty() checks if the argument is empty
 									* 	''
 									* 	""
 									* 	'0'
@@ -1599,7 +1598,7 @@
 										'parse_mode' => 'HTML'
 									]);
 								} else {
-									// Retrieving the invalid_syntax message
+									// Retrieving the 'invalid_syntax' message
 									try {
 										$answer = yield $this -> DB -> execute('SELECT `invalid_syntax_message` FROM `Languages` WHERE `lang_code`=?;', [
 											$language
@@ -1611,7 +1610,7 @@
 										$answer = 'The syntax of the command is: <code>${syntax}</code>.';
 									}
 
-									// Checking if the query has product a result
+									// Checking if the query produced results
 									if ($answer instanceof Amp\Mysql\ResultSet) {
 										yield $answer -> advance();
 										$answer = $answer -> getCurrent();
@@ -1619,9 +1618,9 @@
 									}
 
 									/**
-									* Checking if the invalid_syntax message isn't setted
+									* Checking if the 'invalid_syntax' message isn't set
 									*
-									* empty() check if the argument is empty
+									* empty() checks if the argument is empty
 									* 	''
 									* 	""
 									* 	'0'
@@ -1638,9 +1637,9 @@
 									}
 
 									/**
-									* Personalizing the invalid_syntax message
+									* Personalizing the 'invalid_syntax' message
 									*
-									* str_replace() replace the tags with their value
+									* str_replace() replaces the tags with their value
 									*/
 									$answer = str_replace('${syntax}', '/' . $command . ' &lt;lang_code&gt;', $answer);
 
@@ -1659,9 +1658,9 @@
 						}
 
 						/**
-						* Checking if the message isn't a message that replies to another message
+						* Checking if the message isn't a reply to another message
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -1674,10 +1673,10 @@
 						* 	array()
 						*/
 						if (empty($message['reply_to_msg_id'])) {
-							// Retrieving the query
+							// Retrieving query
 							$sql_query = $command == 'add' ? 'INSERT INTO `Chats` (`id`, `type`, `title`, `username`, `invite_link`) VALUES (?, ?, ?, ?, ?);' : 'DELETE FROM `Chats` WHERE `id`=?;';
 
-							// Opening a transaction
+							// Opening transaction
 							$transaction = yield $this -> DB -> beginTransaction();
 
 							try {
@@ -1693,7 +1692,7 @@
 							} catch (Amp\Sql\QueryError | Amp\Sql\FailureException $e) {
 								$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 
-								// Retrieving the reject message
+								// Retrieving 'reject' message
 								try {
 									$answer = yield $this -> DB -> execute('SELECT `reject_message` FROM `Languages` WHERE `lang_code`=?;', [
 										$language
@@ -1705,7 +1704,7 @@
 									$answer = 'Operation deleted.';
 								}
 
-								// Checking if the query has product a result
+								// Checking if the query produced results
 								if ($answer instanceof Amp\Mysql\ResultSet) {
 									yield $answer -> advance();
 									$answer = $answer -> getCurrent();
@@ -1713,9 +1712,9 @@
 								}
 
 								/**
-								* Checking if the reject message isn't setted
+								* Checking if the 'reject' message isn't set
 								*
-								* empty() check if the argument is empty
+								* empty() checks if the argument is empty
 								* 	''
 								* 	""
 								* 	'0'
@@ -1741,13 +1740,13 @@
 								return;
 							}
 
-							// Commit the change
+							// Commit changes
 							yield $transaction -> commit();
 
-							// Closing the transaction
+							// Closing transaction
 							yield $transaction -> close();
 
-							// Retrieving the confirm message
+							// Retrieving 'confirm' message
 							try {
 								$answer = yield $this -> DB -> execute('SELECT `confirm_message` FROM `Languages` WHERE `lang_code`=?;', [
 									$language
@@ -1759,7 +1758,7 @@
 								$answer = 'Operation completed.';
 							}
 
-							// Checking if the query has product a result
+							// Checking if the query produced results
 							if ($answer instanceof Amp\Mysql\ResultSet) {
 								yield $answer -> advance();
 								$answer = $answer -> getCurrent();
@@ -1767,9 +1766,9 @@
 							}
 
 							/**
-							* Checking if the confirm message isn't setted
+							* Checking if the 'confirm' message isn't set
 							*
-							* empty() check if the argument is empty
+							* empty() checks if the argument is empty
 							* 	''
 							* 	""
 							* 	'0'
@@ -1793,7 +1792,7 @@
 								'parse_mode' => 'HTML'
 							]);
 
-							// Sending the report to the channel
+							// Sending report to channel
 							$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> ' . $command . ($command == 'add' ? 'e' : '') . 'd <a href=\"' . $chat['exported_invite'] . '\" >' . $chat['title'] . '</a> ' . ($command == 'add' ? 'into' : 'from') . ' the database.');
 							return;
 						}
@@ -1813,14 +1812,14 @@
 
 						$reply_message = $reply_message['messages'][0];
 
-						// Retrieving the data of the user
+						// Retrieving the user's data
 						$user = yield $this -> getInfo($reply_message['from_id']);
 						$user = $user['User'] ?? NULL;
 
 						/**
 						* Checking if the user is a normal user
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -1837,10 +1836,10 @@
 							return;
 						}
 
-						// Retrieving the query
+						// Retrieving query
 						$sql_query = $command == 'add' ? 'INSERT INTO `Admins` (`id`, `first_name`, `last_name`) VALUES (?, ?, ?);' : 'DELETE FROM `Admins` WHERE `id`=?;';
 
-						// Opening a transaction
+						// Opening transaction
 						$transaction = yield $this -> DB -> beginTransaction();
 
 						try {
@@ -1854,7 +1853,7 @@
 						} catch (Amp\Sql\QueryError | Amp\Sql\FailureException $e) {
 							$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 
-							// Retrieving the reject message
+							// Retrieving 'reject' message
 							try {
 								$answer = yield $this -> DB -> execute('SELECT `reject_message` FROM `Languages` WHERE `lang_code`=?;', [
 									$language
@@ -1866,7 +1865,7 @@
 								$answer = 'Operation deleted.';
 							}
 
-							// Checking if the query has product a result
+							// Checking if the query produced results
 							if ($answer instanceof Amp\Mysql\ResultSet) {
 								yield $answer -> advance();
 								$answer = $answer -> getCurrent();
@@ -1874,9 +1873,9 @@
 							}
 
 							/**
-							* Checking if the reject message isn't setted
+							* Checking if the 'reject' message isn't set
 							*
-							* empty() check if the argument is empty
+							* empty() checks if the argument is empty
 							* 	''
 							* 	""
 							* 	'0'
@@ -1902,13 +1901,13 @@
 							return;
 						}
 
-						// Commit the change
+						// Commit changes
 						yield $transaction -> commit();
 
-						// Closing the transaction
+						// Closing transaction
 						yield $transaction -> close();
 
-						// Retrieving the confirm message
+						// Retrieving 'confirm' message
 						try {
 							$answer = yield $this -> DB -> execute('SELECT `confirm_message` FROM `Languages` WHERE `lang_code`=?;', [
 								$language
@@ -1920,7 +1919,7 @@
 							$answer = 'Operation completed.';
 						}
 
-						// Checking if the query has product a result
+						// Checking if the query produced results
 						if ($answer instanceof Amp\Mysql\ResultSet) {
 							yield $answer -> advance();
 							$answer = $answer -> getCurrent();
@@ -1928,9 +1927,9 @@
 						}
 
 						/**
-						* Checking if the confirm message isn't setted
+						* Checking if the 'confirm' message isn't set
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -1954,7 +1953,7 @@
 							'parse_mode' => 'HTML'
 						]);
 
-						// Sending the report to the channel
+						// Sending report to channel
 						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> ' . $command == 'add' ? 'assigned' : 'removed' . ' <a href=\"mention:' . $user['id'] . '\" >' . $user['first_name'] . '</a> as bot\'s admin.');
 						break;
 					case 'announce':
@@ -1965,9 +1964,9 @@
 						}
 
 						/**
-						* Checking if the command have arguments
+						* Checking if the command has arguments
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -1980,7 +1979,7 @@
 						* 	array()
 						*/
 						if (empty($args) == FALSE) {
-							// Checking if is a serious use of the /announce command (command runned by a bot's admin)
+							// Checking if it's a serious use of the /announce command (command runned by a bot's admin)
 							try {
 								yield $this -> DB -> execute('SELECT NULL FROM `Admins` WHERE `id`=?;', [
 									$sender['id']
@@ -1993,7 +1992,7 @@
 								* Retrieving the admins list
 								*
 								* array_filter() filters the array by the role of each member
-								* array_map() convert each admins to its id
+								* array_map() converts each admins to its id
 								*/
 								$admins = array_filter($chat['participants'], function ($n) {
 									return $n['role'] == 'admin' || $n['role'] == 'creator';
@@ -2005,7 +2004,7 @@
 								/**
 								* Checking if the user is an admin and if the command has arguments
 								*
-								* in_array() check if the array contains an item that match the element
+								* in_array() checks if the array contains an item that matches the element
 								*/
 								if (in_array($sender['id'], $admins) == FALSE) {
 									$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because the sender isn\'t an admin of the chat (/' . $command . ' section).');
@@ -2021,7 +2020,7 @@
 								return;
 							}
 
-							// Checking if is a serious use of the /announce command (command runned into the staff group)
+							// Checking if it's a serious use of the /announce command (command runned into the staff group)
 							try {
 								$result = yield $this -> DB -> execute('SELECT `id` FROM `Chats` WHERE `staff_group`=?;', [
 									$chat['id']
@@ -2034,7 +2033,7 @@
 								* Retrieving the admins list
 								*
 								* array_filter() filters the array by the role of each member
-								* array_map() convert each admins to its id
+								* array_map() converts each admins to its id
 								*/
 								$admins = array_filter($chat['participants'], function ($n) {
 									return $n['role'] == 'admin' || $n['role'] == 'creator';
@@ -2046,7 +2045,7 @@
 								/**
 								* Checking if the user is an admin and if the command has arguments
 								*
-								* in_array() check if the array contains an item that match the element
+								* in_array() checks if the array contains an item that matches the element
 								*/
 								if (in_array($sender['id'], $admins) == FALSE) {
 									$this -> logger('The Message ' . $update['id'] . ' wasn\'t managed because the sender isn\'t an admin of the chat (/' . $command . ' section).');
@@ -2114,8 +2113,8 @@
 							/**
 							* Checking if the command is /mute, if it has arguments and if the arguments are correct
 							*
-							* preg_match() perform a RegEx match
-							* empty() check if the argument is empty
+							* preg_match() performs a RegEx match
+							* empty() checks if the argument is empty
 							* 	''
 							* 	""
 							* 	'0'
@@ -2169,7 +2168,7 @@
 										$limit *= 60 * 60 * 24 * 365;
 										break;
 									default:
-										// Retrieving the mute message
+										// Retrieving the 'mute' message
 										try {
 											$answer = yield $this -> DB -> execute('SELECT `mute_message` FROM `Languages` WHERE `lang_code`=?;', [
 												$language
@@ -2181,7 +2180,7 @@
 											$answer = 'The syntax of the command is: <code>/mute [time]</code>.\nThe <code>time</code> option must be more then 30 seconds and less of 366 days.';
 										}
 
-										// Checking if the query has product a result
+										// Checking if the query produced results
 										if ($answer instanceof Amp\Mysql\ResultSet) {
 											yield $answer -> advance();
 											$answer = $answer -> getCurrent();
@@ -2189,9 +2188,9 @@
 										}
 
 										/**
-										* Checking if the mute message is setted
+										* Checking if the 'mute' message is set
 										*
-										* empty() check if the argument is empty
+										* empty() checks if the argument is empty
 										* 	''
 										* 	""
 										* 	'0'
@@ -2219,9 +2218,9 @@
 							}
 
 							/**
-							* Checking if the message isn't a message that replies to another message
+							* Checking if the message isn't a reply to another message
 							*
-							* empty() check if the argument is empty
+							* empty() checks if the argument is empty
 							* 	''
 							* 	""
 							* 	'0'
@@ -2253,14 +2252,14 @@
 
 							$reply_message = $reply_message['messages'][0];
 
-							// Retrieving the data of the user
+							// Retrieving the user's data
 							$user = yield $this -> getInfo($reply_message['from_id']);
 							$user = $user['User'] ?? NULL;
 
 							/**
 							* Checking if the user is a normal user
 							*
-							* empty() check if the argument is empty
+							* empty() checks if the argument is empty
 							* 	''
 							* 	""
 							* 	'0'
@@ -2277,7 +2276,7 @@
 								return;
 							}
 
-							// Checking if the command is one of: /ban, /kick or /mute
+							// Checking if the command is one from: /ban, /kick or /mute
 							if ($command == 'ban' || $command == 'kick' || $command == 'mute') {
 								yield $this -> channels -> editBanned([
 									'channel' => $chat['id'],
@@ -2301,7 +2300,7 @@
 								]);
 							}
 
-							// Checking if the command is one of: /kick, /unban or /unmute
+							// Checking if the command is one from: /kick, /unban or /unmute
 							if ($command == 'kick' || $command == 'unban' || $command == 'unmute') {
 								yield $this -> channels -> editBanned([
 									'channel' => $chat['id'],
@@ -2311,9 +2310,9 @@
 							}
 
 							/**
-							* Checking if is a /(un)silence command
+							* Checking if it's a /(un)silence command
 							*
-							* preg_match() perform a RegEx match
+							* preg_match() performs a RegEx match
 							*/
 							if (preg_match('/^(un)?silence/miu', $command)) {
 								yield $this -> messages -> editChatDefaultBannedRights([
@@ -2337,9 +2336,9 @@
 								]);
 							}
 
-							// Checking if is a permanent /mute command
+							// Checking if it's a permanent /mute command
 							if ($command == 'mute' && ($limit < 30 || $limit > 60 * 60 * 24 * 366)) {
-								// Retrieving the mute_advert message
+								// Retrieving the 'mute_advert' message
 								try {
 									$answer = yield $this -> DB -> execute('SELECT `mute_advert_message` FROM `Languages` WHERE `lang_code`=?;', [
 										$language
@@ -2351,7 +2350,7 @@
 									$answer = 'You have muted <a href=\"mention:${sender_id}\" >${sender_first_name}</a> forever.';
 								}
 
-								// Checking if the query has product a result
+								// Checking if the query produced results
 								if ($answer instanceof Amp\Mysql\ResultSet) {
 									yield $answer -> advance();
 									$answer = $answer -> getCurrent();
@@ -2359,9 +2358,9 @@
 								}
 
 								/**
-								* Checking if the mute_advert message isn't setted
+								* Checking if the 'mute_advert' message isn't set
 								*
-								* empty() check if the argument is empty
+								* empty() checks if the argument is empty
 								* 	''
 								* 	""
 								* 	'0'
@@ -2380,7 +2379,7 @@
 								/**
 								* Personalizing the message
 								*
-								* str_replace() replace the tags with their value
+								* str_replace() replaces the tags with their value
 								*/
 								$answer = str_replace('${sender_first_name}', $sender['first_name'], $answer);
 								$answer = str_replace('${sender_id}', $sender['id'], $answer);
@@ -2398,31 +2397,31 @@
 							$verb = $command;
 
 							/**
-							* Checking if is a /(un)ban command
+							* Checking if it's a /(un)ban command
 							*
-							* preg_match() perform a RegEx match
+							* preg_match() performs a RegEx match
 							*/
 							if (preg_match('/^(un)?ban/miu', $command)) {
 								$verb .= 'ne';
-							// Checking if is a /kick command
+							// Checking if it's a /kick command
 							} else if ($command == 'kick') {
 								$verb .= 'e';
 							}
 
 							$verb .= 'd';
 
-							// Sending the report to the channel
+							// Sending report to channel
 							$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> ' . $verb . ' <a href=\"mention:' . $user['id'] . '\" >' . $user['first_name'] . '</a>' . ($command == 'mute' && $limit > 30 && $limit < 60 * 60 * 24 * 366 ? ' for ' . $args : '') . '.');
 							return;
 						}
 
 						/**
-						* Checking if is a serious use of the /(un)ban command (command runned by a bot's admin)
+						* Checking if it's a serious use of the /(un)ban command (command runned by a bot's admin)
 						*
-						* preg_match() perform a RegEx match
+						* preg_match() performs a RegEx match
 						*/
 						if (preg_match('/^(un)?ban/miu', $command)) {
-							// Checking if is a serious use of the /(un)ban command (command runned in the staff group)
+							// Checking if it's a serious use of the /(un)ban command (command runned in the staff group)
 							try {
 								$result = yield $this -> DB -> execute('SELECT `id` FROM `Chats` WHERE `staff_group`=?;', [
 									$chat['id']
@@ -2435,9 +2434,9 @@
 							}
 
 							/**
-							* Checking if the command haven't arguments
+							* Checking if the command has no arguments
 							*
-							* empty() check if the argument is empty
+							* empty() checks if the argument is empty
 							* 	''
 							* 	""
 							* 	'0'
@@ -2450,7 +2449,7 @@
 							* 	array()
 							*/
 							if (empty($args)) {
-								// Retrieving the invalid_syntax message
+								// Retrieving the 'invalid_syntax' message
 								try {
 									$answer = yield $this -> DB -> execute('SELECT `invalid_syntax_message` FROM `Languages` WHERE `lang_code`=?;', [
 										$language
@@ -2462,7 +2461,7 @@
 									$answer = 'The syntax of the command is: <code>${syntax}</code>.';
 								}
 
-								// Checking if the query has product a result
+								// Checking if the query produced results
 								if ($answer instanceof Amp\Mysql\ResultSet) {
 									yield $answer -> advance();
 									$answer = $answer -> getCurrent();
@@ -2470,9 +2469,9 @@
 								}
 
 								/**
-								* Checking if the invalid_syntax message isn't setted
+								* Checking if the 'invalid_syntax' message isn't set
 								*
-								* empty() check if the argument is empty
+								* empty() checks if the argument is empty
 								* 	''
 								* 	""
 								* 	'0'
@@ -2491,7 +2490,7 @@
 								/**
 								* Personalizing the message
 								*
-								* str_replace() replace the tag with its value
+								* str_replace() replaces the tag with its value
 								*/
 								$answer = str_replace('${syntax}', '/' . $command . ' &lt;user_id|username&gt;', $answer);
 
@@ -2507,14 +2506,14 @@
 								return;
 							}
 
-							// Retrieving the data of the user
+							// Retrieving the user's data
 							$user = yield $this -> getInfo($args);
 							$user = $user['User'] ?? NULL;
 
 							/**
 							* Checking if the user isn't a normal user
 							*
-							* empty() check if the argument is empty
+							* empty() checks if the argument is empty
 							* 	''
 							* 	""
 							* 	'0'
@@ -2527,7 +2526,7 @@
 							* 	array()
 							*/
 							if (empty($user) || $user['_'] !== 'user') {
-								// Retrieving the invalid_parameter message
+								// Retrieving the 'invalid_parameter' message
 								try {
 									$answer = yield $this -> DB -> execute('SELECT `invalid_parameter_message` FROM `Languages` WHERE `lang_code`=?;', [
 										$language
@@ -2539,7 +2538,7 @@
 									$answer = 'The ${parameter} is invalid.';
 								}
 
-								// Checking if the query has product a result
+								// Checking if the query produced results
 								if ($answer instanceof Amp\Mysql\ResultSet) {
 									yield $answer -> advance();
 									$answer = $answer -> getCurrent();
@@ -2547,9 +2546,9 @@
 								}
 
 								/**
-								* Checking if the invalid_parameter message isn't setted
+								* Checking if the 'invalid_parameter' message isn't set
 								*
-								* empty() check if the argument is empty
+								* empty() checks if the argument is empty
 								* 	''
 								* 	""
 								* 	'0'
@@ -2568,7 +2567,7 @@
 								/**
 								* Personalizing the message
 								*
-								* str_replace() replace the tag with its value
+								* str_replace() replaces the tag with its value
 								*/
 								$answer = str_replace('${parameter}', 'username/id', $answer);
 
@@ -2598,9 +2597,9 @@
 								$sub_chat = $sub_chat['Chat'] ?? NULL;
 
 								/**
-								* Checking if the chat isn't setted
+								* Checking if the chat isn't set
 								*
-								* empty() check if the argument is empty
+								* empty() checks if the argument is empty
 								* 	''
 								* 	""
 								* 	'0'
@@ -2638,7 +2637,7 @@
 								]);
 							}
 
-							// Sending the report to the channel
+							// Sending report to channel
 							$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> ' . $command . 'ned <a href=\"mention:' . $user['id'] . '\" >' . $user['first_name'] . '</a> from all chats.');
 						}
 						break;
@@ -2664,9 +2663,9 @@
 						}
 
 						/**
-						* Checking if the message isn't a message that replies to another message
+						* Checking if the message isn't a reply to another message
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -2698,14 +2697,14 @@
 
 						$reply_message = $reply_message['messages'][0];
 
-						// Retrieving the data of the user
+						// Retrieving the user's data
 						$user = yield $this -> getInfo($reply_message['from_id']);
 						$user = $user['User'] ?? NULL;
 
 						/**
 						* Checking if the user is a normal user
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -2722,7 +2721,7 @@
 							return;
 						}
 
-						// Opening a transaction
+						// Opening transaction
 						$transaction = yield $this -> DB -> beginTransaction();
 
 						// Insert the user into the blacklist
@@ -2731,12 +2730,12 @@
 								$user['id']
 							]);
 						} catch (Amp\Sql\QueryError | Amp\Sql\FailureException $e) {
-							// Closing the transaction
+							// Closing transaction
 							yield $transaction -> close();
 
 							$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 
-							// Retrieving the reject message
+							// Retrieving 'reject' message
 							try {
 								$answer = yield $this -> DB -> execute('SELECT `reject_message` FROM `Languages` WHERE `lang_code`=?;', [
 									$language
@@ -2748,7 +2747,7 @@
 								$answer = 'Operation deleted.';
 							}
 
-							// Checking if the query has product a result
+							// Checking if the query produced results
 							if ($answer instanceof Amp\Mysql\ResultSet) {
 								yield $answer -> advance();
 								$answer = $answer -> getCurrent();
@@ -2756,9 +2755,9 @@
 							}
 
 							/**
-							* Checking if the reject message isn't setted
+							* Checking if the 'reject' message isn't set
 							*
-							* empty() check if the argument is empty
+							* empty() checks if the argument is empty
 							* 	''
 							* 	""
 							* 	'0'
@@ -2784,13 +2783,13 @@
 							return;
 						}
 
-						// Commit the change
+						// Commit changes
 						yield $transaction -> commit();
 
-						// Closing the transaction
+						// Closing transaction
 						yield $transaction -> close();
 
-						// Retrieving the confirm message
+						// Retrieving 'confirm' message
 						try {
 							$answer = yield $this -> DB -> execute('SELECT `confirm_message` FROM `Languages` WHERE `lang_code`=?;', [
 								$language
@@ -2802,7 +2801,7 @@
 							$answer = 'Operation completed.';
 						}
 
-						// Checking if the query has product a result
+						// Checking if the query produced results
 						if ($answer instanceof Amp\Mysql\ResultSet) {
 							yield $answer -> advance();
 							$answer = $answer -> getCurrent();
@@ -2810,9 +2809,9 @@
 						}
 
 						/**
-						* Checking if the confirm message isn't setted
+						* Checking if the 'confirm' message isn't set
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -2836,7 +2835,7 @@
 							'parse_mode' => 'HTML'
 						]);
 
-						// Sending the report to the channel
+						// Sending report to channel
 						$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> ' . $command . 'ed <a href=\"mention:' . $user['id'] . '\" >' . $user['first_name'] . '</a>.');
 						break;
 					case 'help':
@@ -2846,7 +2845,7 @@
 							return;
 						}
 
-						// Retrieving the help message
+						// Retrieving 'help' message
 						try {
 							$answer = yield $this -> DB -> execute('SELECT `help_message` FROM `Languages` WHERE `lang_code`=?;', [
 								$language
@@ -2858,7 +2857,7 @@
 							$answer = '<b>FREQUENTLY ASKED QUESTION<\b>\n(FAQ list)\n\n<a href=\"(link to the manual, without brackets)\" >TELEGRAM GUIDE</a>\n\n<b>INLINE COMMANDS<\b>\n(Inline mode description)';
 						}
 
-						// Checking if the query has product a result
+						// Checking if the query produced results
 						if ($answer instanceof Amp\Mysql\ResultSet) {
 							yield $answer -> advance();
 							$answer = $answer -> getCurrent();
@@ -2866,9 +2865,9 @@
 						}
 
 						/**
-						* Checking if the help message is setted
+						* Checking if the 'help' message is set
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -2898,7 +2897,7 @@
 							return;
 						}
 
-						// Retrieving the link message
+						// Retrieving 'link' message
 						try {
 							$answer = yield $this -> DB -> execute('SELECT `link_message` FROM `Languages` WHERE `lang_code`=?;', [
 								$language
@@ -2910,7 +2909,7 @@
 							$answer = '<a href=\"${invite_link}\" >This</a> is the invite link to this chat.';
 						}
 
-						// Checking if the query has product a result
+						// Checking if the query produced results
 						if ($answer instanceof Amp\Mysql\ResultSet) {
 							yield $answer -> advance();
 							$answer = $answer -> getCurrent();
@@ -2918,9 +2917,9 @@
 						}
 
 						/**
-						* Checking if the link message isn't setted
+						* Checking if the 'link' message isn't set
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -2939,7 +2938,7 @@
 						/**
 						* Personalizing the message
 						*
-						* str_replace() replace the tag with its value
+						* str_replace() replaces the tag with its value
 						*/
 						$answer = str_replace('${invite_link}', $chat['invite'], $answer);
 
@@ -3066,7 +3065,7 @@
 							]
 						]);
 
-						// Retrieving the confirm message
+						// Retrieving 'confirm' message
 						try {
 							$answer = yield $this -> DB -> execute('SELECT `confirm_message` FROM `Languages` WHERE `lang_code`=?;', [
 								$language
@@ -3078,7 +3077,7 @@
 							$answer = 'Operation completed.';
 						}
 
-						// Checking if the query has product a result
+						// Checking if the query produced results
 						if ($answer instanceof Amp\Mysql\ResultSet) {
 							yield $answer -> advance();
 							$answer = $answer -> getCurrent();
@@ -3086,9 +3085,9 @@
 						}
 
 						/**
-						* Checking if the confirm message isn't setted
+						* Checking if the 'confirm' message isn't set
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -3150,15 +3149,15 @@
 						/**
 						* Retrieving the length of the chats' list
 						*
-						* count() retrieve the length of the array
+						* count() retrieves the length of the array
 						*/
 						$total = count($chats);
 
 						/**
 						* Setting the Inline Keyboard
 						*
-						* array_splice() extract the sub-array from the main array
-						* array_map() convert each chat to a keyboardButtonCallback
+						* array_splice() extracts the sub-array from the main array
+						* array_map() converts each chat to a keyboardButtonCallback
 						*/
 						$chats = array_slice($chats, 0,  $this -> button_InlineKeyboard);
 						$chats = array_map(function ($n) {
@@ -3168,7 +3167,7 @@
 								/**
 								* Generating the keyboardButtonCallback data
 								*
-								* base64_encode() encode the string
+								* base64_encode() encodes the string
 								*/
 								'data' => base64_encode($command . '/' . $n['id'] . '/no')
 							];
@@ -3188,7 +3187,7 @@
 							/**
 							* Retrieving the length of the row
 							*
-							* count() retrieve the length of the array
+							* count() retrieves the length of the array
 							*/
 							if (count($row['buttons']) == 2) {
 								// Saving the row
@@ -3212,7 +3211,7 @@
 										/**
 										* Generating the keyboardButtonCallback data
 										*
-										* base64_encode() encode the string
+										* base64_encode() encodes the string
 										*/
 										'data' => base64_encode('')
 									],
@@ -3222,7 +3221,7 @@
 										/**
 										* Generating the keyboardButtonCallback data
 										*
-										* base64_encode() encode the string
+										* base64_encode() encodes the string
 										*/
 										'data' => base64_encode($command . '/page/1')
 									]
@@ -3230,7 +3229,7 @@
 							];
 						}
 
-						// Setting the confirm buttons
+						// Setting 'confirm' buttons
 						$keyboard['rows'] []= [
 							'_' => 'keyboardButtonRow',
 							'buttons' => [
@@ -3240,7 +3239,7 @@
 									/**
 									* Generating the keyboardButtonCallback data
 									*
-									* base64_encode() encode the string
+									* base64_encode() encodes the string
 									*/
 									'data' => base64_encode($command . '/reject')
 								],
@@ -3250,14 +3249,14 @@
 									/**
 									* Generating the keyboardButtonCallback data
 									*
-									* base64_encode() encode the string
+									* base64_encode() encodes the string
 									*/
 									'data' => base64_encode($command . '/confirm')
 								]
 							]
 						];
 
-						// Retrieving the staff_group message
+						// Retrieving 'staff_group' message
 						try {
 							$answer = yield $this -> DB -> execute('SELECT `staff_group_message` FROM `Languages` WHERE `lang_code`=?;', [
 								$language
@@ -3269,7 +3268,7 @@
 							$answer = 'For what chats do you want set this staff group ?';
 						}
 
-						// Checking if the query has product a result
+						// Checking if the query produced results
 						if ($answer instanceof Amp\Mysql\ResultSet) {
 							yield $answer -> advance();
 							$answer = $answer -> getCurrent();
@@ -3277,9 +3276,9 @@
 						}
 
 						/**
-						* Checking if the staff_group message isn't setted
+						* Checking if the 'staff_group' message isn't set
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -3310,7 +3309,7 @@
 							return;
 						}
 
-						// Retrieving the start message
+						// Retrieving 'start' message
 						try {
 							$answer = yield $this -> DB -> execute('SELECT `start_message` FROM `Languages` WHERE `lang_code`=?;', [
 								$language
@@ -3330,9 +3329,9 @@
 						}
 
 						/**
-						* Checking if the start message isn't setted
+						* Checking if the 'start' message isn't set
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -3351,7 +3350,7 @@
 						/**
 						* Personalizing the message
 						*
-						* str_replace() replace the tags with their value
+						* str_replace() replaces the tags with their value
 						*/
 						$answer = str_replace('${sender_first_name}', $sender['first_name'], $answer);
 						$answer = str_replace('${sender_id}', $sender['id'], $answer);
@@ -3402,7 +3401,7 @@
 							$chats []= $result -> getCurrent();
 						}
 
-						// Opening a transaction
+						// Opening transaction
 						$transaction = yield $this -> DB -> beginTransaction();
 
 						// Updating the chats' data
@@ -3411,7 +3410,7 @@
 						} catch (Amp\Sql\QueryError | Amp\Sql\FailureException $e) {
 							$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 
-							// Closing the transaction
+							// Closing transaction
 							yield $transaction -> close();
 							return;
 						}
@@ -3438,7 +3437,7 @@
 							* 	array()
 							*/
 							if (empty($DB_chat) == FALSE && $DB_chat['_'] === 'chat' && $DB_chat['migrated_to']['_'] !== 'inputChannelEmpty') {
-								// Closing the statement
+								// Closing statement
 								$statement -> close();
 
 								$old_id = $DB_chat['id'];
@@ -3468,7 +3467,7 @@
 									continue;
 								}
 
-								// Commit the change
+								// Commit changes
 								$transaction -> commit();
 
 								try {
@@ -3476,7 +3475,7 @@
 								} catch (Amp\Sql\QueryError | Amp\Sql\FailureException $e) {
 									$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 
-									// Closing the transaction
+									// Closing transaction
 									yield $transaction -> close();
 									return;
 								}
@@ -3496,20 +3495,20 @@
 							}
 						}
 
-						// Closing the statement
+						// Closing statement
 						$statement -> close();
 
-						// Commit the change
+						// Commit changes
 						yield $transaction -> commit();
 
-						// Closing the transaction
+						// Closing transaction
 						yield $transaction -> close();
 
 						/**
 						* Retrieving the (super)groups list
 						*
 						* array_filter() filters the array by the type of each chat
-						* array_map() convert each chat to its id
+						* array_map() converts each chat to its id
 						*/
 						$chats = array_filter($chats, function ($n) {
 							return $n['type'] == 'supergroup' || $n['type'] == 'chat';
@@ -3520,14 +3519,14 @@
 
 						// Cycle on the list of the (super)groups
 						foreach ($chats as $DB_chat) {
-							// Retrieving the data of the chat
+							// Retrieving the chat's data
 							$DB_chat = yield $this -> getPwrChat($DB_chat);
 
 							/**
 							* Retrieving the members' list of the chat
 							*
 							* array_filter() filters the array by the type of each member
-							* array_map() convert each member to its id
+							* array_map() converts each member to its id
 							*/
 							$members = array_filter($DB_chat['participants'], function ($n) {
 								return $n['role'] == 'user';
@@ -3541,7 +3540,7 @@
 								/**
 								* Downloading the user's informations from the Combot Anti-Spam API
 								*
-								* json_decode() convert a JSON string into a PHP variables
+								* json_decode() converts a JSON string into a PHP variables
 								*/
 								$result = yield $this -> getHttpClient() -> request(new Amp\Http\Client\Request('https://api.cas.chat/check?user_id=' . $member));
 
@@ -3550,14 +3549,14 @@
 
 								$result = json_decode($result, TRUE);
 
-								// Retrieving the data of the new member
+								// Retrieving the new member's data
 								$member = yield $this -> getInfo($member);
 								$member = $member['User'] ?? NULL;
 
 								/**
-								* Checking if the user isn't a spammer, isn't a deleted account and is a normal user
+								* Checking if the user is a normal user and not a spammer or a deleted account
 								*
-								* empty() check if the argument is empty
+								* empty() checks if the argument is empty
 								* 	''
 								* 	""
 								* 	'0'
@@ -3601,7 +3600,7 @@
 						/**
 						* Retrieving the admins' list
 						*
-						* array_map() convert admin to its id
+						* array_map() converts admin to its id
 						*/
 						try {
  							$result = yield $this -> DB -> query('SELECT `id` FROM `Admins`;');
@@ -3621,7 +3620,7 @@
 							return $n['id'];
 						}, $admins);
 
-						// Opening a transaction
+						// Opening transaction
 						$transaction = yield $this -> DB -> beginTransaction();
 
 						// Updating the admins' data
@@ -3630,7 +3629,7 @@
 						} catch (Amp\Sql\QueryError | Amp\Sql\FailureException $e) {
 							$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 
-							// Closing the transaction
+							// Closing transaction
 							yield $transaction -> close();
 							return;
 						}
@@ -3656,7 +3655,7 @@
 							* 	array()
 							*/
 							if (empty($admin) || $admin['_'] !== 'user') {
-								// Closing the statement
+								// Closing statement
 								$statement -> close();
 
 								try {
@@ -3678,10 +3677,10 @@
 									continue;
 								}
 
-								// Closing the statement
+								// Closing statement
 								$statement -> close();
 
-								// Commit the change
+								// Commit changes
 								yield $transaction -> commit();
 
 								try {
@@ -3689,7 +3688,7 @@
 								} catch (Amp\Sql\QueryError | Amp\Sql\FailureException $e) {
 									$this -> logger('Failed to make the query, because ' . $e -> getMessage() . '.', \danog\MadelineProto\Logger::ERROR);
 
-									// Closing the transaction
+									// Closing transaction
 									yield $transaction -> close();
 									return;
 								}
@@ -3707,16 +3706,16 @@
 							}
 						}
 
-						// Closing the statement
+						// Closing statement
 						$statement -> close();
 
-						// Commit the change
+						// Commit changes
 						yield $transaction -> commit();
 
-						// Closing the transaction
+						// Closing transaction
 						yield $transaction -> close();
 
-						// Retrieving the update message
+						// Retrieving 'update' message
 						try {
 							$answer = yield $this -> DB -> execute('SELECT `update_message` FROM `Languages` WHERE `lang_code`=?;', [
 								$language
@@ -3728,7 +3727,7 @@
 							$answer = 'Database updated.';
 						}
 
-						// Checking if the query has product a result
+						// Checking if the query produced results
 						if ($answer instanceof Amp\Mysql\ResultSet) {
 							yield $answer -> advance();
 							$answer = $answer -> getCurrent();
@@ -3736,9 +3735,9 @@
 						}
 
 						/**
-						* Checking if the update message isn't setted
+						* Checking if the 'update' message isn't set
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -3768,7 +3767,7 @@
 							return;
 						}
 
-						// Retrieving the unknown message
+						// Retrieving 'unknown' message
 						try {
 							$answer = yield $this -> DB -> execute('SELECT `unknown_message` FROM `Languages` WHERE `lang_code`=?;', [
 								$language
@@ -3780,7 +3779,7 @@
 							$answer = 'This command isn\'t supported.';
 						}
 
-						// Checking if the query has product a result
+						// Checking if the query produced results
 						if ($answer instanceof Amp\Mysql\ResultSet) {
 							yield $answer -> advance();
 							$answer = $answer -> getCurrent();
@@ -3788,9 +3787,9 @@
 						}
 
 						/**
-						* Checking if the unknown message isn't setted
+						* Checking if the 'unknown' message isn't set
 						*
-						* empty() check if the argument is empty
+						* empty() checks if the argument is empty
 						* 	''
 						* 	""
 						* 	'0'
@@ -3825,9 +3824,9 @@
 					]);
 				}
 			/**
-			* Checking if is the add_lang message
+			* Checking if is the 'add_lang' message
 			*
-			* preg_match_all() perform a RegEx match with the 'g' flag active
+			* preg_match_all() performs a RegEx match with the 'g' flag active
 			*/
 			} else if (preg_match_all('/^(lang\_code|(add\_lang|admin|confirm|help|invalid\_parameter|invalid\_syntax|mute|mute\_advert|link|reject|staff\_group|start|unknown|update)\_message)\:[[:blank:]]?([[:alnum:][:blank:]\_\<\>\/\@]*)$/miu', $message['message'], $matches, PREG_SET_ORDER)) {
 				// Checking if the sender is a bot's admin
@@ -3855,7 +3854,7 @@
 				/**
 				* Checking if the message doesn't contains the lang_code
 				*
-				* empty() check if the argument is empty
+				* empty() checks if the argument is empty
 				* 	''
 				* 	""
 				* 	'0'
@@ -3875,14 +3874,14 @@
 				/**
 				* Removing the primary key from the matches
 				*
-				* array_search() search the primary key into the array
-				* array_splice() extract the sub-array from the main array
+				* array_search() searches the primary key into the array
+				* array_splice() extracts the sub-array from the main array
 				*/
 				array_splice($matches, array_search($primary_key, $matches), 1);
 
 				$primary_key = $primary_key[0][3];
 
-				// Opening a transaction
+				// Opening transaction
 				$transaction = yield $this -> DB -> beginTransaction();
 
 				// Insert the language
@@ -3895,11 +3894,10 @@
 					return;
 				}
 
-				// Commit the change
+				// Commit changes
 				yield $transaction -> commit();
 
-				// Adding the messages
-
+				// Adding messages
 				try {
 					$statement = yield $transaction -> prepare('UPDATE `Languages` SET ?=? WHERE `lang_code`=?;');
 				} catch (Amp\Sql\QueryError | Amp\Sql\FailureException $e) {
@@ -3920,16 +3918,16 @@
 					}
 				}
 
-				// Closing the statement
+				// Closing statement
 				$statement -> close();
 
-				// Commit the change
+				// Commit changes
 				yield $transaction -> commit();
 
-				// Closing the transaction
+				// Closing transaction
 				yield $transaction -> close();
 
-				// Retrieving the confirm message
+				// Retrieving 'confirm' message
 				try {
 					$answer = yield $this -> DB -> execute('SELECT `confirm_message` FROM `Languages` WHERE `lang_code`=?;', [
 						$language
@@ -3941,7 +3939,7 @@
 					$answer = 'Operation completed.';
 				}
 
-				// Checking if the query has product a result
+				// Checking if the query produced results
 				if ($answer instanceof Amp\Mysql\ResultSet) {
 					yield $answer -> advance();
 					$answer = $answer -> getCurrent();
@@ -3949,9 +3947,9 @@
 				}
 
 				/**
-				* Checking if the confirm message isn't setted
+				* Checking if the 'confirm' message isn't set
 				*
-				* empty() check if the argument is empty
+				* empty() checks if the argument is empty
 				* 	''
 				* 	""
 				* 	'0'
@@ -3975,7 +3973,7 @@
 					'parse_mode' => 'HTML'
 				]);
 
-				// Sending the report to the channel
+				// Sending report to channel
 				$this -> report('<a href=\"mention:' . $sender['id'] . '\" >' . $sender['first_name'] . '</a> added a language (<code>' . $primary_key . '</code>) to the database.');
 			}
 		}
@@ -3994,7 +3992,7 @@
 				'password' => 'password',
 				'database' => 'database_name'
 			]
-			],
+		],
 		'logger' => [
 			'logger' => danog\MadelineProto\Logger::FILE_LOGGER,
 			'logger_level' => danog\MadelineProto\Logger::ULTRA_VERBOSE,
@@ -4002,7 +4000,7 @@
 		]
 	]);
 
-	// Starting the bot
+	// Starting bot
 	$MadelineProto -> startAndLoop(inginf_bot::class);
 
 	exit(0);
