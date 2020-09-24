@@ -1,6 +1,6 @@
 # inginf_bot
  ![Icons](https://i.imgur.com/YLSSaGU.png)
-[@inginf_bot](https://t.me/inginf_bot) s a Telegram bot created for the students of Computer Engineering @ Politecnico di Torino.
+[@inginf_bot](https://t.me/inginf_bot) is a Telegram bot created for the students of Computer Engineering @ Politecnico di Torino.
 
 It contains links to the various groups related to the degree course (bachelor and master's), together with other useful resources. We have created this repository to share the bot's core code. You can reuse this code freely, **in compliance with the [GNU GPLv3 license](https://www.gnu.org/licenses/gpl-3.0.html)**. If you want to create a bot like this for your degree program, follow the guide below.
 

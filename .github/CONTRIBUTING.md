@@ -1,5 +1,5 @@
 # How to Contribute
-For contribute at this bot, open an Issue or a Pull request.
+For contributions to this bot, open an Issue or a Pull request.
 
 ### Rules to Code
 
