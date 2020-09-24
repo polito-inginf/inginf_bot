@@ -831,6 +831,7 @@
 					];
 
 					/**
+					* 
 					* Checking if the welcome message is setted
 					*
 					* empty() check if the argument is empty
