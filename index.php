@@ -35,7 +35,7 @@
 		*
 		* @return void
 		*/
-		public function onStart() : void {
+		public function onStart() : Generator {
 			// Setting the database
 			try {
 				$this -> DB = yield Amp\Mysql\connect(Amp\Mysql\ConnectionConfig::fromString('host=localhost;user=username;pass=password;db=database_name'));
@@ -827,7 +827,7 @@
 				// Checking if the service message is about new members
 				if ($message['action']['_'] === 'messageActionChatAddUser') {
 					$banned = [
-						'multiple' = TRUE
+						'multiple' => TRUE
 					];
 
 					/**
@@ -3384,7 +3384,7 @@
 						}
 
 						$banned = [
-							'multiple' = TRUE
+							'multiple' => TRUE
 						];
 
 						// Retrieving the chats' list
