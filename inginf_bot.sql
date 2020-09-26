@@ -1,3 +1,7 @@
+/** SQL Database creator
+ * @todo Adapt to our needs
+ */
+
 DROP DATABASE IF EXISTS `inginf_bot`;
 CREATE DATABASE `inginf_bot` DEFAULT CHARACTER SET utf8;
 USE `inginf_bot`;
