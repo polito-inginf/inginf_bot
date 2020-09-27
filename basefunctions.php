@@ -26,14 +26,16 @@ function request($url) {
 /**
  * Send a message using HTML parse mode.
  *
- * @param int $id the userid
- * @param string $urltext The message to send
+ * @param int $chatid the userid
+ * @param string $text The message to send
  *
  * @return mixed $result Result of the encode
  */
-function sendMessage($id, $urltext) {
-  if (strpos($urltext, "\n")) $urltext = urlencode($urltext);
-  return request("sendMessage?text=$urltext&parse_mode=HTML&chat_id=$id&disable_web_page_preview=true");
+function sendMessage($chatid, $text) {
+  if (strpos($text, "\n")) $text = urlencode($text);
+  $msg = request("sendMessage?text=$text&chat_id=$chatid&parse_mode=HTML&disable_web_page_preview=true");
+  if (DEBUGLVL > 3 && $chatid != DEBUGCHANNEL) sendDebugRes(__FUNCTION__,$msg);
+  return $msg;
 }
 
 /**
