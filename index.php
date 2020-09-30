@@ -9,7 +9,9 @@ include 'basefunctions.php';
 include 'logger.php';
 //This file contains all global variables from the various update types
 include 'variables.php';
-if($text === "/start") {
+//Checks if user is an admin, otherwise exits
+if (!in_array($userid,ADMINS)) exit;
+if ($text === "/start") {
   sendMessage($userid,"Hi!");
   exit;
 }
