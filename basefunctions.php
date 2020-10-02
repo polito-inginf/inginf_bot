@@ -18,29 +18,15 @@
 
 		// Replace the special character into the URL
 		$url = str_replace([
-			"\t",
 			"\n",
 			' ',
-			'"',
 			'#',
-			'$',
-			'%',
-			"'",
-			',',
-			';',
-			'@'
+			"'"
 		], [
-			'%09',
 			'%0A%0D',
 			'%20',
-			'%22',
 			'%23',
-			'%24',
-			'%25',
-			'%27',
-			'%2C',
-			'%3B',
-			'%40'
+			'%27'
 		], $url);
 
 		$curl_session = curl_init($url);
