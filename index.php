@@ -30,14 +30,14 @@
 	*
 	* preg_match() perform a RegEx match
 	*/
-	if (preg_match('/^\@admin([[:blank:]\n]{1}((\n|.)*))?$/miu', $text, $matches)) {
+	if (preg_match('/^@admin([[:blank:]\n]((\n|.)*))?$/miu', $text, $matches)) {
 		$text_without_tag = $matches[2] ?? NULL;
 	/**
 	* Checking if is a bot command
 	*
 	* preg_match() perform a RegEx match
 	*/
-	} else if (preg_match('/^\/([[:alnum:]\@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $text, $matches)) {
+	} else if (preg_match('/^\/([[:alnum:]@]+)[[:blank:]]?([[:alnum:]]|[^\n]+)?$/miu', $text, $matches)) {
 		/**
 		* Retrieving the command
 		*
@@ -53,4 +53,4 @@
 		}
 	}
 	exit(0);
-?>
+

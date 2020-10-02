@@ -52,4 +52,3 @@
 	if (LOG_LVL > 6) {
 		sendDebugRes("UPDATE", $content);
 	}
-?>

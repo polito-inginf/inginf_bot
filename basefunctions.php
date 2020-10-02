@@ -15,10 +15,10 @@
 	*/
 	function request($url) {
 		$url = api . $url;
-		
+
 		// Replace the special character into the URL
 		$url = str_replace([
-			"\t"
+			"\t",
 			"\n",
 			' ',
 			'"',
@@ -28,7 +28,7 @@
 			"'",
 			',',
 			';',
-			'@',
+			'@'
 		], [
 			'%09',
 			'%0A%0D',
@@ -42,16 +42,16 @@
 			'%3B',
 			'%40'
 		], $url);
-		
+
 		$curl_session = curl_init($url);
-		
+
 		curl_setopt_array($curl_session, [
 			CURLOPT_HEADER => FALSE,
 			CURLOPT_RETURNTRANSFER => TRUE
 		]);
-		
+
 		$result = curl_exec($curl_session);
-		
+
 		curl_close($curl_session);
 		return $result;
 	}
@@ -189,4 +189,3 @@
 	function answerCallbackQuery($callback_id) {
 		return request("answerCallbackQuery?callback_query_id=$callback_id");
 	}
-?>

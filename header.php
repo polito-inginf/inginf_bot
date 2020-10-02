@@ -6,10 +6,9 @@
 	$update = json_decode($content, TRUE);
 	
 	// Opens a MySQL connection. Credentials are stored in private.php file
-	$db_conn = mysqli_connect(DB_HOST, DB_USER, DB_PASSWD, DB_NAME, DB_PORT);
+	$db_conn = mysqli_connect(DB_HOST, DB_USER, DB_PASSWD, DB_NAME);
 	
-	// Checking if the connecion is failed
+	// Checking if the connection is failed
 	if ($db_conn === FALSE) {
 		exit(1);
 	}
-?>
