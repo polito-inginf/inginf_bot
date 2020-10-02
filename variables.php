@@ -29,5 +29,4 @@
 	$username = empty($user['username']) === FALSE ? $user['username'] : "";
 	$lang = empty($user['language_code']) === FALSE ? $user['language_code'] : "";
 	
-	$name_text = $firstname . " " . $lastname;
-?>
+	$name_text = $first_name . " " . $last_name;
