@@ -45,38 +45,36 @@ function request($url) {
 /**
  * Send a message using HTML parse mode.
  *
- * @param int $chat_id the userid
+ * @param int $chat_id The userid
  * @param string $text The message to send
- *
+ * @param int $flags [Optional] Pipe to set more options.<br><br>
+ * MARKDOWN: enables Markdown parse mode<br>
+ * ENABLE_PAGE_PREVIEW: enables preview for links<br>
+ * DISABLE_NOTIFICATIONS: mutes notifications
  * @return mixed $result Result of the encode
  */
-function sendMessage($chat_id, $text) {
+function sendMessage($chat_id, $text, $flags = 0) {
 	if (strpos($text, "\n")) {
 		$text = urlencode($text);
 	}
-
-	$msg = request("sendMessage?text=$text&chat_id=$chat_id&parse_mode=HTML&disable_web_page_preview=TRUE");
+	$parse_mode = "HTML";
+	$disable_preview = true;
+	$mute = false;
+	if ($flags & MARKDOWN) {
+		$parse_mode = "markdown";
+	}
+	if ($flags & ENABLE_PAGE_PREVIEW) {
+		$disable_preview = false;
+	}
+	if ($flags & DISABLE_NOTIFICATION) {
+		$mute = true;
+	}
+	$msg = request("sendMessage?text=$text&chat_id=$chat_id&parse_mode=$parse_mode&disable_web_page_preview=$disable_preview&disable_notification=$mute");
 
 	if (LOG_LVL > 3 && $chat_id != LOG_CHANNEL) {
 		sendDebugRes(__FUNCTION__,$msg);
 	}
 	return $msg;
-}
-
-/**
- * Send a message using Markdown parse mode.
- *
- * @param int $id the userid
- * @param string $url_text The message to send
- *
- * @return mixed The result of the encode
- */
-function sendMessageMD($id, $url_text) {
-	if (strpos($url_text, "\n")) {
-		$url_text = urlencode($url_text);
-	}
-
-	return request("sendMessage?text=$url_text&parse_mode=markdown&chat_id=$id&disable_web_page_preview=TRUE");
 }
 
 /**
