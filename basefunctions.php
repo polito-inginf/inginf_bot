@@ -51,6 +51,7 @@ function request($url) {
  * MARKDOWN: enables Markdown parse mode<br>
  * ENABLE_PAGE_PREVIEW: enables preview for links<br>
  * DISABLE_NOTIFICATIONS: mutes notifications
+ *
  * @return mixed $result Result of the encode
  */
 function sendMessage($chat_id, $text, $flags = 0) {
@@ -58,21 +59,21 @@ function sendMessage($chat_id, $text, $flags = 0) {
 		$text = urlencode($text);
 	}
 	$parse_mode = "HTML";
-	$disable_preview = true;
-	$mute = false;
+	$disable_preview = TRUE;
+	$mute = FALSE;
 	if ($flags & MARKDOWN) {
 		$parse_mode = "markdown";
 	}
 	if ($flags & ENABLE_PAGE_PREVIEW) {
-		$disable_preview = false;
+		$disable_preview = FALSE;
 	}
 	if ($flags & DISABLE_NOTIFICATION) {
-		$mute = true;
+		$mute = TRUE;
 	}
 	$msg = request("sendMessage?text=$text&chat_id=$chat_id&parse_mode=$parse_mode&disable_web_page_preview=$disable_preview&disable_notification=$mute");
 
 	if (LOG_LVL > 3 && $chat_id != LOG_CHANNEL) {
-		sendDebugRes(__FUNCTION__,$msg);
+		sendDebugRes(__FUNCTION__, $msg);
 	}
 	return $msg;
 }
