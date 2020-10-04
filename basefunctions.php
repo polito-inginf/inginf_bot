@@ -174,3 +174,73 @@ function ansquery($query_id, $ans) {
 function answerCallbackQuery($callback_id) {
 	return request("answerCallbackQuery?callback_query_id=$callback_id");
 }
+
+/**
+ * Sends a Photo (identified by a string that can be both a file_id or an HTTP URL of a pic on internet)
+ *  to the chat pointed from $chatid and returns the Message object of the sent message
+ * 
+ * @param int $chatid  the user id
+ * @param string $photo it's an URL that points to a photo from the web OR a file_id of a photo already on telegram
+ * @param int $flag [Optional] Pipe to set more options.<br><br>
+ * MARKDOWN: enables Markdown parse mode<br>
+ * DISABLE_NOTIFICATIONS: mutes notifications
+ * @param string $caption [Optional] the caption 					
+ * 
+ * @return mixed The Message sent by the method
+ */
+function sendPhoto($chatid, $photo, $flags = 0, $caption = "") {
+	//encoding $photo (a string) to be sent through url call to sendPhoto method
+	if (strpos($photo, "\n")){
+		$photo = urlencode($photo);
+	}
+	//encoding $caption (a string) to be sent through url call to sendPhoto method
+	if (strpos($caption, "\n")){
+		$caption = urlencode($caption);
+	}
+
+	$parse_mode = "HTML";
+	$mute = FALSE;
+	if($flags & DISABLE_NOTIFICATIONS){
+		$mute = TRUE;
+	}
+	if($flags & MARKDOWN){
+		$parse_mode = "markdown";
+	}
+	
+	//calls telegram API's sendPhoto method with selected optional parameters
+	$msg = request("sendPhoto?chat_id=$chatid&photo=$photo&caption=$caption&parse_mode=$parse_mode&disable_notification=$mute");
+
+	//checks for the debug level and eventually calls the logger
+	if (LOG_LVL > 3 && $chatid != LOG_CHANNEL){
+		sendDebugRes(__FUNCTION__, $msg);
+	}
+
+	//decodes the JSON OBJECT returned from the telegram method
+	$decodedAnswer = json_decode($msg, TRUE);
+	//returns the Message object if the operation succeded, returns NULL otherwise
+	return $decodedAnswer['ok'] == TRUE ? $decodedAnswer['result'] : NULL ;
+}
+
+/**
+ * Returns an up-to-date information about a chat with a certain chat_id through a Chat object
+ * 
+ * @param int/string $chatid  the chat id (int) or
+ * the user/channel username (string) in the format @username
+ * of the chat we want to extract the information from
+ * 
+ * @return mixed The Chat object of the chat
+ */
+function getChat($chatid) {
+	//calls telegram API's getChat method
+	$chat = request("getChat?chat_id=$chatid");
+
+	//checks for the debug level and eventually calls the logger
+	if (LOG_LVL > 3){
+		sendDebugRes(__FUNCTION__,$chat);
+	}
+
+	//decodes the JSON OBJECT returned from the telegram method
+	$decodedAnswer = json_decode($chat, TRUE);
+	//returns the Chat object	 if the operation succeded, returns NULL otherwise
+	return $decodedAnswer['ok'] == TRUE ? $decodedAnswer['result'] : NULL ;
+}
