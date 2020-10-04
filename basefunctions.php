@@ -244,3 +244,67 @@ function getChat($chatid) {
 	//returns the Chat object	 if the operation succeded, returns NULL otherwise
 	return $decodedAnswer['ok'] == TRUE ? $decodedAnswer['result'] : NULL ;
 }
+
+/**
+ * Pins a given message in a specific group/supergroupchat or channel where the bot it's an admin
+ * 
+ * @param int/string $chatid  the chat id (int) or
+ * the user/channel username (string) in the format @username
+ * of the chat where we want to pin the message
+ * @param int $messageid identifier of the message to pin
+ * @param int $flag [Optional] set to DISABLE_NOTIFICATIONS to mute notifications
+ * 
+ * @return boolean TRUE if the pinning operation was successful.
+ */
+function pinChatMessage($chatid, $messageid, $flag = 0) {
+	$mute = FALSE;
+	if($flags & DISABLE_NOTIFICATIONS){
+		$mute = TRUE;
+	}
+
+	//calls telegram API's pinChatMessage method
+	$result = request("pinChatMessage?chat_id=$chatid&message_id=$messageid&disable_notification=$mute");
+
+	if (LOG_LVL > 3 && $chatid != LOG_CHANNEL){
+		sendDebugRes(__FUNCTION__, $result);
+	}
+
+	//decodes the JSON OBJECT returned from the telegram method
+	$decodedAnswer = json_decode($result, TRUE);
+	//returns boolean TRUE if the pin operation was succesful
+	return $decodedAnswer['result'];
+}
+
+/**
+ * Pins a given message in a specific group/supergroupchat or channel where the bot it's an admin
+ * 
+ * @param int/string  $toChatid  the chat id (int) or
+ * the user/channel username (string) in the format @username
+ * of the chat where we want to send the message
+ * @param int/string  $fromChatid the chat id (int) or
+ * the user/channel username (string) in the format @username
+ * of the chat where the message we want to forward it's located
+ * @param int $messageid identifier of the message to forward
+ * @param int $flag [Optional] set to DISABLE_NOTIFICATIONS to mute notifications
+ * 
+ * @return mixed the forwarded message object if forwarding was successful, NULL otherwise.
+ */
+function forwardMessage($toChatid, $fromChatid, $messageid, $flag = 0) {
+	$mute=FALSE;
+	if($flag & DISABLE_NOTIFICATIONS){
+		$mute=TRUE;
+	}
+
+	//calls telegram API's forwardMessage method
+	$msg = request("forwardMessage?chat_id=$toChatid&from_chat_id=$fromChatid&message_id=$messageid&disable_notification=$mute");
+
+	if (LOG_LVL > 3 && $toChatid != LOG_CHANNEL){
+		sendDebugRes(__FUNCTION__, $msg);
+	}
+
+	//decodes the JSON OBJECT returned from the telegram method
+	$decodedAnswer = json_decode($msg, TRUE);
+	//returns the message if the operation succeded, returns NULL otherwise
+	return $decodedAnswer['ok'] == TRUE ? $decodedAnswer['result'] : NULL ;
+
+}
