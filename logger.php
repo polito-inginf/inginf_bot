@@ -27,6 +27,9 @@
 * @license		https://choosealicense.com/licenses/gpl-3.0/
 */
 
+// The log level of the project
+define('LOG_LVL', 7);
+
 /**
 * Send the log to the log channel
 *

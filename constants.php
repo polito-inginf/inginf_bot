@@ -1,6 +1,6 @@
 <?php
 /**
-* These are all the base functions that will be used for communicating
+* These are all the constants that will be used for communicating
 * with Telegram Bot.
 *
 * No libraries are used in this project.
@@ -19,14 +19,10 @@
 
 include 'private.php';
 
-/**
- * Bitwise operators constants
- */
-
+// Bitwise operators constants
 const MARKDOWN = 0b001;
 const ENABLE_PAGE_PREVIEW = 0b010;
 const DISABLE_NOTIFICATION = 0b100;
 
+// The Bot API endpoint
 define('api', 'https://api.telegram.org/bot' . token . '/');
-
-define('LOG_LVL', 7);
