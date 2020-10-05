@@ -27,17 +27,15 @@
 * @license		https://choosealicense.com/licenses/gpl-3.0/
 */
 
-define('LOG_LVL', 7);
-
 /**
 * Send the log to the log channel
 *
-* @param string $function Name of the function/update
-* @param string $request JSON returned from method/update
+* @param string $function The name of the function/update
+* @param string $request The JSON returned from the method/update
 *
 * @return mixed Message sent in the channel
 */
-function sendLog($function, $request) {
+function sendLog(string $function, string $request) {
 	/**
 	* Decode the request
 	*
@@ -84,15 +82,31 @@ function sendLog($function, $request) {
 		*/
 		$msg = empty($request['result']) === FALSE ? $request['result'] : $request;
 
-		// Appends a pretty-printed message to $reply
+		// Appends a pretty-printed message to the reply
 		$reply .= json_encode($msg, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-	// If there are some errors getting the results
+	// Check if there are some errors getting the results
 	} else if($request['ok'] == FALSE) {
-		//If an error_code is set, appends it to the reply message
-		$error_code = empty($request['error_code']) === FALSE ? "\n\n<b>❌ Error code:" . $request['error_code'] . "❌</b>" : "";
-		$reply = "<b>Result not present!</b>" . $description . $error_code;
+		/**
+		* If an error_code is set, appends it to the reply message
+		*
+		* empty() check if the argument is empty
+		* 	''
+		* 	""
+		* 	'0'
+		* 	"0"
+		* 	0
+		* 	0.0
+		* 	NULL
+		* 	FALSE
+		* 	[]
+		* 	array()
+		*/
+		$errorCode = empty($request['error_code']) === FALSE ? "\n\n<b>❌ Error code:" . $request['error_code'] . '❌</b>' : '';
+		
+		$reply = '<b>Result not present!</b>' . $description . $errorCode;
 	}
-	// Sends a message to the debug channel (chatid of the channel declared in private.php file, not present in the repo)
+	
+	// Sends a message to the debug channel (The id of the channel is declared in private.php file)
 	return sendMessage(LOG_CHANNEL, $reply);
 }
 

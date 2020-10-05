@@ -28,3 +28,5 @@ const ENABLE_PAGE_PREVIEW = 0b010;
 const DISABLE_NOTIFICATION = 0b100;
 
 define('api', 'https://api.telegram.org/bot' . token . '/');
+
+define('LOG_LVL', 7);
