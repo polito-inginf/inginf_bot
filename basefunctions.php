@@ -75,7 +75,10 @@ function sendMessage($chat_id, $text, $flags = 0) {
 	if (LOG_LVL > 3 && $chat_id != LOG_CHANNEL) {
 		sendDebugRes(__FUNCTION__, $msg);
 	}
-	return $msg;
+
+	$msg = json_decode($msg, TRUE);
+
+	return $msg['ok'] == TRUE ? $msg['result'] : NULL;
 }
 
 /**
