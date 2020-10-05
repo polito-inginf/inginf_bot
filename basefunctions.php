@@ -491,3 +491,70 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 function deleteMessage($chatId, int $messageId) {
 	return request("deleteMessage?chat_id=$chatId&message_id=$messageId");
 }
+
+/**
+* Edits a caption of a sent message (with or not the InlineKeyboard associated).
+*
+* @param int/string $chatId The id/username of the chat/channel/user where we want edit the message
+* @param int $messageId The id of the message to modify
+* @param string $caption The caption to send
+* @param int $flags [Optional] Pipe to set more options
+* 	MARKDOWN: enables Markdown parse mode
+* @param array $keyboard [Optional] Keyboard layout to send
+*
+* @return mixed The result of the encode
+*/
+function editMessageCaption($chatId, int $messageId, string $caption, int $flags = 0, array $keyboard = []) {
+	$parseMode = 'HTML';
+	
+	/**
+	* Check if the URL must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($text, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$caption = urlencode($caption);
+	}
+	
+	// Check if the parse mode must be setted to 'MarkdownV2'
+	if ($flags & MARKDOWN) {
+		$parseMode = 'MarkdownV2';
+	}
+	
+	$url = "editMessageCaption?chat_id=$chatId&message_id=$messageId&caption=$caption&parse_mode=$parseMode";
+
+	/**
+	* Check if the message have an InlineKeyboard
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($keyboard) === FALSE) {
+		/**
+		* Encode the keyboard layout
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
+		$keyboard = json_encode([
+			"inline_keyboard" => $keyboard
+		]);
+		
+		$url .= "&reply_markup=$keyboard";
+	}
+	
+	return request($url);
+}
