@@ -62,11 +62,43 @@ function request(string $url) {
 * Answers to a CallbackQuery
 *
 * @param int $callbackId CallbackQuery id
+* @param string $text Text to be sent in the notification
+* @param int $flags [Optional] Pipe to set more options
+* 	SHOW_ALERT: enables alert instead of top notification
+* @param string $url [Optional] Url to be opened
 *
 * @return mixed The result of the encode
 */
-function answerCallbackQuery(int $callbackId) {
-	return request("answerCallbackQuery?callback_query_id=$callbackId");
+function answerCallbackQuery(int $callbackId, string $text, int $flags = 0, string $url = "") {
+	$showAlert = FALSE;
+
+	/**
+	* Check if the URL must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($text, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$text = urlencode($text);
+	}
+
+	// Checking if the SHOW_ALERT feature is present in the flags
+	if($flags & SHOW_ALERT) {
+		$showAlert = TRUE;
+	}
+
+	$requestUrl = "answerCallbackQuery?callback_query_id=$callbackId&text=$text&show_alert=$showAlert";
+
+	// Cheking if a url parameter is present
+	if($url !== "") {
+		$requestUrl = $requestUrl . "&url=$url";
+	}
+	
+	return request($requestUrl);
 }
 
 /**
