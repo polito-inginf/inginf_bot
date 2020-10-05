@@ -479,3 +479,15 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 
 	return $msg['ok'] == TRUE ? $msg['result'] : NULL ;
 }
+
+/**
+* Deletes a message
+* 
+* @param int/string $chatId The id/username of the chat/channel/user where the message is located
+* @param string $messageId The id of the message to delete
+* 
+* @return mixed TRUE on success
+*/
+function deleteMessage($chatId, int $messageId) {
+	return request("deleteMessage?chat_id=$chatId&message_id=$messageId");
+}
