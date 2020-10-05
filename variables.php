@@ -1,5 +1,23 @@
 <?php
 /**
+* These are all the base functions that will be used for communicating
+* with Telegram Bot.
+*
+* No libraries are used in this project.
+*
+* @author		Giorgio Pais
+* @author		Giulio Coa
+* @author		Simone Cosimo
+* @author		Luca Zaccaria
+* @author		Alessio Bincoletto
+* @author		Marco Smorti
+*
+* @copyright	2020- Giorgio Pais <info@politoinginf.it>
+*
+* @license		https://choosealicense.com/licenses/gpl-3.0/
+*/
+
+/**
 * This section of the code defines all required variables
 * by getting information from Telegram Bot's update.
 *

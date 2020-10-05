@@ -7,21 +7,43 @@
 *
 * Intended use in a function (where $request is the result of the method):
 * if (LOG_LVL > prefixed_level) {
-* 	sendDebugRes(__FUNCTION__, $request);
+* 	sendLog(__FUNCTION__, $request);
 * }
 *
 * @todo Define other log levels
 * @todo Define aliases for the log levels
+*
+* No libraries are used in this project.
+*
+* @author		Giorgio Pais
+* @author		Giulio Coa
+* @author		Simone Cosimo
+* @author		Luca Zaccaria
+* @author		Alessio Bincoletto
+* @author		Marco Smorti
+*
+* @copyright	2020- Giorgio Pais <info@politoinginf.it>
+*
+* @license		https://choosealicense.com/licenses/gpl-3.0/
 */
+
 define('LOG_LVL', 7);
 
 /**
+* Send the log to the log channel
+*
 * @param string $function Name of the function/update
 * @param string $request JSON returned from method/update
+*
 * @return mixed Message sent in the channel
 */
-function sendDebugRes($function, $request) {
+function sendLog($function, $request) {
 	// Decodes the $request JSON string into an array
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
 	$res = json_decode($request, TRUE);
 	$reply = "<b>$function</b>:\n\n";
 
@@ -50,5 +72,5 @@ function sendDebugRes($function, $request) {
 
 // Warning: sends every single update and every method result to the debug channel
 if (LOG_LVL > 6) {
-	sendDebugRes("UPDATE", $content);
+	sendLog("UPDATE", $content);
 }

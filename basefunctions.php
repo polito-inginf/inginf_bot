@@ -139,7 +139,7 @@ function sendMessage($chatId, $text, $flags = 0, $keyboard = []) {
 	
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
-		sendDebugRes(__FUNCTION__, $msg);
+		sendLog(__FUNCTION__, $msg);
 	}
 
 	/**
@@ -338,7 +338,7 @@ function sendPhoto($chatId, $photo, $flags = 0, $caption = '') {
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
-		sendDebugRes(__FUNCTION__, $msg);
+		sendLog(__FUNCTION__, $msg);
 	}
 
 	/**
@@ -363,7 +363,7 @@ function getChat($chatId) {
 
 	// Check if function must be logged
 	if (LOG_LVL > 3){
-		sendDebugRes(__FUNCTION__, $chat);
+		sendLog(__FUNCTION__, $chat);
 	}
 
 	/**
@@ -398,7 +398,7 @@ function pinChatMessage($chatId, $messageId, $flag = 0) {
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
-		sendDebugRes(__FUNCTION__, $result);
+		sendLog(__FUNCTION__, $result);
 	}
 
 	/**
@@ -434,7 +434,7 @@ function forwardMessage($toChatid, $fromChatid, $messageId, $flag = 0) {
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $toChatid != LOG_CHANNEL){
-		sendDebugRes(__FUNCTION__, $msg);
+		sendLog(__FUNCTION__, $msg);
 	}
 
 	/**
