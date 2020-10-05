@@ -20,9 +20,9 @@
 include 'private.php';
 
 // Bitwise operators constants
-const MARKDOWN = 0b001;
-const ENABLE_PAGE_PREVIEW = 0b010;
-const DISABLE_NOTIFICATION = 0b100;
+const MARKDOWN = 1 << 0;
+const ENABLE_PAGE_PREVIEW = 1 << 1;
+const DISABLE_NOTIFICATION = 1 << 2;
 
 // The Bot API endpoint
 define('api', 'https://api.telegram.org/bot' . token . '/');
