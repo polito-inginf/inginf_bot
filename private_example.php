@@ -1,6 +1,6 @@
 <?php
 /**
-* These are all the base functions that will be used for communicating
+* These are all the private variables that will be used for communicating
 * with Telegram Bot.
 *
 * No libraries are used in this project.
