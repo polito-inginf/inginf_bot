@@ -24,7 +24,7 @@
 *
 * @copyright	2020- Giorgio Pais <info@politoinginf.it>
 *
-* @license		https://choosealicense.com/licenses/gpl-3.0/
+* @license		https://choosealicense.com/licenses/lgpl-3.0/
 */
 
 // The log level of the project
