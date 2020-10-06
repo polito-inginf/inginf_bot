@@ -500,7 +500,24 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 * @return mixed TRUE on success
 */
 function deleteMessage($chatId, int $messageId) {
-	return request("deleteMessage?chat_id=$chatId&message_id=$messageId");
+	$response =  request("deleteMessage?chat_id=$chatId&message_id=$messageId");
+
+	// Check if function must be logged
+	if (LOG_LVL > 3){
+		/**
+		 * @todo improve this log, the response should print also the chatId and messageId
+		 */
+		sendLog(__FUNCTION__, $response);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$response = json_decode($response, TRUE);
+
+	return $response['ok'] == TRUE ? $response['result'] : NULL;
 }
 
 /**
