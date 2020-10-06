@@ -611,3 +611,98 @@ function editMessageCaption($chatId, int $messageId, string $caption, int $flags
 	 */
 	return $response['ok'] == TRUE ? $response['result'] : NULL;
 }
+
+/**
+* Reply to a message
+*
+* @param int/string $chatId The id/username of the chat/channel/user where we want send the message
+* @param string $text The message to send
+* @param int $messageId The id of the message you want to respond to
+* @param int $flags [Optional] Pipe to set more options
+* 	MARKDOWN: enables Markdown parse mode
+* 	ENABLE_PAGE_PREVIEW: enables preview for links
+* 	DISABLE_NOTIFICATIONS: mutes notifications
+* @param array $keyboard [Optional] Keyboard layout to send
+*
+* @return mixed Result of the encode
+*/
+function replyToMessage($chatId, string $text, int $messageId, int $flags = 0, array $keyboard = []) {
+	$parseMode = 'HTML';
+	$disablePreview = TRUE;
+	$mute = FALSE;
+	
+	/**
+	* Check if the URL must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($text, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$text = urlencode($text);
+	}
+	
+	// Check if the parse mode must be setted to 'MarkdownV2'
+	if ($flags & MARKDOWN) {
+		$parseMode = 'MarkdownV2';
+	}
+	
+	// Check if the preview for links must be enabled
+	if ($flags & ENABLE_PAGE_PREVIEW) {
+		$disablePreview = FALSE;
+	}
+	
+	// Check if the message must be muted
+	if ($flags & DISABLE_NOTIFICATION) {
+		$mute = TRUE;
+	}
+	
+	$url = "sendMessage?text=$text&chat_id=$chatId&parse_mode=$parseMode&disable_web_page_preview=$disablePreview&disable_notification=$mute&reply_to_message_id=$messageId";
+	
+	/**
+	* Check if the message have an InlineKeyboard
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($keyboard) === FALSE) {
+		/**
+		* Encode the keyboard layout
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
+		$keyboard = json_encode([
+			"inline_keyboard" => $keyboard
+		]);
+		
+		$url .= "&reply_markup=$keyboard";
+	}
+
+	$msg = request($url);
+	
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
+		sendLog(__FUNCTION__, $msg);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$msg = json_decode($msg, TRUE);
+
+	return $msg['ok'] == TRUE ? $msg['result'] : NULL;
+}
