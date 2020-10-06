@@ -103,6 +103,7 @@ function answerCallbackQuery(int $callbackId, string $text, int $flags = 0, stri
 
 /**
 * Answers to an InlineQuery
+* @todo Do we want to pass the results as a parameter or find the results inside the function?
 *
 * @param int $queryId Query id
 * @param array $ans The answers
