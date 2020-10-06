@@ -214,7 +214,18 @@ function editMessageText($chatId, int $messageId, string $text, int $flags = 0, 
 		$url .= "&reply_markup=$keyboard";
 	}
 	
-	return request($url);
+	$response = request($url);
+
+	if (LOG_LVL > 3){
+		sendLog(__FUNCTION__, $response);
+	}
+
+	$response = json_decode($response, TRUE);
+
+	/**
+	 * @todo test if this works when editing other people messages.
+	 */
+	return $response['ok'] == TRUE ? $response['result'] : NULL;
 }
 
 /**
@@ -556,5 +567,16 @@ function editMessageCaption($chatId, int $messageId, string $caption, int $flags
 		$url .= "&reply_markup=$keyboard";
 	}
 	
-	return request($url);
+	$response = request($url);
+
+	if (LOG_LVL > 3){
+		sendLog(__FUNCTION__, $response);
+	}
+
+	$response = json_decode($response, TRUE);
+
+	/**
+	 * @todo test if this works when editing other people messages.
+	 */
+	return $response['ok'] == TRUE ? $response['result'] : NULL;
 }
