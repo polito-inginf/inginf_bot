@@ -138,8 +138,21 @@ function editMessageReplyMarkup($chatId, array $keyboard, int $messageId) {
 	$keyboard = json_encode([
 		"inline_keyboard" => $keyboard
 	]);
+
+	$url = "editMessageReplyMarkup?chat_id=$chatId&message_id=$messageId&reply_markup=$keyboard";
 	
-	return request("editMessageReplyMarkup?chat_id=$chatId&message_id=$messageId&reply_markup=$keyboard");
+	$response = request($url);
+
+	if (LOG_LVL > 3){
+		sendLog(__FUNCTION__, $response);
+	}
+
+	$response = json_decode($response, TRUE);
+
+	/**
+	 * @todo test if this works when editing other people messages.
+	 */
+	return $response['ok'] == TRUE ? $response['result'] : NULL;
 }
 
 /**
