@@ -359,13 +359,15 @@ function pinChatMessage($chatId, int $messageId, int $flag = 0) {
 * 	ENABLE_PAGE_PREVIEW: enables preview for links
 * 	DISABLE_NOTIFICATIONS: mutes notifications
 * @param array $keyboard [Optional] Keyboard layout to send
+* @param int $messageId [Optional] The id of the message you want to respond to
 *
 * @return mixed Result of the encode
 */
-function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []) {
+function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = [], int $messageId = 0) {
 	$parseMode = 'HTML';
 	$disablePreview = TRUE;
 	$mute = FALSE;
+	$functionToLog = __FUNCTION__;
 	
 	/**
 	* Check if the URL must be encoded
@@ -398,6 +400,12 @@ function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []
 	
 	$url = "sendMessage?text=$text&chat_id=$chatId&parse_mode=$parseMode&disable_web_page_preview=$disablePreview&disable_notification=$mute";
 	
+	// Check if the message must reply to another one
+	if($messageId !== 0) {
+		$url .= "&reply_to_message_id=$messageId";
+		$functionToLog = "replyToMessage";
+	}
+
 	/**
 	* Check if the message have an InlineKeyboard
 	*
@@ -430,7 +438,7 @@ function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []
 	
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
-		sendLog(__FUNCTION__, $msg);
+		sendLog($functionToLog, $msg);
 	}
 
 	/**
@@ -648,82 +656,5 @@ function editMessageCaption($chatId, int $messageId, string $caption, int $flags
 * @return mixed Result of the encode
 */
 function replyToMessage($chatId, string $text, int $messageId, int $flags = 0, array $keyboard = []) {
-	$parseMode = 'HTML';
-	$disablePreview = TRUE;
-	$mute = FALSE;
-	
-	/**
-	* Check if the URL must be encoded
-	*
-	* strpos() Check if the '\n' character is into the string
-	*/
-	if (strpos($text, "\n")) {
-		/**
-		* Encode the URL
-		*
-		* urlencode() Encode the URL, converting all the special character to its safe value
-		*/
-		$text = urlencode($text);
-	}
-	
-	// Check if the parse mode must be setted to 'MarkdownV2'
-	if ($flags & MARKDOWN) {
-		$parseMode = 'MarkdownV2';
-	}
-	
-	// Check if the preview for links must be enabled
-	if ($flags & ENABLE_PAGE_PREVIEW) {
-		$disablePreview = FALSE;
-	}
-	
-	// Check if the message must be muted
-	if ($flags & DISABLE_NOTIFICATION) {
-		$mute = TRUE;
-	}
-	
-	$url = "sendMessage?text=$text&chat_id=$chatId&parse_mode=$parseMode&disable_web_page_preview=$disablePreview&disable_notification=$mute&reply_to_message_id=$messageId";
-	
-	/**
-	* Check if the message have an InlineKeyboard
-	*
-	* empty() check if the argument is empty
-	* 	''
-	* 	""
-	* 	'0'
-	* 	"0"
-	* 	0
-	* 	0.0
-	* 	NULL
-	* 	FALSE
-	* 	[]
-	* 	array()
-	*/
-	if (empty($keyboard) === FALSE) {
-		/**
-		* Encode the keyboard layout
-		*
-		* json_encode() Convert the PHP object to a JSON string
-		*/
-		$keyboard = json_encode([
-			"inline_keyboard" => $keyboard
-		]);
-		
-		$url .= "&reply_markup=$keyboard";
-	}
-
-	$msg = request($url);
-	
-	// Check if function must be logged
-	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
-		sendLog(__FUNCTION__, $msg);
-	}
-
-	/**
-	* Decode the output of the HTTPS query
-	*
-	* json_decode() Convert the JSON string to a PHP object
-	*/
-	$msg = json_decode($msg, TRUE);
-
-	return $msg['ok'] == TRUE ? $msg['result'] : NULL;
+	return sendMessage($chatId, $text, $flags, $keyboard, $messageId);
 }
