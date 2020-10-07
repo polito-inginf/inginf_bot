@@ -86,16 +86,16 @@ function answerCallbackQuery(int $callbackId, string $text, int $flags = 0, stri
 		$text = urlencode($text);
 	}
 
-	// Checking if the SHOW_ALERT feature is present in the flags
+	// Check if the CallbackQuery must produce an alert popup
 	if($flags & SHOW_ALERT) {
 		$showAlert = TRUE;
 	}
 
 	$requestUrl = "answerCallbackQuery?callback_query_id=$callbackId&text=$text&show_alert=$showAlert";
 
-	// Cheking if a url parameter is present
+	// Check if a url parameter is present
 	if($url !== "") {
-		$requestUrl = $requestUrl . "&url=$url";
+		$requestUrl .= "&url=$url";
 	}
 	
 	return request($requestUrl);
@@ -139,15 +139,19 @@ function editMessageReplyMarkup($chatId, array $keyboard, int $messageId) {
 	$keyboard = json_encode([
 		"inline_keyboard" => $keyboard
 	]);
-
-	$url = "editMessageReplyMarkup?chat_id=$chatId&message_id=$messageId&reply_markup=$keyboard";
 	
-	$response = request($url);
+	$response = request("editMessageReplyMarkup?chat_id=$chatId&message_id=$messageId&reply_markup=$keyboard");
 
+	// Check if function must be logged
 	if (LOG_LVL > 3){
 		sendLog(__FUNCTION__, $response);
 	}
 
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
 	$response = json_decode($response, TRUE);
 
 	/**
@@ -230,10 +234,16 @@ function editMessageText($chatId, int $messageId, string $text, int $flags = 0, 
 	
 	$response = request($url);
 
+	// Check if function must be logged
 	if (LOG_LVL > 3){
 		sendLog(__FUNCTION__, $response);
 	}
 
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
 	$response = json_decode($response, TRUE);
 
 	/**
@@ -511,7 +521,7 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 * @param int/string $chatId The id/username of the chat/channel/user where the message is located
 * @param string $messageId The id of the message to delete
 * 
-* @return mixed TRUE on success
+* @return boolean TRUE on success
 */
 function deleteMessage($chatId, int $messageId) {
 	$response =  request("deleteMessage?chat_id=$chatId&message_id=$messageId");
@@ -598,12 +608,23 @@ function editMessageCaption($chatId, int $messageId, string $caption, int $flags
 		$url .= "&reply_markup=$keyboard";
 	}
 	
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
 	$response = request($url);
 
+	// Check if function must be logged
 	if (LOG_LVL > 3){
 		sendLog(__FUNCTION__, $response);
 	}
 
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
 	$response = json_decode($response, TRUE);
 
 	/**
