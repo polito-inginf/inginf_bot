@@ -658,3 +658,75 @@ function editMessageCaption($chatId, int $messageId, string $caption, int $flags
 function replyToMessage($chatId, string $text, int $messageId, int $flags = 0, array $keyboard = []) {
 	return sendMessage($chatId, $text, $flags, $keyboard, $messageId);
 }
+
+
+/**
+* Edits (replaces) animation, audio, document, photo, or video messages (with or not the InlineKeyboard associated).
+*
+* @param int/string $chatId [Optional] The id/username of the chat/channel/user where we want edit the message
+* @param int $messageId [Optional] The id of the message to modify
+* @param string $inlineMessageId [Optional] necessary if $chatId and $messageId are not specified. Identifier of the inline message
+* @param mixed $media the new media content of the message.
+*	it should be one of the following InputMedia type:
+*	InputMediaPhoto
+*	InputMediaVideo
+*	InputMediaAnimation
+*	InputMediaAudio
+*	InputMediaDocument
+* @param array $keyboard [Optional] Keyboard layout to send
+*
+* @return mixed/bool If the edited message was originally sent by the bot, it returns the modified Message, 
+*	otherwise returns True
+*/
+function editMessageMedia($chatId, int $messageId, string $inlineMessageId, $media, array $keyboard = []) {
+	
+	$url = "editMessageMedia?chat_id=$chatId&message_id=$messageId&inline_message_id=$inlineMessageId&media=$media";
+
+	/**
+	* Check if the message have an InlineKeyboard
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($keyboard) === FALSE) {
+		/**
+		* Encode the keyboard layout
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
+		$keyboard = json_encode([
+			"inline_keyboard" => $keyboard
+		]);
+		
+		$url .= "&reply_markup=$keyboard";
+	}
+	
+	$response = request($url);
+
+
+	// Check if function must be logged
+	if (LOG_LVL > 3){
+		sendLog(__FUNCTION__, $response);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$response = json_decode($response, TRUE);
+
+	/**
+	 * @todo test if this works when editing other people messages.
+	 */
+	return $response['ok'] == TRUE ? $response['result'] : NULL;
+}
