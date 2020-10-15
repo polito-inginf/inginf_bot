@@ -861,3 +861,31 @@ function getFile($fileId){
 	return $file['ok'] == TRUE ? $file['result'] : NULL;
 
 }
+
+
+/**
+ *  Returns basic information about the bot in form of a User object.
+ * 
+ * @return $myself is the User Object of the bot.
+ */
+function getMe(){
+
+	$url = "getme";	//try at least, no one gets me, i'm such a sad bot
+
+	$myself = request($url);
+	
+	// Check if function must be logged
+	if (LOG_LVL > 3) {
+		sendLog(__FUNCTION__, $myself);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$myself = json_decode($myself, TRUE);
+
+	return $myself['ok'] == TRUE ? $myelf['result'] : NULL;
+
+}
