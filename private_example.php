@@ -17,20 +17,36 @@
 * @license		https://choosealicense.com/licenses/lgpl-3.0/
 */
 
-// Bot token
+/**
+* Bot token
+*
+* define() Defines a named constant
+*/
 define('token', '');
 
-// DB credentials
+/**
+* DB credentials
+*
+* define() Defines a named constant
+*/
 define('DB_HOST', 'localhost');
 define('DB_USER', '');
 define('DB_PASSWD', '');
 define('DB_NAME', '');
 define('DB_PORT', 3306);
 
-// Log channel chat_id
+/**
+* Log channel chat_id
+*
+* define() Defines a named constant
+*/
 define('LOG_CHANNEL', 0);
 
-// Temp admins array (update with SQL table)
+/**
+* Temp admins array (update with SQL table)
+*
+* define() Defines a named constant
+*/
 define('ADMINS', [
 	0
 ]);

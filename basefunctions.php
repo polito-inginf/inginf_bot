@@ -28,7 +28,11 @@ function request(string $url) {
 	// Create the URL for the Telegram's Bot API
 	$url = api . $url;
 
-	// Replace the special character into the URL
+	/**
+	* Replace the special character into the URL
+	*
+	* str_replace() Replace the first array of character with the second array
+	*/
 	$url = str_replace([
 		"\n",
 		' ',
@@ -41,19 +45,35 @@ function request(string $url) {
 		'%27'
 	], $url);
 
-	// Open the cURL session
+	/**
+	* Open the cURL session
+	*
+	* curl_init() Open the session
+	*/
 	$curlSession = curl_init($url);
 
-	// Set the cURL session
+	/**
+	* Set the cURL session
+	*
+	* curl_setopt_array() Set the options for the session
+	*/
 	curl_setopt_array($curlSession, [
 		CURLOPT_HEADER => FALSE,
 		CURLOPT_RETURNTRANSFER => TRUE
 	]);
 
-	// Exec the request
+	/**
+	* Exec the request
+	*
+	* curl_exec() Execute the session
+	*/
 	$result = curl_exec($curlSession);
 
-	// Close the cURL session
+	/**
+	* Close the cURL session
+	*
+	* curl_close() Close the session
+	*/
 	curl_close($curlSession);
 	return $result;
 }
@@ -148,10 +168,11 @@ function deleteMessage($chatId, int $messageId) {
 
 	// Check if function must be logged
 	if (LOG_LVL > 3){
-		/**
-		 * @todo improve this log, the response should print also the chatId and messageId
-		 */
-		sendLog(__FUNCTION__, $response);
+		sendLog(__FUNCTION__, [
+			'chat_id' => $chatId,
+			'message_id' => $messageId,
+			'response' => $response
+		]);
 	}
 
 	/**
@@ -825,7 +846,6 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 		/**
 		* Check if the caption of the media exists and if it must be encoded
 		*
-		* strpos() Check if the '\n' character is into the string
 		* empty() check if the argument is empty
 		* 	''
 		* 	""
@@ -837,6 +857,7 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 		* 	FALSE
 		* 	[]
 		* 	array()
+		* strpos() Check if the '\n' character is into the string
 		*/
 		if (empty($singleMedia['caption']) === FALSE && strpos($singleMedia['caption'], "\n")) {
 			/**
@@ -850,6 +871,17 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 		/**
 		* Check if the media is a video, if its thumbnail exists and if its thumbnail must be encoded
 		*
+		* empty() check if the argument is empty
+		* 	''
+		* 	""
+		* 	'0'
+		* 	"0"
+		* 	0
+		* 	0.0
+		* 	NULL
+		* 	FALSE
+		* 	[]
+		* 	array()
 		* strpos() Check if the '\n' character is into the string
 		*/
 		if ($singleMedia['type'] === 'video' && empty($singleMedia['thumb']) === FALSE && strpos($singleMedia['thumb'], "\n")) {
@@ -864,8 +896,12 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 
 	$url = "sendMediaGroup?chat_id=$chatId&disable_notification=$mute&media=";
 
-	// Appends a pretty-printed version of the array of media to the URL
-	$url .= json_encode($media, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+	/**
+	* Appends the JSON version of the array of media to the URL
+	*
+	* json_encode() Convert the PHP object to a JSON string
+	*/
+	$url .= json_encode($media, JSON_UNESCAPED_SLASHES);
 
 	/**
 	* Check if the message must reply to another one
@@ -1518,4 +1554,66 @@ function sendVoice($chatId, string $voice, string $caption = '', int $flags = 0,
 	$msg = json_decode($msg, TRUE);
 
 	return $msg['ok'] == TRUE ? $msg['result'] : NULL ;
+}
+
+/**
+* Set the command of the Bot.
+*
+* @param array $commands The commands of the Bot.
+*
+* @return boolean On success, TRUE.
+*/
+function setMyCommands(array $commands) {
+	foreach ($commands as $command) {
+		/**
+		* Check if the name of the command must be encoded
+		*
+		* strpos() Check if the '\n' character is into the string
+		*/
+		if (strpos($command['command'], "\n")) {
+			/**
+			* Encode the URL
+			*
+			* urlencode() Encode the URL, converting all the special character to its safe value
+			*/
+			$command['command'] = urlencode($command['command']);
+		}
+
+		/**
+		* Check if the description of the command must be encoded
+		*
+		* strpos() Check if the '\n' character is into the string
+		*/
+		if (strpos($command['description'], "\n")) {
+			/**
+			* Encode the URL
+			*
+			* urlencode() Encode the URL, converting all the special character to its safe value
+			*/
+			$command['description'] = urlencode($command['description']);
+		}
+	}
+
+	/**
+	* Convert the array of the Bot's command to its JSON version
+	*
+	* json_encode() Convert the PHP object to a JSON string
+	*/
+	$commands = json_encode($commands, JSON_UNESCAPED_SLASHES);
+
+	$result = request("setMyCommands?commands=$commands");
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $result);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$result = json_decode($result, TRUE);
+
+	return $result['result'];
 }
