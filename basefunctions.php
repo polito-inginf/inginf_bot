@@ -18,11 +18,11 @@
 */
 
 /**
-* Encodes a created URL to Telegram
+* Execute a request to the Telegram's Bot API.
 *
-* @param string $url the URL to encode
+* @param string $urlt The Bot API endpoint.
 *
-* @return mixed The result of the encode
+* @return mixed The result of the request
 */
 function request(string $url) {
 	// Create the URL for the Telegram's Bot API
@@ -59,15 +59,15 @@ function request(string $url) {
 }
 
 /**
-* Answers to a CallbackQuery
+* Answers to a CallbackQuery.
 *
-* @param int $callbackId CallbackQuery id
-* @param string $text Text to be sent in the notification
+* @param int $callbackId The id of the CallbackQuery.
+* @param string $text The text to be sent in the notification.
 * @param int $flags [Optional] Pipe to set more options
 * 	SHOW_ALERT: enables alert instead of top notification
-* @param string $url [Optional] Url to be opened
+* @param string $url [Optional] Url to be opened.
 *
-* @return mixed The result of the encode
+* @return boolean On success, TRUE.
 */
 function answerCallbackQuery(int $callbackId, string $text, int $flags = 0, string $url = "") {
 	$showAlert = FALSE;
@@ -116,13 +116,13 @@ function answerCallbackQuery(int $callbackId, string $text, int $flags = 0, stri
 }
 
 /**
-* Answers to an InlineQuery
-* @todo Do we want to pass the results as a parameter or find the results inside the function?
+* Answers to an InlineQuery.
+* @todo Do we want to pass the results as a parameter or find the results inside the function ?
 *
-* @param int $queryId Query id
-* @param array $ans The answers
+* @param int $queryId The id of the InlineQuery.
+* @param array $ans The answers.
 *
-* @return mixed The result of the encode
+* @return boolean On success, TRUE.
 */
 function answerInlineQuery(int $queryId, array $ans) {
 	/**
@@ -136,12 +136,12 @@ function answerInlineQuery(int $queryId, array $ans) {
 }
 
 /**
-* Deletes a message
+* Deletes a message.
 *
-* @param int/string $chatId The id/username of the chat/channel/user where the message is located
-* @param string $messageId The id of the message to delete
+* @param int/string $chatId The id/username of the chat/channel/user where the message is located.
+* @param string $messageId The id of the message to delete.
 *
-* @return boolean TRUE on success
+* @return boolean On success, TRUE.
 */
 function deleteMessage($chatId, int $messageId) {
 	$response =  request("deleteMessage?chat_id=$chatId&message_id=$messageId");
@@ -167,14 +167,14 @@ function deleteMessage($chatId, int $messageId) {
 /**
 * Edits a caption of a sent message (with or not the InlineKeyboard associated).
 *
-* @param int/string $chatId The id/username of the chat/channel/user where we want edit the message
-* @param int $messageId The id of the message to modify
-* @param string $caption The caption to send
+* @param int/string $chatId The id/username of the chat/channel/user where we want edit the message.
+* @param int $messageId The id of the message to modify.
+* @param string $caption The caption to send.
 * @param int $flags [Optional] Pipe to set more options
 * 	MARKDOWN: enables Markdown parse mode
-* @param array $keyboard [Optional] The layout of the keyboard to send
+* @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed The result of the encode
+* @return mixed On success, the Message edited by the method.
 */
 function editMessageCaption($chatId, int $messageId, string $caption, int $flags = 0, array $keyboard = []) {
 	$parseMode = 'HTML';
@@ -254,13 +254,13 @@ function editMessageCaption($chatId, int $messageId, string $caption, int $flags
 }
 
 /**
-* Updates the keyboard without sending a new message, but modifies the existing one
+* Updates the keyboard without sending a new message, but modifies the existing one.
 *
-* @param int/string $chatId The id/username of the chat/channel/user to where we want edit the InlineKeyboard
-* @param array $keyboard [Optional] The layout of the keyboard to send
-* @param int $messageId message id to modify
+* @param int/string $chatId The id/username of the chat/channel/user to where we want edit the InlineKeyboard.
+* @param array $keyboard [Optional] The layout of the keyboard to send.
+* @param int $messageId The id of the message to modify.
 *
-* @return mixed The result of the encode
+* @return mixed On success, the Message edited by the method.
 */
 function editMessageReplyMarkup($chatId, array $keyboard, int $messageId) {
 	/**
@@ -295,16 +295,16 @@ function editMessageReplyMarkup($chatId, array $keyboard, int $messageId) {
 /**
 * Edits a sent message (with or not the InlineKeyboard associated).
 *
-* @param int/string $chatId The id/username of the chat/channel/user where we want edit the message
-* @param int $messageId The id of the message to modify
-* @param string $text The message to send
+* @param int/string $chatId The id/username of the chat/channel/user where we want edit the message.
+* @param int $messageId The id of the message to modify.
+* @param string $text The message to send.
 * @param int $flags [Optional] Pipe to set more options
 * 	MARKDOWN: enables Markdown parse mode
 * 	ENABLE_PAGE_PREVIEW: enables preview for links
 * 	DISABLE_NOTIFICATIONS: mutes notifications
-* @param array $keyboard [Optional] The layout of the keyboard to send
+* @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed The result of the encode
+* @return mixed On success, the Message edited by the method.
 */
 function editMessageText($chatId, int $messageId, string $text, int $flags = 0, array $keyboard = []) {
 	$parseMode = 'HTML';
@@ -385,15 +385,15 @@ function editMessageText($chatId, int $messageId, string $text, int $flags = 0, 
 }
 
 /**
-* Forward a message from a chat/channel/user to another
+* Forward a message from a chat/channel/user to another.
 *
-* @param int/string $toChatid The id/username of the chat/channel/user where we want send the message
-* @param int/string $fromChatid The id/username of the chat/channel/user where the message we want to forward it's located
-* @param int $messageId The id of the message to forward
+* @param int/string $toChatid The id/username of the chat/channel/user where we want send the message.
+* @param int/string $fromChatid The id/username of the chat/channel/user where the message we want to forward it's located.
+* @param int $messageId The id of the message to forward.
 * @param int $flag [Optional] Pipe to set more options
 * 	DISABLE_NOTIFICATIONS: mutes notifications
 *
-* @return mixed The forwarded message object if forwarding was successful, NULL otherwise.
+* @return mixed On success, the Message forwarded by the method.
 */
 function forwardMessage($toChatid, $fromChatid, int $messageId, int $flag = 0) {
 	$mute = FALSE;
@@ -422,11 +422,11 @@ function forwardMessage($toChatid, $fromChatid, int $messageId, int $flag = 0) {
 }
 
 /**
-* Returns an up-to-date information about a chat/channel with a certain chat_id through a Chat object
+* Returns an up-to-date information about a chat/channel with a certain chat_id through a Chat object.
 *
-* @param int/string $chatId The id/username of the chat/channel we want to extract the information from
+* @param int/string $chatId The id/username of the chat/channel we want to extract the information from.
 *
-* @return mixed The Chat object of the chat
+* @return mixed On success, the Chat retrieved by the method.
 */
 function getChat($chatId) {
 	$chat = request("getChat?chat_id=$chatId");
@@ -447,14 +447,14 @@ function getChat($chatId) {
 }
 
 /**
-* Pins a given message in a specific chat/channel where the bot it's an admin
+* Pins a given message in a specific chat/channel where the bot it's an admin.
 *
-* @param int/string $chatId The id/username of the chat/channel where we want pin the message
-* @param int $messageId  The id of the message to pin
+* @param int/string $chatId The id/username of the chat/channel where we want pin the message.
+* @param int $messageId  The id of the message to pin.
 * @param int $flag [Optional] Pipe to set more options
 * 	DISABLE_NOTIFICATIONS: mutes notifications
 *
-* @return boolean TRUE if the pinning operation was successful.
+* @return boolean On success, TRUE.
 */
 function pinChatMessage($chatId, int $messageId, int $flag = 0) {
 	$mute = FALSE;
@@ -482,34 +482,34 @@ function pinChatMessage($chatId, int $messageId, int $flag = 0) {
 }
 
 /**
-* Reply to a message
+* Reply to a message.
 *
-* @param int/string $chatId The id/username of the chat/channel/user where we want send the message
-* @param string $text The message to send
-* @param int $messageId The id of the message you want to respond to
+* @param int/string $chatId The id/username of the chat/channel/user where we want send the message.
+* @param string $text The message to send.
+* @param int $messageId The id of the message you want to respond to.
 * @param int $flags [Optional] Pipe to set more options
 * 	MARKDOWN: enables Markdown parse mode
 * 	ENABLE_PAGE_PREVIEW: enables preview for links
 * 	DISABLE_NOTIFICATIONS: mutes notifications
-* @param array $keyboard [Optional] The layout of the keyboard to send
+* @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed Result of the encode
+* @return mixed On success, the Message edited by the method.
 */
 function replyToMessage($chatId, string $text, int $messageId, int $flags = 0, array $keyboard = []) {
 	return sendMessage($chatId, $text, $flags, $keyboard, $messageId);
 }
 
 /**
-* Sends a group of photos and videos as an album to the chat pointed from $chatId and returns the Message object of the sent message
+* Sends a group of photos and videos as an album to the chat pointed from $chatId and returns the Message object of the sent message.
 *
-* @param int/string $chatId The id/username of the chat/channel/user to send the message
-* @param array $media An array of InputMediaPhoto and InputMediaVideo that describe the photos and the videos to be sent; must include 2-10 items
+* @param int/string $chatId The id/username of the chat/channel/user to send the message.
+* @param array $media An array of InputMediaPhoto and InputMediaVideo that describe the photos and the videos to be sent; must include 2-10 items.
 * @param int $flag [Optional] Pipe to set more options
 * 	MARKDOWN: enables Markdown parse mode
 * 	DISABLE_NOTIFICATIONS: mutes notifications
-* @param int $messageId [Optional] The id of the message you want to respond to
+* @param int $messageId [Optional] The id of the message you want to respond to.
 *
-* @return mixed The Message sent by the method
+* @return mixed On success, the Message edited by the method.
 */
 function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 0) {
 	$mute = FALSE;
@@ -638,18 +638,18 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 }
 
 /**
-* Send a message
+* Send a message.
 *
-* @param int/string $chatId The id/username of the chat/channel/user where we want send the message
-* @param string $text The message to send
+* @param int/string $chatId The id/username of the chat/channel/user where we want send the message.
+* @param string $text The message to send.
 * @param int $flags [Optional] Pipe to set more options
 * 	MARKDOWN: enables Markdown parse mode
 * 	ENABLE_PAGE_PREVIEW: enables preview for links
 * 	DISABLE_NOTIFICATIONS: mutes notifications
-* @param array $keyboard [Optional] The layout of the keyboard to send
-* @param int $messageId [Optional] The id of the message you want to respond to
+* @param array $keyboard [Optional] The layout of the keyboard to send.
+* @param int $messageId [Optional] The id of the message you want to respond to.
 *
-* @return mixed Result of the encode
+* @return mixed On success, the Message edited by the method.
 */
 function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = [], int $messageId = 0) {
 	$parseMode = 'HTML';
@@ -755,16 +755,16 @@ function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []
 
 /**
 * Sends a Photo (identified by a string that can be both a file_id or an HTTP URL of a pic on internet)
-* to the chat pointed from $chatId and returns the Message object of the sent message
+* to the chat pointed from $chatId and returns the Message object of the sent message.
 *
-* @param int/string $chatId The id/username of the chat/channel/user to send the message
-* @param string $photo The URL that points to a photo from the web or a file_id of a photo already on the Telegram's servers
+* @param int/string $chatId The id/username of the chat/channel/user to send the message.
+* @param string $photo The URL that points to a photo from the web or a file_id of a photo already on the Telegram's servers.
 * @param int $flag [Optional] Pipe to set more options
 * 	MARKDOWN: enables Markdown parse mode
 * 	DISABLE_NOTIFICATIONS: mutes notifications
-* @param string $caption [Optional] The caption of the photo
+* @param string $caption [Optional] The caption of the photo.
 *
-* @return mixed The Message sent by the method
+* @return mixed On success, the Message edited by the method.
 */
 function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '') {
 	$parseMode = 'HTML';
@@ -848,24 +848,24 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 
 /**
 * Sends a Video (identified by a string that can be both a file_id or an HTTP URL of a pic on internet)
-* to the chat pointed from $chatId and returns the Message object of the sent message
+* to the chat pointed from $chatId and returns the Message object of the sent message.
 * Bots can, currently, send video files of up to 50 MB in size, this limit may be changed in the future.
 *
-* @param int/string $chatId The id/username of the chat/channel/user to send the message
-* @param string $video The URL that points to a video from the web or a file_id of a video already on the Telegram's servers
-* @param int $duration [Optional] The duration of sent video in seconds
-* @param int $width [Optional] The video width
-* @param int $height [Optional] The video height
-* @param string $thumb [Optional] The URL that points to the thumbnail of the video from the web or a file_id of a thumbnail already on the Telegram's servers
+* @param int/string $chatId The id/username of the chat/channel/user to send the message.
+* @param string $video The URL that points to a video from the web or a file_id of a video already on the Telegram's servers.
+* @param int $duration [Optional] The duration of sent video expressed in seconds.
+* @param int $width [Optional] The video width.
+* @param int $height [Optional] The video height.
+* @param string $thumb [Optional] The URL that points to the thumbnail of the video from the web or a file_id of a thumbnail already on the Telegram's servers.
 * @param int $flag [Optional] Pipe to set more options
 * 	MARKDOWN: enables Markdown parse mode
 * 	DISABLE_NOTIFICATIONS: mutes notifications
 * 	SUPPORTS_STREAMING: tells if the video is suitable for streaming
-* @param string $caption [Optional] The caption of the video
-* @param int $messageId [Optional] The id of the message you want to respond to
-* @param array $keyboard [Optional] The layout of the keyboard to send
+* @param string $caption [Optional] The caption of the video.
+* @param int $messageId [Optional] The id of the message you want to respond to.
+* @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed The Message sent by the method
+* @return mixed On success, the Message edited by the method.
 */
 function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, int $height = 0, string $thumb = '', int $flags = 0, string $caption = '', int $messageId = 0, array $keyboard = []) {
 	$parseMode = 'HTML';
@@ -1024,6 +1024,170 @@ function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, in
 	*/
 	if(empty($height) === FALSE) {
 		$url .= "&height=$height";
+	}
+
+	/**
+	* Check if the message must reply to another one
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($messageId) === FALSE) {
+		$url .= "&reply_to_message_id=$messageId";
+	}
+
+	/**
+	* Check if the message have an InlineKeyboard
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($keyboard) === FALSE) {
+		/**
+		* Encode the keyboard layout
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
+		$keyboard = json_encode([
+			"inline_keyboard" => $keyboard
+		]);
+
+		$url .= "&reply_markup=$keyboard";
+	}
+
+	$msg = request($url);
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $msg);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$msg = json_decode($msg, TRUE);
+
+	return $msg['ok'] == TRUE ? $msg['result'] : NULL ;
+}
+
+/**
+* Sends an Audio file, if you want Telegram clients to display the audio as a playable voice message,
+* to the chat pointed from $chatId and returns the Message object of the sent message.
+* The audio is identified by a string that can be both a file_id or an HTTP URL of a pic on internet.
+* Bots can, currently, send audio files of up to 50 MB in size, this limit may be changed in the future.
+*
+* @param int/string $chatId The id/username of the chat/channel/user to send the message.
+* @param string $voice The URL that points to an audio from the web or a file_id of an audio already on the Telegram's servers.
+* @param string $caption [Optional] The caption of the audio.
+* @param int $flag [Optional] Pipe to set more options
+* 	MARKDOWN: enables Markdown parse mode
+* 	DISABLE_NOTIFICATIONS: mutes notifications
+* @param int $duration [Optional] The duration of sent audio expressed in seconds.
+* @param int $messageId [Optional] The id of the message you want to respond to.
+* @param array $keyboard [Optional] The layout of the keyboard to send.
+*
+* @return mixed On success, the Message edited by the method.
+*/
+function sendVoice($chatId, string $voice, string $caption = '', int $flags = 0, int $duration = 0, int $messageId = 0, array $keyboard = []) {
+	$parseMode = 'HTML';
+	$mute = FALSE;
+
+	/**
+	* Check if the audio must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($voice, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$voice = urlencode($voice);
+	}
+
+	/**
+	* Check if the caption of the audio must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($caption, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$caption = urlencode($caption);
+	}
+
+	// Check if the parse mode must be setted to 'MarkdownV2'
+	if ($flags & MARKDOWN) {
+		$parseMode = 'MarkdownV2';
+	}
+
+	// Check if the message must be muted
+	if ($flags & DISABLE_NOTIFICATION) {
+		$mute = TRUE;
+	}
+
+	$url = "sendVoice?chat_id=$chatId&voice=$voice&parse_mode=$parseMode&disable_notification=$mute";
+
+	/**
+	* Check if the caption of the audio exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($caption) === FALSE) {
+		$url .= "&caption=$caption";
+	}
+
+	/**
+	* Check if the audio have a specific duration
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($duration) === FALSE) {
+		$url .= "&duration=$duration";
 	}
 
 	/**
