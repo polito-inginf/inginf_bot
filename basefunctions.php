@@ -796,3 +796,33 @@ function getChatAdministrators($chatId){
 	return $adminsArray['ok'] == TRUE ? $adminsArray['result'] : NULL;
 
 }
+
+/**
+ * Used to get information about a specific member of a chat through his relative ChatMember Object. 
+ * 
+ * @param int/string $chatId the id of the chat.
+ * @param int $userId the id of the targeted member of the chat.
+ * 
+ * @return mixed $chatMember returns the ChatMember Object of the targeted member.
+ */
+function getChatMember($chatId){
+
+	$url = "getChatMember?chat_id=$chatId";
+
+	$chatMember = request($url);
+	
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
+		sendLog(__FUNCTION__, $chatMember);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$chatMember = json_decode($chatMember, TRUE);
+
+	return $chatMember['ok'] == TRUE ? $chatMember['result'] : NULL;
+
+}
