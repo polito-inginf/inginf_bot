@@ -526,7 +526,7 @@ function replyToMessage($chatId, string $text, int $messageId, int $flags = 0, a
 * The audio is identified by a string that can be both a file_id or an HTTP URL of a pic on internet.
 * Bots can, currently, send audio files of up to 50 MB in size, this limit may be changed in the future.
 *
-* @param int/string $chatId The id/username of the chat/channel/user to send the message.
+* @param int/string $chatId The id/username of the chat/channel/user to send the audio.
 * @param string $audio The URL that points to an audio from the web or a file_id of an audio already on the Telegram's servers.
 * @param string $caption [Optional] The caption of the audio.
 * @param int $flag [Optional] Pipe to set more options
@@ -789,7 +789,7 @@ function sendAudio($chatId, string $audio, string $caption = '', int $flags = 0,
 /**
 * Sends a group of photos and videos as an album to the chat pointed from $chatId and returns the Message object of the sent message.
 *
-* @param int/string $chatId The id/username of the chat/channel/user to send the message.
+* @param int/string $chatId The id/username of the chat/channel/user to send the album.
 * @param array $media An array of InputMediaPhoto and InputMediaVideo that describe the photos and the videos to be sent; must include 2-10 items.
 * @param int $flag [Optional] Pipe to set more options
 * 	MARKDOWN: enables Markdown parse mode
@@ -1059,7 +1059,7 @@ function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []
 * Sends a Photo (identified by a string that can be both a file_id or an HTTP URL of a pic on internet)
 * to the chat pointed from $chatId and returns the Message object of the sent message.
 *
-* @param int/string $chatId The id/username of the chat/channel/user to send the message.
+* @param int/string $chatId The id/username of the chat/channel/user to send the photo.
 * @param string $photo The URL that points to a photo from the web or a file_id of a photo already on the Telegram's servers.
 * @param int $flag [Optional] Pipe to set more options
 * 	MARKDOWN: enables Markdown parse mode
@@ -1153,7 +1153,7 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 * to the chat pointed from $chatId and returns the Message object of the sent message.
 * Bots can, currently, send video files of up to 50 MB in size, this limit may be changed in the future.
 *
-* @param int/string $chatId The id/username of the chat/channel/user to send the message.
+* @param int/string $chatId The id/username of the chat/channel/user to send the video.
 * @param string $video The URL that points to a video from the web or a file_id of a video already on the Telegram's servers.
 * @param int $duration [Optional] The duration of sent video expressed in seconds.
 * @param int $width [Optional] The video width.
@@ -1398,7 +1398,7 @@ function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, in
 * The audio is identified by a string that can be both a file_id or an HTTP URL of a pic on internet.
 * Bots can, currently, send audio files of up to 50 MB in size, this limit may be changed in the future.
 *
-* @param int/string $chatId The id/username of the chat/channel/user to send the message.
+* @param int/string $chatId The id/username of the chat/channel/user to send the audio.
 * @param string $voice The URL that points to an audio from the web or a file_id of an audio already on the Telegram's servers.
 * @param string $caption [Optional] The caption of the audio.
 * @param int $flag [Optional] Pipe to set more options
@@ -1602,6 +1602,32 @@ function setMyCommands(array $commands) {
 	$commands = json_encode($commands, JSON_UNESCAPED_SLASHES);
 
 	$result = request("setMyCommands?commands=$commands");
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $result);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$result = json_decode($result, TRUE);
+
+	return $result['result'];
+}
+
+/**
+* Unban a user in a specific chat/channel where the bot it's an admin.
+*
+* @param int/string $chatId The id/username of the chat/channel where we want unban a user
+* @param int/string $userId The id/username of the user we want unban.
+*
+* @return boolean On success, TRUE.
+*/
+function unbanChatMember($chatId, $userId) {
+	$result = request("unbanChatMember?chat_id=$chatId&user_id=$userId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
