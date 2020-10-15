@@ -1643,3 +1643,28 @@ function unbanChatMember($chatId, $userId) {
 
 	return $result['result'];
 }
+
+/**
+* Unpins the message in a specific chat/channel where the bot it's an admin.
+*
+* @param int/string $chatId The id/username of the chat/channel where we want unpin the message.
+*
+* @return boolean On success, TRUE.
+*/
+function unpinChatMessage($chatId) {
+	$result = request("unpinChatMessage?chat_id=$chatId");
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $result);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$result = json_decode($result, TRUE);
+
+	return $result['result'];
+}
