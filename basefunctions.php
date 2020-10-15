@@ -158,7 +158,7 @@ function deleteMessage($chatId, int $messageId) {
 * @param string $caption The caption to send
 * @param int $flags [Optional] Pipe to set more options
 * 	MARKDOWN: enables Markdown parse mode
-* @param array $keyboard [Optional] Keyboard layout to send
+* @param array $keyboard [Optional] The layout of the keyboard to send
 *
 * @return mixed The result of the encode
 */
@@ -242,8 +242,8 @@ function editMessageCaption($chatId, int $messageId, string $caption, int $flags
 /**
 * Updates the keyboard without sending a new message, but modifies the existing one
 *
-* @param array $keyboard Keyboard layout to send
 * @param int/string $chatId The id/username of the chat/channel/user to where we want edit the InlineKeyboard
+* @param array $keyboard [Optional] The layout of the keyboard to send
 * @param int $messageId message id to modify
 *
 * @return mixed The result of the encode
@@ -288,7 +288,7 @@ function editMessageReplyMarkup($chatId, array $keyboard, int $messageId) {
 * 	MARKDOWN: enables Markdown parse mode
 * 	ENABLE_PAGE_PREVIEW: enables preview for links
 * 	DISABLE_NOTIFICATIONS: mutes notifications
-* @param array $keyboard [Optional] Keyboard layout to send
+* @param array $keyboard [Optional] The layout of the keyboard to send
 *
 * @return mixed The result of the encode
 */
@@ -477,7 +477,7 @@ function pinChatMessage($chatId, int $messageId, int $flag = 0) {
 * 	MARKDOWN: enables Markdown parse mode
 * 	ENABLE_PAGE_PREVIEW: enables preview for links
 * 	DISABLE_NOTIFICATIONS: mutes notifications
-* @param array $keyboard [Optional] Keyboard layout to send
+* @param array $keyboard [Optional] The layout of the keyboard to send
 *
 * @return mixed Result of the encode
 */
@@ -607,7 +607,7 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 * 	MARKDOWN: enables Markdown parse mode
 * 	ENABLE_PAGE_PREVIEW: enables preview for links
 * 	DISABLE_NOTIFICATIONS: mutes notifications
-* @param array $keyboard [Optional] Keyboard layout to send
+* @param array $keyboard [Optional] The layout of the keyboard to send
 * @param int $messageId [Optional] The id of the message you want to respond to
 *
 * @return mixed Result of the encode
@@ -709,7 +709,7 @@ function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []
 * @param int $flag [Optional] Pipe to set more options
 * 	MARKDOWN: enables Markdown parse mode
 * 	DISABLE_NOTIFICATIONS: mutes notifications
-* @param string $caption [Optional] the caption
+* @param string $caption [Optional] The caption of the photo
 *
 * @return mixed The Message sent by the method
 */
@@ -756,6 +756,161 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 	}
 
 	$msg = request("sendPhoto?chat_id=$chatId&photo=$photo&caption=$caption&parse_mode=$parseMode&disable_notification=$mute");
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $msg);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$msg = json_decode($msg, TRUE);
+
+	return $msg['ok'] == TRUE ? $msg['result'] : NULL ;
+}
+
+/**
+* Sends a Video (identified by a string that can be both a file_id or an HTTP URL of a pic on internet)
+* to the chat pointed from $chatId and returns the Message object of the sent message
+* Bots can, currently, send video files of up to 50 MB in size, this limit may be changed in the future.
+*
+* @param int/string $chatId The id/username of the chat/channel/user to send the message
+* @param string $video The URL that points to a video from the web or a file_id of a video already on the Telegram's servers
+* @param int $duration [Optional] The duration of sent video in seconds
+* @param int $width [Optional] The video width
+* @param int $height [Optional] The video height
+* @param string $thumb [Optional] The URL that points to the thumbnail of the video from the web or a file_id of a thumbnail already on the Telegram's servers
+* @param int $flag [Optional] Pipe to set more options
+* 	MARKDOWN: enables Markdown parse mode
+* 	DISABLE_NOTIFICATIONS: mutes notifications
+* 	SUPPORTS_STREAMING: tells if the video is suitable for streaming
+* @param string $caption [Optional] The caption of the video
+* @param int $messageId [Optional] The id of the message you want to respond to
+* @param array $keyboard [Optional] The layout of the keyboard to send
+*
+* @return mixed The Message sent by the method
+*/
+function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, int $height = 0, string $thumb = '', int $flags = 0, string $caption = '', int $messageId = 0, array $keyboard = []) {
+	$parseMode = 'HTML';
+	$mute = FALSE;
+	$streaming = FALSE;
+
+	/**
+	* Check if the video must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($video, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$video = urlencode($video);
+	}
+
+	/**
+	* Check if the thumbnail of the video must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($thumb, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$thumb = urlencode($thumb);
+	}
+
+	/**
+	* Check if the caption of the video must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($caption, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$caption = urlencode($caption);
+	}
+
+	// Check if the parse mode must be setted to 'MarkdownV2'
+	if ($flags & MARKDOWN) {
+		$parseMode = 'MarkdownV2';
+	}
+
+	// Check if the message must be muted
+	if ($flags & DISABLE_NOTIFICATION) {
+		$mute = TRUE;
+	}
+
+	// Check if the video supports the streaming
+	if ($flags & SUPPORTS_STREAMING) {
+		$streaming = TRUE;
+	}
+
+	$url = "sendVideo?chat_id=$chatId&video=$video&caption=$caption&parse_mode=$parseMode&supports_streaming=$streaming&disable_notification=$mute";
+
+	// Check if the message have a specific duration
+	if($duration !== 0) {
+		$url .= "&duration=$duration";
+	}
+
+	// Check if the message have a thumbnail
+	if($thumb !== '') {
+		$url .= "&thumb=$thumb";
+	}
+
+	// Check if the message have a specific width
+	if($width !== 0) {
+		$url .= "&width=$width";
+	}
+
+	// Check if the message have a specific height
+	if($height !== 0) {
+		$url .= "&height=$height";
+	}
+
+	// Check if the message must reply to another one
+	if($messageId !== 0) {
+		$url .= "&reply_to_message_id=$messageId";
+	}
+
+	/**
+	* Check if the message have an InlineKeyboard
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($keyboard) === FALSE) {
+		/**
+		* Encode the keyboard layout
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
+		$keyboard = json_encode([
+			"inline_keyboard" => $keyboard
+		]);
+
+		$url .= "&reply_markup=$keyboard";
+	}
+
+	$msg = request($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
