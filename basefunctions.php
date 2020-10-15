@@ -730,3 +730,38 @@ function editMessageMedia($chatId, int $messageId, string $inlineMessageId, $med
 	 */
 	return $response['ok'] == TRUE ? $response['result'] : NULL;
 }
+
+/**
+* Gives the bot the possibility to generate his own (NEW) invite link to the chat and also makes it
+* retrievable via the getChat method as it's stored into the [Optional] field invite_link of the Chat Object returned
+* by that method.
+* 	
+* NB:
+* 1) The bot must be an administrator since every admin has it's own invite link and bots cannot use
+* invite links of other adiministrators.
+* 2)Every time a new invite link is generated through this method the previous invite links stops working (are revoked).
+*
+* @param int/string $chatId The id/username of the targeted chat/channel
+*
+* @return string returns the new invite link on success
+*/
+function exportChatInviteLink($chatId) {
+		
+	$url = "exportChatInviteLink?chat_id=$chatId";
+
+	$inviteLink = request($url);
+	
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
+		sendLog(__FUNCTION__, $inviteLink);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$inviteLink = json_decode($inviteLink, TRUE);
+
+	return $inviteLink['ok'] == TRUE ? $inviteLink['result'] : NULL;
+}
