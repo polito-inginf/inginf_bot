@@ -826,3 +826,38 @@ function getChatMember($chatId){
 	return $chatMember['ok'] == TRUE ? $chatMember['result'] : NULL;
 
 }
+
+/**
+ * Used to get the File Object of a certain file already uploaded on telegram through its file_id. 
+ * NB: 
+ * 1) Bot download size limit for a file is 20MB.
+ * 2) File Object contains the [Optional] file_path field where it's stored the <file_path> 
+ * to concat to --> https://api.telegram.org/file/bot<token>/ to download via link the file.
+ * the link it's guaranteed to be valid for at least one hour.
+ * 3)This function may not preserve the original file name and MIME type.
+ * 
+ * @param string $fileId the id of the targeted file.
+ * 
+ * @return mixed $file the File Object of the targeted file
+ */
+function getFile($fileId){
+
+	$url = "getFile?file_id=$fileId";
+
+	$file = request($url);
+	
+	// Check if function must be logged
+	if (LOG_LVL > 3) {
+		sendLog(__FUNCTION__, $file);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$file = json_decode($file, TRUE);
+
+	return $file['ok'] == TRUE ? $file['result'] : NULL;
+
+}
