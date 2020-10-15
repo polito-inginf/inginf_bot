@@ -765,3 +765,34 @@ function exportChatInviteLink($chatId) {
 
 	return $inviteLink['ok'] == TRUE ? $inviteLink['result'] : NULL;
 }
+
+
+/**
+ * Used to know the list of administrators of a channel/group/supergroup. 
+ * 
+ * @param int/string $chatId the id of the targeted chat.
+ * 
+ * @return mixed $adminsArray is an array of ChatMember objects representing the Administrators, if no admins are setted
+ * then only the the creator's ChatMember object will be returned.
+ */
+function getChatAdministrators($chatId){
+
+	$url = "getChatAdministrators?chat_id=$chatId";
+
+	$adminsArray = request($url);
+	
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
+		sendLog(__FUNCTION__, $adminsArray);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$adminsArray = json_decode($adminsArray, TRUE);
+
+	return $adminsArray['ok'] == TRUE ? $adminsArray['result'] : NULL;
+
+}
