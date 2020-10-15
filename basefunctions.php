@@ -500,6 +500,272 @@ function replyToMessage($chatId, string $text, int $messageId, int $flags = 0, a
 }
 
 /**
+* Sends an Audio file, if you want Telegram clients to display them in the music player,
+* to the chat pointed from $chatId and returns the Message object of the sent message.
+* The audio is identified by a string that can be both a file_id or an HTTP URL of a pic on internet.
+* Bots can, currently, send audio files of up to 50 MB in size, this limit may be changed in the future.
+*
+* @param int/string $chatId The id/username of the chat/channel/user to send the message.
+* @param string $audio The URL that points to an audio from the web or a file_id of an audio already on the Telegram's servers.
+* @param string $caption [Optional] The caption of the audio.
+* @param int $flag [Optional] Pipe to set more options
+* 	MARKDOWN: enables Markdown parse mode
+* 	DISABLE_NOTIFICATIONS: mutes notifications
+* @param int $duration [Optional] The duration of sent audio expressed in seconds.
+* @param string $performer [Optional] The performer of the audio.
+* @param string $title [Optional] The title of the audio.
+* @param string $thumb [Optional] The URL that points to the thumbnail of the audio from the web or a file_id of a thumbnail already on the Telegram's servers.
+* @param int $messageId [Optional] The id of the message you want to respond to.
+* @param array $keyboard [Optional] The layout of the keyboard to send.
+*
+* @return mixed On success, the Message edited by the method.
+*/
+function sendAudio($chatId, string $audio, string $caption = '', int $flags = 0, int $duration = 0, string $performer = '', string $title = '', string $thumb = '', int $messageId = 0, array $keyboard = []) {
+	$parseMode = 'HTML';
+	$mute = FALSE;
+
+	/**
+	* Check if the audio must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($audio, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$audio = urlencode($audio);
+	}
+
+	/**
+	* Check if the caption of the audio must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($caption, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$caption = urlencode($caption);
+	}
+
+	/**
+	* Check if the thumbnail of the audio must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($thumb, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$thumb = urlencode($thumb);
+	}
+
+	/**
+	* Check if the performer of the audio must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($performer, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$performer = urlencode($performer);
+	}
+
+	/**
+	* Check if the title of the audio must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($title, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$title = urlencode($title);
+	}
+
+	// Check if the parse mode must be setted to 'MarkdownV2'
+	if ($flags & MARKDOWN) {
+		$parseMode = 'MarkdownV2';
+	}
+
+	// Check if the message must be muted
+	if ($flags & DISABLE_NOTIFICATION) {
+		$mute = TRUE;
+	}
+
+	$url = "sendAudio?chat_id=$chatId&audio=$audio&parse_mode=$parseMode&disable_notification=$mute";
+
+	/**
+	* Check if the caption of the audio exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($caption) === FALSE) {
+		$url .= "&caption=$caption";
+	}
+
+	/**
+	* Check if the audio have a specific duration
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($duration) === FALSE) {
+		$url .= "&duration=$duration";
+	}
+
+	/**
+	* Check if the thumbnail of the audio exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($thumb) === FALSE) {
+		$url .= "&thumb=$thumb";
+	}
+
+	/**
+	* Check if the performer of the audio exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($performer) === FALSE) {
+		$url .= "&performer=$performer";
+	}
+
+	/**
+	* Check if the title of the audio exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($title) === FALSE) {
+		$url .= "&title=$title";
+	}
+
+	/**
+	* Check if the message must reply to another one
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($messageId) === FALSE) {
+		$url .= "&reply_to_message_id=$messageId";
+	}
+
+	/**
+	* Check if the message have an InlineKeyboard
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($keyboard) === FALSE) {
+		/**
+		* Encode the keyboard layout
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
+		$keyboard = json_encode([
+			"inline_keyboard" => $keyboard
+		]);
+
+		$url .= "&reply_markup=$keyboard";
+	}
+
+	$msg = request($url);
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $msg);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$msg = json_decode($msg, TRUE);
+
+	return $msg['ok'] == TRUE ? $msg['result'] : NULL ;
+}
+
+/**
 * Sends a group of photos and videos as an album to the chat pointed from $chatId and returns the Message object of the sent message.
 *
 * @param int/string $chatId The id/username of the chat/channel/user to send the message.
