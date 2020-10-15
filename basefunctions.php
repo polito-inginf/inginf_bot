@@ -93,8 +93,22 @@ function answerCallbackQuery(int $callbackId, string $text, int $flags = 0, stri
 
 	$requestUrl = "answerCallbackQuery?callback_query_id=$callbackId&text=$text&show_alert=$showAlert";
 
-	// Check if a url parameter is present
-	if($url !== "") {
+	/**
+	* Check if a url parameter is present
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($url) === FALSE) {
 		$requestUrl .= "&url=$url";
 	}
 
@@ -543,11 +557,22 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 		}
 
 		/**
-		* Check if the caption of the media must be encoded
+		* Check if the caption of the media exists and if it must be encoded
 		*
 		* strpos() Check if the '\n' character is into the string
+		* empty() check if the argument is empty
+		* 	''
+		* 	""
+		* 	'0'
+		* 	"0"
+		* 	0
+		* 	0.0
+		* 	NULL
+		* 	FALSE
+		* 	[]
+		* 	array()
 		*/
-		if (strpos($singleMedia['caption'], "\n")) {
+		if (empty($singleMedia['caption']) === FALSE && strpos($singleMedia['caption'], "\n")) {
 			/**
 			* Encode the URL
 			*
@@ -557,11 +582,11 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 		}
 
 		/**
-		* Check if the media is a video and if its thumbnail must be encoded
+		* Check if the media is a video, if its thumbnail exists and if its thumbnail must be encoded
 		*
 		* strpos() Check if the '\n' character is into the string
 		*/
-		if ($singleMedia['type'] === 'video' && strpos($singleMedia['thumb'], "\n")) {
+		if ($singleMedia['type'] === 'video' && empty($singleMedia['thumb']) === FALSE && strpos($singleMedia['thumb'], "\n")) {
 			/**
 			* Encode the URL
 			*
@@ -576,8 +601,22 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 	// Appends a pretty-printed version of the array of media to the URL
 	$url .= json_encode($media, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 
-	// Check if the message must reply to another one
-	if($messageId !== 0) {
+	/**
+	* Check if the message must reply to another one
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($messageId) === FALSE) {
 		$url .= "&reply_to_message_id=$messageId";
 	}
 
@@ -649,8 +688,22 @@ function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []
 
 	$url = "sendMessage?text=$text&chat_id=$chatId&parse_mode=$parseMode&disable_web_page_preview=$disablePreview&disable_notification=$mute";
 
-	// Check if the message must reply to another one
-	if($messageId !== 0) {
+	/**
+	* Check if the message must reply to another one
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($messageId) === FALSE) {
 		$url .= "&reply_to_message_id=$messageId";
 		$functionToLog = "replyToMessage";
 	}
@@ -755,7 +808,28 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 		$mute = TRUE;
 	}
 
-	$msg = request("sendPhoto?chat_id=$chatId&photo=$photo&caption=$caption&parse_mode=$parseMode&disable_notification=$mute");
+	$url = "sendPhoto?chat_id=$chatId&photo=$photo&parse_mode=$parseMode&disable_notification=$mute"
+
+	/**
+	* Check if the caption of the photo exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($caption) === FALSE) {
+		$url .= "&caption=$caption";
+	}
+
+	$msg = request($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -855,30 +929,119 @@ function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, in
 		$streaming = TRUE;
 	}
 
-	$url = "sendVideo?chat_id=$chatId&video=$video&caption=$caption&parse_mode=$parseMode&supports_streaming=$streaming&disable_notification=$mute";
+	$url = "sendVideo?chat_id=$chatId&video=$video&parse_mode=$parseMode&supports_streaming=$streaming&disable_notification=$mute";
 
-	// Check if the message have a specific duration
-	if($duration !== 0) {
-		$url .= "&duration=$duration";
+	/**
+	* Check if the caption of the video exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($caption) === FALSE) {
+		$url .= "&caption=$caption";
 	}
 
-	// Check if the message have a thumbnail
-	if($thumb !== '') {
+	/**
+	* Check if the thumbnail of the video exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($thumb) === FALSE) {
 		$url .= "&thumb=$thumb";
 	}
 
-	// Check if the message have a specific width
-	if($width !== 0) {
+	/**
+	* Check if the video have a specific duration
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($duration) === FALSE) {
+		$url .= "&duration=$duration";
+	}
+
+	/**
+	* Check if the video have a specific width
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($width) === FALSE) {
 		$url .= "&width=$width";
 	}
 
-	// Check if the message have a specific height
-	if($height !== 0) {
+	/**
+	* Check if the video have a specific height
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($height) === FALSE) {
 		$url .= "&height=$height";
 	}
 
-	// Check if the message must reply to another one
-	if($messageId !== 0) {
+	/**
+	* Check if the message must reply to another one
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($messageId) === FALSE) {
 		$url .= "&reply_to_message_id=$messageId";
 	}
 
