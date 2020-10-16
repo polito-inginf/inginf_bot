@@ -27,7 +27,11 @@
 * @license		https://choosealicense.com/licenses/lgpl-3.0/
 */
 
-// The log level of the project
+/**
+* The log level of the project
+*
+* define() Defines a named constant
+*/
 define('LOG_LVL', 7);
 
 /**
@@ -45,7 +49,7 @@ function sendLog(string $function, string $request) {
 	* json_decode() Convert the JSON string to a PHP object
 	*/
 	$request = json_decode($request, TRUE);
-	
+
 	$reply = "<b>$function</b>:\n\n";
 
 	/**
@@ -85,7 +89,11 @@ function sendLog(string $function, string $request) {
 		*/
 		$msg = empty($request['result']) === FALSE ? $request['result'] : $request;
 
-		// Appends a pretty-printed message to the reply
+		/**
+		* Appends a pretty-printed message to the reply
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
 		$reply .= json_encode($msg, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 	// Check if there are some errors getting the results
 	} else if($request['ok'] == FALSE) {
@@ -105,10 +113,10 @@ function sendLog(string $function, string $request) {
 		* 	array()
 		*/
 		$errorCode = empty($request['error_code']) === FALSE ? "\n\n<b>❌ Error code:" . $request['error_code'] . '❌</b>' : '';
-		
+
 		$reply = '<b>Result not present!</b>' . $description . $errorCode;
 	}
-	
+
 	// Sends a message to the debug channel (The id of the channel is declared in private.php file)
 	return sendMessage(LOG_CHANNEL, $reply);
 }

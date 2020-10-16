@@ -24,6 +24,11 @@ const MARKDOWN = 1 << 0;
 const ENABLE_PAGE_PREVIEW = 1 << 1;
 const DISABLE_NOTIFICATION = 1 << 2;
 const SHOW_ALERT = 1 << 3;
+const SUPPORTS_STREAMING = 1 << 4;
 
-// The Bot API endpoint
+/**
+* The Bot API endpoint
+*
+* define() Defines a named constant
+*/
 define('api', 'https://api.telegram.org/bot' . token . '/');
