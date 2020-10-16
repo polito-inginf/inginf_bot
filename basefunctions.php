@@ -683,7 +683,7 @@ function editMessageMedia($chatId, int $messageId, string $inlineMessageId, $med
 	$url = "editMessageMedia?chat_id=$chatId&message_id=$messageId&inline_message_id=$inlineMessageId&media=$media";
 
 	/**
-	* Check if the message have an InlineKeyboard
+	* Check if the message has an InlineKeyboard
 	*
 	* empty() check if the argument is empty
 	* 	''
@@ -746,10 +746,8 @@ function editMessageMedia($chatId, int $messageId, string $inlineMessageId, $med
 * @return string returns the new invite link on success
 */
 function exportChatInviteLink($chatId) {
-		
-	$url = "exportChatInviteLink?chat_id=$chatId";
 
-	$inviteLink = request($url);
+	$inviteLink = request("exportChatInviteLink?chat_id=$chatId");
 	
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
@@ -777,9 +775,7 @@ function exportChatInviteLink($chatId) {
  */
 function getChatAdministrators($chatId){
 
-	$url = "getChatAdministrators?chat_id=$chatId";
-
-	$adminsArray = request($url);
+	$adminsArray = request("getChatAdministrators?chat_id=$chatId");
 	
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
@@ -807,9 +803,7 @@ function getChatAdministrators($chatId){
  */
 function getChatMember($chatId){
 
-	$url = "getChatMember?chat_id=$chatId";
-
-	$chatMember = request($url);
+	$chatMember = request("getChatMember?chat_id=$chatId");
 	
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
@@ -842,9 +836,7 @@ function getChatMember($chatId){
  */
 function getFile($fileId){
 
-	$url = "getFile?file_id=$fileId";
-
-	$file = request($url);
+	$file = request("getFile?file_id=$fileId");
 	
 	// Check if function must be logged
 	if (LOG_LVL > 3) {
@@ -870,9 +862,8 @@ function getFile($fileId){
  */
 function getMe(){
 
-	$url = "getme";	//try at least, no one gets me, i'm such a sad bot
-
-	$myself = request($url);
+	//try at least, no one gets me, i'm such a sad bot
+	$myself = request("getme");
 	
 	// Check if function must be logged
 	if (LOG_LVL > 3) {
