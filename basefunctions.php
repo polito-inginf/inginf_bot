@@ -87,9 +87,9 @@ function request(string $url) {
 * 	SHOW_ALERT: enables alert instead of top notification
 * @param string $url [Optional] Url to be opened.
 *
-* @return boolean On success, TRUE.
+* @return bool On success, TRUE.
 */
-function answerCallbackQuery(int $callbackId, string $text, int $flags = 0, string $url = "") {
+function answerCallbackQuery(int $callbackId, string $text, int $flags = 0, string $url = "") : bool {
 	$showAlert = FALSE;
 
 	/**
@@ -142,9 +142,9 @@ function answerCallbackQuery(int $callbackId, string $text, int $flags = 0, stri
 * @param int $queryId The id of the InlineQuery.
 * @param array $ans The answers.
 *
-* @return boolean On success, TRUE.
+* @return bool On success, TRUE.
 */
-function answerInlineQuery(int $queryId, array $ans) {
+function answerInlineQuery(int $queryId, array $ans) : bool {
 	/**
 	* Encode the keyboard layout
 	*
@@ -161,9 +161,9 @@ function answerInlineQuery(int $queryId, array $ans) {
 * @param int/string $chatId The id/username of the chat/channel/user where the message is located.
 * @param string $messageId The id of the message to delete.
 *
-* @return boolean On success, TRUE.
+* @return bool On success, TRUE.
 */
-function deleteMessage($chatId, int $messageId) {
+function deleteMessage($chatId, int $messageId) : bool {
 	$response =  request("deleteMessage?chat_id=$chatId&message_id=$messageId");
 
 	// Check if function must be logged
@@ -269,8 +269,125 @@ function editMessageCaption($chatId, int $messageId, string $caption, int $flags
 	$response = json_decode($response, TRUE);
 
 	/**
-	 * @todo test if this works when editing other people messages.
-	 */
+	* @todo test if this works when editing other people messages.
+	*/
+	return $response['ok'] == TRUE ? $response['result'] : NULL;
+}
+
+/**
+* Replaces the animation, audio, document, photo, or video messages (with or not the InlineKeyboard associated).
+*
+* @param mixed $media The new media content of the message
+*	It should be one of the following InputMedia type:
+*		InputMediaAnimation
+*		InputMediaDocument
+*		InputMediaAudio
+*		InputMediaPhoto
+*		InputMediaVideo
+* @param int/string $chatId [Optional] The id/username of the chat/channel/user where we want edit the message.
+* 	This parameter is necessary if $inlineMessageId isn't specified.
+* @param int $messageId [Optional] The id of the message to modify.
+* 	This parameter is necessary if $inlineMessageId isn't specified.
+* @param string $inlineMessageId [Optional] The id of the inline message.
+* 	This parameter is necessary if $chatId and $messageId aren't specified.
+* @param array $keyboard [Optional] The layout of the keyboard to send.
+*
+* @return mixed On success, because, if the edited message was originally sent by the bot, the modified Message, otherwise TRUE.
+*/
+function editMessageMedia($media, $chatId, int $messageId = 0, string $inlineMessageId = '', array $keyboard = []) {
+
+	$url = "editMessageMedia?media=$media";
+
+	/**
+	* Check if the id of the inline message associated to the media exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($inlineMessageId) === FALSE) {
+		$url .= "&inline_message_id=$inlineMessageId";
+	/**
+	* Check if the id of the message associated to the media exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	} else if(empty($chatId) === FALSE && empty($messageId) === FALSE) {
+		$url .= "&chat_id=$chatId&message_id=$messageId";
+	} else {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "At least one of the necessary parameters isn't setted."
+			]);
+		}
+		return;
+	}
+
+	/**
+	* Check if the message has an InlineKeyboard
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($keyboard) === FALSE) {
+		/**
+		* Encode the keyboard layout
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
+		$keyboard = json_encode([
+			"inline_keyboard" => $keyboard
+		]);
+
+		$url .= "&reply_markup=$keyboard";
+	}
+
+	$response = request($url);
+
+
+	// Check if function must be logged
+	if (LOG_LVL > 3){
+		sendLog(__FUNCTION__, $response);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$response = json_decode($response, TRUE);
+
+	/**
+	* @todo test if this works when editing other people messages.
+	*/
 	return $response['ok'] == TRUE ? $response['result'] : NULL;
 }
 
@@ -308,8 +425,8 @@ function editMessageReplyMarkup($chatId, array $keyboard, int $messageId) {
 	$response = json_decode($response, TRUE);
 
 	/**
-	 * @todo test if this works when editing other people messages.
-	 */
+	* @todo test if this works when editing other people messages.
+	*/
 	return $response['ok'] == TRUE ? $response['result'] : NULL;
 }
 
@@ -400,9 +517,36 @@ function editMessageText($chatId, int $messageId, string $text, int $flags = 0, 
 	$response = json_decode($response, TRUE);
 
 	/**
-	 * @todo test if this works when editing other people messages.
-	 */
+	* @todo test if this works when editing other people messages.
+	*/
 	return $response['ok'] == TRUE ? $response['result'] : NULL;
+}
+
+/**
+* Generate a new invite link in a specific chat/channel where the bot it's an admin; any previously generated link is revoked.
+* N.B. The invite link in exam is the link associated to the bot; every other invite link isn't interested by this method.
+*
+* @param int/string $chatId The id/username of the chat/channel where we want generate the new link.
+*
+* @return string On success, the new invite link.
+*/
+function exportChatInviteLink($chatId) : ?string {
+
+	$inviteLink = request("exportChatInviteLink?chat_id=$chatId");
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
+		sendLog(__FUNCTION__, $inviteLink);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$inviteLink = json_decode($inviteLink, TRUE);
+
+	return $inviteLink['ok'] == TRUE ? $inviteLink['result'] : NULL;
 }
 
 /**
@@ -468,6 +612,120 @@ function getChat($chatId) {
 }
 
 /**
+* Use this method to get a list of administrators in a specific chat/channel.
+* N.B. If, into the chat/channel, there are some bots as administrators, they will not be returned.
+*
+* @param int/string $chatId The id/username of the chat/channel where we want retrieve the admins.
+*
+* @return mixed On success, an array of ChatMember objects; if no administrators were appointed, only the creator will be returned.
+*/
+function getChatAdministrators($chatId) {
+
+	$adminsArray = request("getChatAdministrators?chat_id=$chatId");
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
+		sendLog(__FUNCTION__, $adminsArray);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$adminsArray = json_decode($adminsArray, TRUE);
+
+	return $adminsArray['ok'] == TRUE ? $adminsArray['result'] : NULL;
+
+}
+
+/**
+* Used to get information about a specific member of a specific chat.
+*
+* @param int/string $chatId The id/username of the chat/channel where we want search the user.
+* @param int/string $userId The id/username of the user we want search.
+*
+* @return mixed On success, the ChatMember object.
+*/
+function getChatMember($chatId, $userId) {
+
+	$chatMember = request("getChatMember?chat_id=$chatId&user_id=$userId");
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
+		sendLog(__FUNCTION__, $chatMember);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$chatMember = json_decode($chatMember, TRUE);
+
+	return $chatMember['ok'] == TRUE ? $chatMember['result'] : NULL;
+
+}
+
+/**
+* Use this method to get basic info about a file and prepare it for downloading.
+* For the moment, bots can download files of up to 20MB in size.
+* N.B.
+* 	- The file can then be downloaded via the link 'https://api.telegram.org/file/bot' . token . '/' . $file['file_path'], where $file['file_path'] is taken from the response.
+* 		It is guaranteed that the link will be valid for at least 1 hour.
+* 	- This function may not preserve the original file name and MIME type.
+*
+* @param int/string $fileId The id of the file we want retrieve.
+*
+* @return mixed On success, the File object.
+*/
+function getFile(string $fileId) {
+
+	$file = request("getFile?file_id=$fileId");
+
+	// Check if function must be logged
+	if (LOG_LVL > 3) {
+		sendLog(__FUNCTION__, $file);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$file = json_decode($file, TRUE);
+
+	return $file['ok'] == TRUE ? $file['result'] : NULL;
+
+}
+
+/**
+*  Returns basic information about the bot in form of a User object.
+*
+* @return mixed On success, the bot.
+*/
+function getMe() {
+
+	// Try at least, no one gets me, I'm such a sad bot
+	$mySelf = request("getMe");
+
+	// Check if function must be logged
+	if (LOG_LVL > 3) {
+		sendLog(__FUNCTION__, $mySelf);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$mySelf = json_decode($mySelf, TRUE);
+
+	return $mySelf['ok'] == TRUE ? $mySelf['result'] : NULL;
+
+}
+
+/**
 * Pins a given message in a specific chat/channel where the bot it's an admin.
 *
 * @param int/string $chatId The id/username of the chat/channel where we want pin the message.
@@ -475,9 +733,9 @@ function getChat($chatId) {
 * @param int $flag [Optional] Pipe to set more options
 * 	DISABLE_NOTIFICATIONS: mutes notifications
 *
-* @return boolean On success, TRUE.
+* @return bool On success, TRUE.
 */
-function pinChatMessage($chatId, int $messageId, int $flag = 0) {
+function pinChatMessage($chatId, int $messageId, int $flag = 0) : bool {
 	$mute = FALSE;
 
 	// Check if the message must be muted
@@ -1561,9 +1819,9 @@ function sendVoice($chatId, string $voice, string $caption = '', int $flags = 0,
 *
 * @param array $commands The commands of the Bot.
 *
-* @return boolean On success, TRUE.
+* @return bool On success, TRUE.
 */
-function setMyCommands(array $commands) {
+function setMyCommands(array $commands) : bool {
 	foreach ($commands as $command) {
 		/**
 		* Check if the name of the command must be encoded
@@ -1624,9 +1882,9 @@ function setMyCommands(array $commands) {
 * @param int/string $chatId The id/username of the chat/channel where we want unban a user
 * @param int/string $userId The id/username of the user we want unban.
 *
-* @return boolean On success, TRUE.
+* @return bool On success, TRUE.
 */
-function unbanChatMember($chatId, $userId) {
+function unbanChatMember($chatId, $userId) : bool {
 	$result = request("unbanChatMember?chat_id=$chatId&user_id=$userId");
 
 	// Check if function must be logged
@@ -1649,9 +1907,9 @@ function unbanChatMember($chatId, $userId) {
 *
 * @param int/string $chatId The id/username of the chat/channel where we want unpin the message.
 *
-* @return boolean On success, TRUE.
+* @return bool On success, TRUE.
 */
-function unpinChatMessage($chatId) {
+function unpinChatMessage($chatId) : bool {
 	$result = request("unpinChatMessage?chat_id=$chatId");
 
 	// Check if function must be logged
@@ -1667,226 +1925,4 @@ function unpinChatMessage($chatId) {
 	$result = json_decode($result, TRUE);
 
 	return $result['result'];
-}
-
-
-/**
-* Edits (replaces) animation, audio, document, photo, or video messages (with or not the InlineKeyboard associated).
-*
-* @param int/string $chatId [Optional] The id/username of the chat/channel/user where we want edit the message
-* @param int $messageId [Optional] The id of the message to modify
-* @param string $inlineMessageId [Optional] necessary if $chatId and $messageId are not specified. Identifier of the inline message
-* @param mixed $media the new media content of the message.
-*	it should be one of the following InputMedia type:
-*	InputMediaPhoto
-*	InputMediaVideo
-*	InputMediaAnimation
-*	InputMediaAudio
-*	InputMediaDocument
-* @param array $keyboard [Optional] Keyboard layout to send
-*
-* @return mixed/bool If the edited message was originally sent by the bot, it returns the modified Message, 
-*	otherwise returns True
-*/
-function editMessageMedia($chatId, int $messageId, string $inlineMessageId, $media, array $keyboard = []) {
-	
-	$url = "editMessageMedia?chat_id=$chatId&message_id=$messageId&inline_message_id=$inlineMessageId&media=$media";
-
-	/**
-	* Check if the message has an InlineKeyboard
-	*
-	* empty() check if the argument is empty
-	* 	''
-	* 	""
-	* 	'0'
-	* 	"0"
-	* 	0
-	* 	0.0
-	* 	NULL
-	* 	FALSE
-	* 	[]
-	* 	array()
-	*/
-	if (empty($keyboard) === FALSE) {
-		/**
-		* Encode the keyboard layout
-		*
-		* json_encode() Convert the PHP object to a JSON string
-		*/
-		$keyboard = json_encode([
-			"inline_keyboard" => $keyboard
-		]);
-		
-		$url .= "&reply_markup=$keyboard";
-	}
-	
-	$response = request($url);
-
-
-	// Check if function must be logged
-	if (LOG_LVL > 3){
-		sendLog(__FUNCTION__, $response);
-	}
-
-	/**
-	* Decode the output of the HTTPS query
-	*
-	* json_decode() Convert the output to a PHP object
-	*/
-	$response = json_decode($response, TRUE);
-
-	/**
-	 * @todo test if this works when editing other people messages.
-	 */
-	return $response['ok'] == TRUE ? $response['result'] : NULL;
-}
-
-/**
-* Gives the bot the possibility to generate his own (NEW) invite link to the chat and also makes it
-* retrievable via the getChat method as it's stored into the [Optional] field invite_link of the Chat Object returned
-* by that method.
-* 	
-* NB:
-* 1) The bot must be an administrator since every admin has it's own invite link and bots cannot use
-* invite links of other adiministrators.
-* 2)Every time a new invite link is generated through this method the previous invite links stops working (are revoked).
-*
-* @param int/string $chatId The id/username of the targeted chat/channel
-*
-* @return string returns the new invite link on success
-*/
-function exportChatInviteLink($chatId) {
-
-	$inviteLink = request("exportChatInviteLink?chat_id=$chatId");
-	
-	// Check if function must be logged
-	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
-		sendLog(__FUNCTION__, $inviteLink);
-	}
-
-	/**
-	* Decode the output of the HTTPS query
-	*
-	* json_decode() Convert the JSON string to a PHP object
-	*/
-	$inviteLink = json_decode($inviteLink, TRUE);
-
-	return $inviteLink['ok'] == TRUE ? $inviteLink['result'] : NULL;
-}
-
-
-/**
- * Used to know the list of administrators of a channel/group/supergroup. 
- * 
- * @param int/string $chatId the id of the targeted chat.
- * 
- * @return mixed $adminsArray is an array of ChatMember objects representing the Administrators, if no admins are setted
- * then only the the creator's ChatMember object will be returned.
- */
-function getChatAdministrators($chatId){
-
-	$adminsArray = request("getChatAdministrators?chat_id=$chatId");
-	
-	// Check if function must be logged
-	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
-		sendLog(__FUNCTION__, $adminsArray);
-	}
-
-	/**
-	* Decode the output of the HTTPS query
-	*
-	* json_decode() Convert the JSON string to a PHP object
-	*/
-	$adminsArray = json_decode($adminsArray, TRUE);
-
-	return $adminsArray['ok'] == TRUE ? $adminsArray['result'] : NULL;
-
-}
-
-/**
- * Used to get information about a specific member of a chat through his relative ChatMember Object. 
- * 
- * @param int/string $chatId the id of the chat.
- * @param int $userId the id of the targeted member of the chat.
- * 
- * @return mixed $chatMember returns the ChatMember Object of the targeted member.
- */
-function getChatMember($chatId){
-
-	$chatMember = request("getChatMember?chat_id=$chatId");
-	
-	// Check if function must be logged
-	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
-		sendLog(__FUNCTION__, $chatMember);
-	}
-
-	/**
-	* Decode the output of the HTTPS query
-	*
-	* json_decode() Convert the JSON string to a PHP object
-	*/
-	$chatMember = json_decode($chatMember, TRUE);
-
-	return $chatMember['ok'] == TRUE ? $chatMember['result'] : NULL;
-
-}
-
-/**
- * Used to get the File Object of a certain file already uploaded on telegram through its file_id. 
- * NB: 
- * 1) Bot download size limit for a file is 20MB.
- * 2) File Object contains the [Optional] file_path field where it's stored the <file_path> 
- * to concat to --> https://api.telegram.org/file/bot<token>/ to download via link the file.
- * the link it's guaranteed to be valid for at least one hour.
- * 3)This function may not preserve the original file name and MIME type.
- * 
- * @param string $fileId the id of the targeted file.
- * 
- * @return mixed $file the File Object of the targeted file
- */
-function getFile($fileId){
-
-	$file = request("getFile?file_id=$fileId");
-	
-	// Check if function must be logged
-	if (LOG_LVL > 3) {
-		sendLog(__FUNCTION__, $file);
-	}
-
-	/**
-	* Decode the output of the HTTPS query
-	*
-	* json_decode() Convert the JSON string to a PHP object
-	*/
-	$file = json_decode($file, TRUE);
-
-	return $file['ok'] == TRUE ? $file['result'] : NULL;
-
-}
-
-
-/**
- *  Returns basic information about the bot in form of a User object.
- * 
- * @return $myself is the User Object of the bot.
- */
-function getMe(){
-
-	//try at least, no one gets me, i'm such a sad bot
-	$myself = request("getme");
-	
-	// Check if function must be logged
-	if (LOG_LVL > 3) {
-		sendLog(__FUNCTION__, $myself);
-	}
-
-	/**
-	* Decode the output of the HTTPS query
-	*
-	* json_decode() Convert the JSON string to a PHP object
-	*/
-	$myself = json_decode($myself, TRUE);
-
-	return $myself['ok'] == TRUE ? $myelf['result'] : NULL;
-
 }

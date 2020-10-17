@@ -6,7 +6,7 @@
 * 7 => Log every single update and method (use with caution)
 *
 * Intended use in a function (where $request is the result of the method):
-* if (LOG_LVL > prefixed_level) {
+* if (LOG_LVL > prefixedLevel) {
 * 	sendLog(__FUNCTION__, $request);
 * }
 *
@@ -35,12 +35,12 @@
 define('LOG_LVL', 7);
 
 /**
-* Send the log to the log channel
+* Send the log to the log channel,
 *
-* @param string $function The name of the function/update
-* @param string $request The JSON returned from the method/update
+* @param string $function The name of the function/update,
+* @param string $request The JSON returned from the method/update,
 *
-* @return mixed Message sent in the channel
+* @return mixed Message sent in the channel,
 */
 function sendLog(string $function, string $request) {
 	/**
