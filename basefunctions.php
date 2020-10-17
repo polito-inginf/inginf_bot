@@ -1668,3 +1668,225 @@ function unpinChatMessage($chatId) {
 
 	return $result['result'];
 }
+
+
+/**
+* Edits (replaces) animation, audio, document, photo, or video messages (with or not the InlineKeyboard associated).
+*
+* @param int/string $chatId [Optional] The id/username of the chat/channel/user where we want edit the message
+* @param int $messageId [Optional] The id of the message to modify
+* @param string $inlineMessageId [Optional] necessary if $chatId and $messageId are not specified. Identifier of the inline message
+* @param mixed $media the new media content of the message.
+*	it should be one of the following InputMedia type:
+*	InputMediaPhoto
+*	InputMediaVideo
+*	InputMediaAnimation
+*	InputMediaAudio
+*	InputMediaDocument
+* @param array $keyboard [Optional] Keyboard layout to send
+*
+* @return mixed/bool If the edited message was originally sent by the bot, it returns the modified Message, 
+*	otherwise returns True
+*/
+function editMessageMedia($chatId, int $messageId, string $inlineMessageId, $media, array $keyboard = []) {
+	
+	$url = "editMessageMedia?chat_id=$chatId&message_id=$messageId&inline_message_id=$inlineMessageId&media=$media";
+
+	/**
+	* Check if the message has an InlineKeyboard
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($keyboard) === FALSE) {
+		/**
+		* Encode the keyboard layout
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
+		$keyboard = json_encode([
+			"inline_keyboard" => $keyboard
+		]);
+		
+		$url .= "&reply_markup=$keyboard";
+	}
+	
+	$response = request($url);
+
+
+	// Check if function must be logged
+	if (LOG_LVL > 3){
+		sendLog(__FUNCTION__, $response);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$response = json_decode($response, TRUE);
+
+	/**
+	 * @todo test if this works when editing other people messages.
+	 */
+	return $response['ok'] == TRUE ? $response['result'] : NULL;
+}
+
+/**
+* Gives the bot the possibility to generate his own (NEW) invite link to the chat and also makes it
+* retrievable via the getChat method as it's stored into the [Optional] field invite_link of the Chat Object returned
+* by that method.
+* 	
+* NB:
+* 1) The bot must be an administrator since every admin has it's own invite link and bots cannot use
+* invite links of other adiministrators.
+* 2)Every time a new invite link is generated through this method the previous invite links stops working (are revoked).
+*
+* @param int/string $chatId The id/username of the targeted chat/channel
+*
+* @return string returns the new invite link on success
+*/
+function exportChatInviteLink($chatId) {
+
+	$inviteLink = request("exportChatInviteLink?chat_id=$chatId");
+	
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
+		sendLog(__FUNCTION__, $inviteLink);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$inviteLink = json_decode($inviteLink, TRUE);
+
+	return $inviteLink['ok'] == TRUE ? $inviteLink['result'] : NULL;
+}
+
+
+/**
+ * Used to know the list of administrators of a channel/group/supergroup. 
+ * 
+ * @param int/string $chatId the id of the targeted chat.
+ * 
+ * @return mixed $adminsArray is an array of ChatMember objects representing the Administrators, if no admins are setted
+ * then only the the creator's ChatMember object will be returned.
+ */
+function getChatAdministrators($chatId){
+
+	$adminsArray = request("getChatAdministrators?chat_id=$chatId");
+	
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
+		sendLog(__FUNCTION__, $adminsArray);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$adminsArray = json_decode($adminsArray, TRUE);
+
+	return $adminsArray['ok'] == TRUE ? $adminsArray['result'] : NULL;
+
+}
+
+/**
+ * Used to get information about a specific member of a chat through his relative ChatMember Object. 
+ * 
+ * @param int/string $chatId the id of the chat.
+ * @param int $userId the id of the targeted member of the chat.
+ * 
+ * @return mixed $chatMember returns the ChatMember Object of the targeted member.
+ */
+function getChatMember($chatId){
+
+	$chatMember = request("getChatMember?chat_id=$chatId");
+	
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
+		sendLog(__FUNCTION__, $chatMember);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$chatMember = json_decode($chatMember, TRUE);
+
+	return $chatMember['ok'] == TRUE ? $chatMember['result'] : NULL;
+
+}
+
+/**
+ * Used to get the File Object of a certain file already uploaded on telegram through its file_id. 
+ * NB: 
+ * 1) Bot download size limit for a file is 20MB.
+ * 2) File Object contains the [Optional] file_path field where it's stored the <file_path> 
+ * to concat to --> https://api.telegram.org/file/bot<token>/ to download via link the file.
+ * the link it's guaranteed to be valid for at least one hour.
+ * 3)This function may not preserve the original file name and MIME type.
+ * 
+ * @param string $fileId the id of the targeted file.
+ * 
+ * @return mixed $file the File Object of the targeted file
+ */
+function getFile($fileId){
+
+	$file = request("getFile?file_id=$fileId");
+	
+	// Check if function must be logged
+	if (LOG_LVL > 3) {
+		sendLog(__FUNCTION__, $file);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$file = json_decode($file, TRUE);
+
+	return $file['ok'] == TRUE ? $file['result'] : NULL;
+
+}
+
+
+/**
+ *  Returns basic information about the bot in form of a User object.
+ * 
+ * @return $myself is the User Object of the bot.
+ */
+function getMe(){
+
+	//try at least, no one gets me, i'm such a sad bot
+	$myself = request("getme");
+	
+	// Check if function must be logged
+	if (LOG_LVL > 3) {
+		sendLog(__FUNCTION__, $myself);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the JSON string to a PHP object
+	*/
+	$myself = json_decode($myself, TRUE);
+
+	return $myself['ok'] == TRUE ? $myelf['result'] : NULL;
+
+}
