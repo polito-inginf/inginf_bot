@@ -294,7 +294,7 @@ function editMessageCaption($chatId, int $messageId, string $caption, int $flags
 * 	This parameter is necessary if $chatId and $messageId aren't specified.
 * @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed On success, because, if the edited message was originally sent by the bot, the modified Message, otherwise TRUE.
+* @return mixed If the edited message was originally sent by the bot, on success, the modified Message, otherwise, ever on success, TRUE.
 */
 function editMessageMedia($media, $chatId, int $messageId = 0, string $inlineMessageId = '', array $keyboard = []) {
 	/**
@@ -1089,16 +1089,279 @@ function pinChatMessage($chatId, int $messageId, int $flag = 0) : bool {
 * 	DISABLE_NOTIFICATIONS: mutes notifications
 * @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function replyToMessage($chatId, string $text, int $messageId, int $flags = 0, array $keyboard = []) {
 	return sendMessage($chatId, $text, $flags, $keyboard, $messageId);
 }
 
 /**
+* Sends an Animation file (GIF or H.264/MPEG-4 AVC video without sound)
+* to the chat pointed from $chatId.
+* The animation is identified by a string that can be both a file_id or an HTTP URL of an animation on internet.
+* Bots can, currently, send animation files of up to 50 MB in size, this limit may be changed in the future.
+*
+* @param int/string $chatId The id/username of the chat/channel/user to send the animation.
+* @param string $animation The URL that points to a animation from the web or a file_id of a animation already on the Telegram's servers.
+* @param int $duration [Optional] The duration of sent animation expressed in seconds.
+* @param int $width [Optional] The animation width.
+* @param int $height [Optional] The animation height.
+* @param string $thumb [Optional] The URL that points to the thumbnail of the animation from the web or a file_id of a thumbnail already on the Telegram's servers.
+* @param int $flag [Optional] Pipe to set more options
+* 	MARKDOWN: enables Markdown parse mode
+* 	DISABLE_NOTIFICATIONS: mutes notifications
+* @param string $caption [Optional] The caption of the animation.
+* @param int $messageId [Optional] The id of the message you want to respond to.
+* @param array $keyboard [Optional] The layout of the keyboard to send.
+*
+* @return mixed On success, the Message sent by the method.
+*/
+function sendAnimation($chatId, string $animation, int $duration = 0, int $width = 0, int $height = 0, string $thumb = '', int $flags = 0, string $caption = '', int $messageId = 0, array $keyboard = []) {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
+	$parseMode = 'HTML';
+	$mute = FALSE;
+
+	/**
+	* Check if the animation must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($animation, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$animation = urlencode($animation);
+	}
+
+	/**
+	* Check if the thumbnail of the animation must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($thumb, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$thumb = urlencode($thumb);
+	}
+
+	/**
+	* Check if the caption of the animation must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($caption, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$caption = urlencode($caption);
+	}
+
+	// Check if the parse mode must be setted to 'MarkdownV2'
+	if ($flags & MARKDOWN) {
+		$parseMode = 'MarkdownV2';
+	}
+
+	// Check if the message must be muted
+	if ($flags & DISABLE_NOTIFICATION) {
+		$mute = TRUE;
+	}
+
+	$url = "sendAnimation?chat_id=$chatId&animation=$animation&parse_mode=$parseMode&disable_notification=$mute";
+
+	/**
+	* Check if the caption of the animation exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($caption) === FALSE) {
+		$url .= "&caption=$caption";
+	}
+
+	/**
+	* Check if the thumbnail of the animation exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($thumb) === FALSE) {
+		$url .= "&thumb=$thumb";
+	}
+
+	/**
+	* Check if the animation have a specific duration
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($duration) === FALSE) {
+		$url .= "&duration=$duration";
+	}
+
+	/**
+	* Check if the animation have a specific width
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($width) === FALSE) {
+		$url .= "&width=$width";
+	}
+
+	/**
+	* Check if the animation have a specific height
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($height) === FALSE) {
+		$url .= "&height=$height";
+	}
+
+	/**
+	* Check if the message must reply to another one
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($messageId) === FALSE) {
+		$url .= "&reply_to_message_id=$messageId";
+	}
+
+	/**
+	* Check if the message have an InlineKeyboard
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($keyboard) === FALSE) {
+		/**
+		* Encode the keyboard layout
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
+		$keyboard = json_encode([
+			"inline_keyboard" => $keyboard
+		]);
+
+		$url .= "&reply_markup=$keyboard";
+	}
+
+	$msg = requestBotAPI($url);
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $msg);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$msg = json_decode($msg, TRUE);
+
+	return $msg['ok'] == TRUE ? $msg['result'] : NULL ;
+}
+
+/**
 * Sends an Audio file, if you want Telegram clients to display them in the music player,
 * to the chat pointed from $chatId and returns the Message object of the sent message.
-* The audio is identified by a string that can be both a file_id or an HTTP URL of a pic on internet.
+* The audio is identified by a string that can be both a file_id or an HTTP URL of an audio on internet.
 * Bots can, currently, send audio files of up to 50 MB in size, this limit may be changed in the future.
 *
 * @param int/string $chatId The id/username of the chat/channel/user to send the audio.
@@ -1114,7 +1377,7 @@ function replyToMessage($chatId, string $text, int $messageId, int $flags = 0, a
 * @param int $messageId [Optional] The id of the message you want to respond to.
 * @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function sendAudio($chatId, string $audio, string $caption = '', int $flags = 0, int $duration = 0, string $performer = '', string $title = '', string $thumb = '', int $messageId = 0, array $keyboard = []) {
 	/**
@@ -1396,7 +1659,7 @@ function sendAudio($chatId, string $audio, string $caption = '', int $flags = 0,
 * 	DISABLE_NOTIFICATIONS: mutes notifications
 * @param int $messageId [Optional] The id of the message you want to respond to.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 0) {
 	/**
@@ -1617,7 +1880,7 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 * @param array $keyboard [Optional] The layout of the keyboard to send.
 * @param int $messageId [Optional] The id of the message you want to respond to.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = [], int $messageId = 0) {
 	/**
@@ -1747,7 +2010,7 @@ function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []
 }
 
 /**
-* Sends a Photo (identified by a string that can be both a file_id or an HTTP URL of a pic on internet)
+* Sends a Photo (identified by a string that can be both a file_id or an HTTP URL of a photo on internet)
 * to the chat pointed from $chatId and returns the Message object of the sent message.
 *
 * @param int/string $chatId The id/username of the chat/channel/user to send the photo.
@@ -1757,7 +2020,7 @@ function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []
 * 	DISABLE_NOTIFICATIONS: mutes notifications
 * @param string $caption [Optional] The caption of the photo.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '') {
 	/**
@@ -1865,7 +2128,7 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 }
 
 /**
-* Sends a Video (identified by a string that can be both a file_id or an HTTP URL of a pic on internet)
+* Sends a Video (identified by a string that can be both a file_id or an HTTP URL of a video on internet)
 * to the chat pointed from $chatId and returns the Message object of the sent message.
 * Bots can, currently, send video files of up to 50 MB in size, this limit may be changed in the future.
 *
@@ -1883,7 +2146,7 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 * @param int $messageId [Optional] The id of the message you want to respond to.
 * @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, int $height = 0, string $thumb = '', int $flags = 0, string $caption = '', int $messageId = 0, array $keyboard = []) {
 	/**
@@ -2136,7 +2399,7 @@ function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, in
 /**
 * Sends an Audio file, if you want Telegram clients to display the audio as a playable voice message,
 * to the chat pointed from $chatId and returns the Message object of the sent message.
-* The audio is identified by a string that can be both a file_id or an HTTP URL of a pic on internet.
+* The audio is identified by a string that can be both a file_id or an HTTP URL of an audio on internet.
 * Bots can, currently, send audio files of up to 50 MB in size, this limit may be changed in the future.
 *
 * @param int/string $chatId The id/username of the chat/channel/user to send the audio.
@@ -2149,7 +2412,7 @@ function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, in
 * @param int $messageId [Optional] The id of the message you want to respond to.
 * @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function sendVoice($chatId, string $voice, string $caption = '', int $flags = 0, int $duration = 0, int $messageId = 0, array $keyboard = []) {
 	/**
