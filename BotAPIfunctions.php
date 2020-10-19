@@ -22,60 +22,13 @@
 *
 * @param string $urlt The Bot API endpoint.
 *
-* @return mixed The result of the request
+* @return mixed The result of the request.
 */
-function request(string $url) {
+function requestBotAPI(string $url) {
 	// Create the URL for the Telegram's Bot API
 	$url = api . $url;
 
-	/**
-	* Replace the special character into the URL
-	*
-	* str_replace() Replace the first array of character with the second array
-	*/
-	$url = str_replace([
-		"\n",
-		' ',
-		'#',
-		"'"
-	], [
-		'%0A%0D',
-		'%20',
-		'%23',
-		'%27'
-	], $url);
-
-	/**
-	* Open the cURL session
-	*
-	* curl_init() Open the session
-	*/
-	$curlSession = curl_init($url);
-
-	/**
-	* Set the cURL session
-	*
-	* curl_setopt_array() Set the options for the session
-	*/
-	curl_setopt_array($curlSession, [
-		CURLOPT_HEADER => FALSE,
-		CURLOPT_RETURNTRANSFER => TRUE
-	]);
-
-	/**
-	* Exec the request
-	*
-	* curl_exec() Execute the session
-	*/
-	$result = curl_exec($curlSession);
-
-	/**
-	* Close the cURL session
-	*
-	* curl_close() Close the session
-	*/
-	curl_close($curlSession);
-	return $result;
+	return request($url);
 }
 
 /**
@@ -132,7 +85,7 @@ function answerCallbackQuery(int $callbackId, string $text, int $flags = 0, stri
 		$requestUrl .= "&url=$url";
 	}
 
-	return request($requestUrl);
+	return requestBotAPI($requestUrl);
 }
 
 /**
@@ -152,7 +105,7 @@ function answerInlineQuery(int $queryId, array $ans) : bool {
 	*/
 	$res = json_encode($ans);
 
-	return request("answerInlineQuery?inline_query_id=$queryId&results=$res");
+	return requestBotAPI("answerInlineQuery?inline_query_id=$queryId&results=$res");
 }
 
 /**
@@ -164,7 +117,7 @@ function answerInlineQuery(int $queryId, array $ans) : bool {
 * @return bool On success, TRUE.
 */
 function deleteMessage($chatId, int $messageId) : bool {
-	$response =  request("deleteMessage?chat_id=$chatId&message_id=$messageId");
+	$response =  requestBotAPI("deleteMessage?chat_id=$chatId&message_id=$messageId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3){
@@ -254,7 +207,7 @@ function editMessageCaption($chatId, int $messageId, string $caption, int $flags
 	*
 	* json_decode() Convert the output to a PHP object
 	*/
-	$response = request($url);
+	$response = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3){
@@ -370,7 +323,7 @@ function editMessageMedia($media, $chatId, int $messageId = 0, string $inlineMes
 		$url .= "&reply_markup=$keyboard";
 	}
 
-	$response = request($url);
+	$response = requestBotAPI($url);
 
 
 	// Check if function must be logged
@@ -410,7 +363,7 @@ function editMessageReplyMarkup($chatId, array $keyboard, int $messageId) {
 		"inline_keyboard" => $keyboard
 	]);
 
-	$response = request("editMessageReplyMarkup?chat_id=$chatId&message_id=$messageId&reply_markup=$keyboard");
+	$response = requestBotAPI("editMessageReplyMarkup?chat_id=$chatId&message_id=$messageId&reply_markup=$keyboard");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3){
@@ -502,7 +455,7 @@ function editMessageText($chatId, int $messageId, string $text, int $flags = 0, 
 		$url .= "&reply_markup=$keyboard";
 	}
 
-	$response = request($url);
+	$response = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3){
@@ -532,7 +485,7 @@ function editMessageText($chatId, int $messageId, string $text, int $flags = 0, 
 */
 function exportChatInviteLink($chatId) : ?string {
 
-	$inviteLink = request("exportChatInviteLink?chat_id=$chatId");
+	$inviteLink = requestBotAPI("exportChatInviteLink?chat_id=$chatId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
@@ -568,7 +521,7 @@ function forwardMessage($toChatid, $fromChatid, int $messageId, int $flag = 0) {
 		$mute = TRUE;
 	}
 
-	$msg = request("forwardMessage?chat_id=$toChatid&from_chat_id=$fromChatid&message_id=$messageId&disable_notification=$mute");
+	$msg = requestBotAPI("forwardMessage?chat_id=$toChatid&from_chat_id=$fromChatid&message_id=$messageId&disable_notification=$mute");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $toChatid != LOG_CHANNEL){
@@ -594,7 +547,7 @@ function forwardMessage($toChatid, $fromChatid, int $messageId, int $flag = 0) {
 * @return mixed On success, the Chat retrieved by the method.
 */
 function getChat($chatId) {
-	$chat = request("getChat?chat_id=$chatId");
+	$chat = requestBotAPI("getChat?chat_id=$chatId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3){
@@ -621,7 +574,7 @@ function getChat($chatId) {
 */
 function getChatAdministrators($chatId) {
 
-	$adminsArray = request("getChatAdministrators?chat_id=$chatId");
+	$adminsArray = requestBotAPI("getChatAdministrators?chat_id=$chatId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
@@ -649,7 +602,7 @@ function getChatAdministrators($chatId) {
 */
 function getChatMember($chatId, $userId) {
 
-	$chatMember = request("getChatMember?chat_id=$chatId&user_id=$userId");
+	$chatMember = requestBotAPI("getChatMember?chat_id=$chatId&user_id=$userId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
@@ -681,7 +634,7 @@ function getChatMember($chatId, $userId) {
 */
 function getFile(string $fileId) {
 
-	$file = request("getFile?file_id=$fileId");
+	$file = requestBotAPI("getFile?file_id=$fileId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3) {
@@ -707,7 +660,7 @@ function getFile(string $fileId) {
 function getMe() {
 
 	// Try at least, no one gets me, I'm such a sad bot
-	$mySelf = request("getMe");
+	$mySelf = requestBotAPI("getMe");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3) {
@@ -743,7 +696,7 @@ function pinChatMessage($chatId, int $messageId, int $flag = 0) : bool {
 		$mute = TRUE;
 	}
 
-	$result = request("pinChatMessage?chat_id=$chatId&message_id=$messageId&disable_notification=$mute");
+	$result = requestBotAPI("pinChatMessage?chat_id=$chatId&message_id=$messageId&disable_notification=$mute");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1027,7 +980,7 @@ function sendAudio($chatId, string $audio, string $caption = '', int $flags = 0,
 		$url .= "&reply_markup=$keyboard";
 	}
 
-	$msg = request($url);
+	$msg = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1180,7 +1133,7 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 		$url .= "&reply_to_message_id=$messageId";
 	}
 
-	$msg = request($url);
+	$msg = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1296,7 +1249,7 @@ function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []
 		$url .= "&reply_markup=$keyboard";
 	}
 
-	$msg = request($url);
+	$msg = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
@@ -1389,7 +1342,7 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 		$url .= "&caption=$caption";
 	}
 
-	$msg = request($url);
+	$msg = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1633,7 +1586,7 @@ function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, in
 		$url .= "&reply_markup=$keyboard";
 	}
 
-	$msg = request($url);
+	$msg = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1797,7 +1750,7 @@ function sendVoice($chatId, string $voice, string $caption = '', int $flags = 0,
 		$url .= "&reply_markup=$keyboard";
 	}
 
-	$msg = request($url);
+	$msg = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1859,7 +1812,7 @@ function setMyCommands(array $commands) : bool {
 	*/
 	$commands = json_encode($commands, JSON_UNESCAPED_SLASHES);
 
-	$result = request("setMyCommands?commands=$commands");
+	$result = requestBotAPI("setMyCommands?commands=$commands");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1885,7 +1838,7 @@ function setMyCommands(array $commands) : bool {
 * @return bool On success, TRUE.
 */
 function unbanChatMember($chatId, $userId) : bool {
-	$result = request("unbanChatMember?chat_id=$chatId&user_id=$userId");
+	$result = requestBotAPI("unbanChatMember?chat_id=$chatId&user_id=$userId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1910,7 +1863,7 @@ function unbanChatMember($chatId, $userId) : bool {
 * @return bool On success, TRUE.
 */
 function unpinChatMessage($chatId) : bool {
-	$result = request("unpinChatMessage?chat_id=$chatId");
+	$result = requestBotAPI("unpinChatMessage?chat_id=$chatId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){

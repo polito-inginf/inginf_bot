@@ -23,7 +23,10 @@ include 'constants.php';
 include 'header.php';
 
 // This file contains all the base functions needed by the bot
-include 'basefunctions.php';
+include 'functions.php';
+
+// This file contains all the functions needed by the bot to connect with the Telegram's Bot API
+include 'BotAPIfunctions.php';
 
 // This file contains all the variables from the various update types
 include 'variables.php';
