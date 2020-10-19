@@ -25,21 +25,11 @@
 */
 function request(string $url) {
 	/**
-	* Replace the special character into the URL
+	* Encode the URL
 	*
-	* str_replace() Replace the first array of character with the second array
+	* urlencode() Encode the URL, converting all the special character to its safe value
 	*/
-	$url = str_replace([
-		"\n",
-		' ',
-		'#',
-		"'"
-	], [
-		'%0A%0D',
-		'%20',
-		'%23',
-		'%27'
-	], $url);
+	$url = urlencode($url);
 
 	/**
 	* Open the cURL session
