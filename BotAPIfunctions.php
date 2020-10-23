@@ -22,60 +22,13 @@
 *
 * @param string $urlt The Bot API endpoint.
 *
-* @return mixed The result of the request
+* @return mixed The result of the request.
 */
-function request(string $url) {
+function requestBotAPI(string $url) {
 	// Create the URL for the Telegram's Bot API
 	$url = api . $url;
 
-	/**
-	* Replace the special character into the URL
-	*
-	* str_replace() Replace the first array of character with the second array
-	*/
-	$url = str_replace([
-		"\n",
-		' ',
-		'#',
-		"'"
-	], [
-		'%0A%0D',
-		'%20',
-		'%23',
-		'%27'
-	], $url);
-
-	/**
-	* Open the cURL session
-	*
-	* curl_init() Open the session
-	*/
-	$curlSession = curl_init($url);
-
-	/**
-	* Set the cURL session
-	*
-	* curl_setopt_array() Set the options for the session
-	*/
-	curl_setopt_array($curlSession, [
-		CURLOPT_HEADER => FALSE,
-		CURLOPT_RETURNTRANSFER => TRUE
-	]);
-
-	/**
-	* Exec the request
-	*
-	* curl_exec() Execute the session
-	*/
-	$result = curl_exec($curlSession);
-
-	/**
-	* Close the cURL session
-	*
-	* curl_close() Close the session
-	*/
-	curl_close($curlSession);
-	return $result;
+	return request($url);
 }
 
 /**
@@ -132,12 +85,11 @@ function answerCallbackQuery(int $callbackId, string $text, int $flags = 0, stri
 		$requestUrl .= "&url=$url";
 	}
 
-	return request($requestUrl);
+	return requestBotAPI($requestUrl);
 }
 
 /**
 * Answers to an InlineQuery.
-* @todo Do we want to pass the results as a parameter or find the results inside the function ?
 *
 * @param int $queryId The id of the InlineQuery.
 * @param array $ans The answers.
@@ -152,19 +104,44 @@ function answerInlineQuery(int $queryId, array $ans) : bool {
 	*/
 	$res = json_encode($ans);
 
-	return request("answerInlineQuery?inline_query_id=$queryId&results=$res");
+	return requestBotAPI("answerInlineQuery?inline_query_id=$queryId&results=$res");
 }
 
 /**
 * Deletes a message.
 *
 * @param int/string $chatId The id/username of the chat/channel/user where the message is located.
-* @param string $messageId The id of the message to delete.
+* @param int $messageId The id of the message to delete.
 *
 * @return bool On success, TRUE.
 */
 function deleteMessage($chatId, int $messageId) : bool {
-	$response =  request("deleteMessage?chat_id=$chatId&message_id=$messageId");
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
+	$response =  requestBotAPI("deleteMessage?chat_id=$chatId&message_id=$messageId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3){
@@ -198,6 +175,31 @@ function deleteMessage($chatId, int $messageId) : bool {
 * @return mixed On success, the Message edited by the method.
 */
 function editMessageCaption($chatId, int $messageId, string $caption, int $flags = 0, array $keyboard = []) {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
 	$parseMode = 'HTML';
 
 	/**
@@ -254,7 +256,7 @@ function editMessageCaption($chatId, int $messageId, string $caption, int $flags
 	*
 	* json_decode() Convert the output to a PHP object
 	*/
-	$response = request($url);
+	$response = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3){
@@ -292,9 +294,83 @@ function editMessageCaption($chatId, int $messageId, string $caption, int $flags
 * 	This parameter is necessary if $chatId and $messageId aren't specified.
 * @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed On success, because, if the edited message was originally sent by the bot, the modified Message, otherwise TRUE.
+* @return mixed If the edited message was originally sent by the bot, on success, the modified Message, otherwise, ever on success, TRUE.
 */
 function editMessageMedia($media, $chatId, int $messageId = 0, string $inlineMessageId = '', array $keyboard = []) {
+	/**
+	* Check if the media isn't a supported object
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($media['type']) || empty($media['media'])) {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The media isn't a supported object."
+			]);
+		}
+		return;
+	/**
+	* Check if the media isn't a supported media
+	*
+	* in_array() Checks if a value exists in an array
+	*/
+	} else if (in_array($media['type'], [
+		'animation',
+		'document',
+		'audio',
+		'photo',
+		'video'
+	]) === FALSE) {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The media type isn't supported."
+			]);
+		}
+		return;
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	} else if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
+
+	/**
+	* Encode the media
+	*
+	* json_encode() Convert the PHP object to a JSON string
+	*/
+	$media = json_encode($media);
 
 	$url = "editMessageMedia?media=$media";
 
@@ -370,7 +446,7 @@ function editMessageMedia($media, $chatId, int $messageId = 0, string $inlineMes
 		$url .= "&reply_markup=$keyboard";
 	}
 
-	$response = request($url);
+	$response = requestBotAPI($url);
 
 
 	// Check if function must be logged
@@ -402,6 +478,31 @@ function editMessageMedia($media, $chatId, int $messageId = 0, string $inlineMes
 */
 function editMessageReplyMarkup($chatId, array $keyboard, int $messageId) {
 	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
+	/**
 	* Encode the keyboard layout
 	*
 	* json_encode() Convert the PHP object to a JSON string
@@ -410,7 +511,7 @@ function editMessageReplyMarkup($chatId, array $keyboard, int $messageId) {
 		"inline_keyboard" => $keyboard
 	]);
 
-	$response = request("editMessageReplyMarkup?chat_id=$chatId&message_id=$messageId&reply_markup=$keyboard");
+	$response = requestBotAPI("editMessageReplyMarkup?chat_id=$chatId&message_id=$messageId&reply_markup=$keyboard");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3){
@@ -445,6 +546,31 @@ function editMessageReplyMarkup($chatId, array $keyboard, int $messageId) {
 * @return mixed On success, the Message edited by the method.
 */
 function editMessageText($chatId, int $messageId, string $text, int $flags = 0, array $keyboard = []) {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
 	$parseMode = 'HTML';
 	$disablePreview = TRUE;
 
@@ -502,7 +628,7 @@ function editMessageText($chatId, int $messageId, string $text, int $flags = 0, 
 		$url .= "&reply_markup=$keyboard";
 	}
 
-	$response = request($url);
+	$response = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3){
@@ -531,8 +657,32 @@ function editMessageText($chatId, int $messageId, string $text, int $flags = 0, 
 * @return string On success, the new invite link.
 */
 function exportChatInviteLink($chatId) : ?string {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
 
-	$inviteLink = request("exportChatInviteLink?chat_id=$chatId");
+	$inviteLink = requestBotAPI("exportChatInviteLink?chat_id=$chatId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
@@ -552,15 +702,63 @@ function exportChatInviteLink($chatId) : ?string {
 /**
 * Forward a message from a chat/channel/user to another.
 *
-* @param int/string $toChatid The id/username of the chat/channel/user where we want send the message.
-* @param int/string $fromChatid The id/username of the chat/channel/user where the message we want to forward it's located.
+* @param int/string $toChatId The id/username of the chat/channel/user where we want send the message.
+* @param int/string $fromChatId The id/username of the chat/channel/user where the message we want to forward it's located.
 * @param int $messageId The id of the message to forward.
 * @param int $flag [Optional] Pipe to set more options
 * 	DISABLE_NOTIFICATIONS: mutes notifications
 *
 * @return mixed On success, the Message forwarded by the method.
 */
-function forwardMessage($toChatid, $fromChatid, int $messageId, int $flag = 0) {
+function forwardMessage($toChatid, $fromChatId, int $messageId, int $flag = 0) {
+	/**
+	* Check if the id of the chat where we want send the message isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($toChatId) !== 'integer' && gettype($toChatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	/**
+	* Check if the id of the chat where the message we want to forward it's located isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	} else if (gettype($fromChatId) !== 'integer' && gettype($fromChatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The from_chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
 	$mute = FALSE;
 
 	// Check if the message must be muted
@@ -568,7 +766,7 @@ function forwardMessage($toChatid, $fromChatid, int $messageId, int $flag = 0) {
 		$mute = TRUE;
 	}
 
-	$msg = request("forwardMessage?chat_id=$toChatid&from_chat_id=$fromChatid&message_id=$messageId&disable_notification=$mute");
+	$msg = requestBotAPI("forwardMessage?chat_id=$toChatId&from_chat_id=$fromChatId&message_id=$messageId&disable_notification=$mute");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $toChatid != LOG_CHANNEL){
@@ -594,7 +792,32 @@ function forwardMessage($toChatid, $fromChatid, int $messageId, int $flag = 0) {
 * @return mixed On success, the Chat retrieved by the method.
 */
 function getChat($chatId) {
-	$chat = request("getChat?chat_id=$chatId");
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
+	$chat = requestBotAPI("getChat?chat_id=$chatId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3){
@@ -620,8 +843,32 @@ function getChat($chatId) {
 * @return mixed On success, an array of ChatMember objects; if no administrators were appointed, only the creator will be returned.
 */
 function getChatAdministrators($chatId) {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
 
-	$adminsArray = request("getChatAdministrators?chat_id=$chatId");
+	$adminsArray = requestBotAPI("getChatAdministrators?chat_id=$chatId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
@@ -648,8 +895,55 @@ function getChatAdministrators($chatId) {
 * @return mixed On success, the ChatMember object.
 */
 function getChatMember($chatId, $userId) {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	/**
+	* Check if the id of the user isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	} else if (gettype($userId) !== 'integer' && gettype($userId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The user_id isn't a supported object."
+			]);
+		}
+		return;
+	}
 
-	$chatMember = request("getChatMember?chat_id=$chatId&user_id=$userId");
+	$chatMember = requestBotAPI("getChatMember?chat_id=$chatId&user_id=$userId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
@@ -675,13 +969,12 @@ function getChatMember($chatId, $userId) {
 * 		It is guaranteed that the link will be valid for at least 1 hour.
 * 	- This function may not preserve the original file name and MIME type.
 *
-* @param int/string $fileId The id of the file we want retrieve.
+* @param string $fileId The id of the file we want retrieve.
 *
 * @return mixed On success, the File object.
 */
 function getFile(string $fileId) {
-
-	$file = request("getFile?file_id=$fileId");
+	$file = requestBotAPI("getFile?file_id=$fileId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3) {
@@ -705,9 +998,8 @@ function getFile(string $fileId) {
 * @return mixed On success, the bot.
 */
 function getMe() {
-
 	// Try at least, no one gets me, I'm such a sad bot
-	$mySelf = request("getMe");
+	$mySelf = requestBotAPI("getMe");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3) {
@@ -736,6 +1028,31 @@ function getMe() {
 * @return bool On success, TRUE.
 */
 function pinChatMessage($chatId, int $messageId, int $flag = 0) : bool {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
 	$mute = FALSE;
 
 	// Check if the message must be muted
@@ -743,7 +1060,7 @@ function pinChatMessage($chatId, int $messageId, int $flag = 0) : bool {
 		$mute = TRUE;
 	}
 
-	$result = request("pinChatMessage?chat_id=$chatId&message_id=$messageId&disable_notification=$mute");
+	$result = requestBotAPI("pinChatMessage?chat_id=$chatId&message_id=$messageId&disable_notification=$mute");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -772,16 +1089,279 @@ function pinChatMessage($chatId, int $messageId, int $flag = 0) : bool {
 * 	DISABLE_NOTIFICATIONS: mutes notifications
 * @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function replyToMessage($chatId, string $text, int $messageId, int $flags = 0, array $keyboard = []) {
 	return sendMessage($chatId, $text, $flags, $keyboard, $messageId);
 }
 
 /**
+* Sends an Animation file (GIF or H.264/MPEG-4 AVC video without sound)
+* to the chat pointed from $chatId.
+* The animation is identified by a string that can be both a file_id or an HTTP URL of an animation on internet.
+* Bots can, currently, send animation files of up to 50 MB in size, this limit may be changed in the future.
+*
+* @param int/string $chatId The id/username of the chat/channel/user to send the animation.
+* @param string $animation The URL that points to a animation from the web or a file_id of a animation already on the Telegram's servers.
+* @param int $duration [Optional] The duration of sent animation expressed in seconds.
+* @param int $width [Optional] The animation width.
+* @param int $height [Optional] The animation height.
+* @param string $thumb [Optional] The URL that points to the thumbnail of the animation from the web or a file_id of a thumbnail already on the Telegram's servers.
+* @param int $flag [Optional] Pipe to set more options
+* 	MARKDOWN: enables Markdown parse mode
+* 	DISABLE_NOTIFICATIONS: mutes notifications
+* @param string $caption [Optional] The caption of the animation.
+* @param int $messageId [Optional] The id of the message you want to respond to.
+* @param array $keyboard [Optional] The layout of the keyboard to send.
+*
+* @return mixed On success, the Message sent by the method.
+*/
+function sendAnimation($chatId, string $animation, int $duration = 0, int $width = 0, int $height = 0, string $thumb = '', int $flags = 0, string $caption = '', int $messageId = 0, array $keyboard = []) {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
+	$parseMode = 'HTML';
+	$mute = FALSE;
+
+	/**
+	* Check if the animation must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($animation, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$animation = urlencode($animation);
+	}
+
+	/**
+	* Check if the thumbnail of the animation must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($thumb, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$thumb = urlencode($thumb);
+	}
+
+	/**
+	* Check if the caption of the animation must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($caption, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$caption = urlencode($caption);
+	}
+
+	// Check if the parse mode must be setted to 'MarkdownV2'
+	if ($flags & MARKDOWN) {
+		$parseMode = 'MarkdownV2';
+	}
+
+	// Check if the message must be muted
+	if ($flags & DISABLE_NOTIFICATION) {
+		$mute = TRUE;
+	}
+
+	$url = "sendAnimation?chat_id=$chatId&animation=$animation&parse_mode=$parseMode&disable_notification=$mute";
+
+	/**
+	* Check if the caption of the animation exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($caption) === FALSE) {
+		$url .= "&caption=$caption";
+	}
+
+	/**
+	* Check if the thumbnail of the animation exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($thumb) === FALSE) {
+		$url .= "&thumb=$thumb";
+	}
+
+	/**
+	* Check if the animation have a specific duration
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($duration) === FALSE) {
+		$url .= "&duration=$duration";
+	}
+
+	/**
+	* Check if the animation have a specific width
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($width) === FALSE) {
+		$url .= "&width=$width";
+	}
+
+	/**
+	* Check if the animation have a specific height
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($height) === FALSE) {
+		$url .= "&height=$height";
+	}
+
+	/**
+	* Check if the message must reply to another one
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($messageId) === FALSE) {
+		$url .= "&reply_to_message_id=$messageId";
+	}
+
+	/**
+	* Check if the message have an InlineKeyboard
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($keyboard) === FALSE) {
+		/**
+		* Encode the keyboard layout
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
+		$keyboard = json_encode([
+			"inline_keyboard" => $keyboard
+		]);
+
+		$url .= "&reply_markup=$keyboard";
+	}
+
+	$msg = requestBotAPI($url);
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $msg);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$msg = json_decode($msg, TRUE);
+
+	return $msg['ok'] == TRUE ? $msg['result'] : NULL ;
+}
+
+/**
 * Sends an Audio file, if you want Telegram clients to display them in the music player,
 * to the chat pointed from $chatId and returns the Message object of the sent message.
-* The audio is identified by a string that can be both a file_id or an HTTP URL of a pic on internet.
+* The audio is identified by a string that can be both a file_id or an HTTP URL of an audio on internet.
 * Bots can, currently, send audio files of up to 50 MB in size, this limit may be changed in the future.
 *
 * @param int/string $chatId The id/username of the chat/channel/user to send the audio.
@@ -797,9 +1377,34 @@ function replyToMessage($chatId, string $text, int $messageId, int $flags = 0, a
 * @param int $messageId [Optional] The id of the message you want to respond to.
 * @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function sendAudio($chatId, string $audio, string $caption = '', int $flags = 0, int $duration = 0, string $performer = '', string $title = '', string $thumb = '', int $messageId = 0, array $keyboard = []) {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
 	$parseMode = 'HTML';
 	$mute = FALSE;
 
@@ -1027,7 +1632,7 @@ function sendAudio($chatId, string $audio, string $caption = '', int $flags = 0,
 		$url .= "&reply_markup=$keyboard";
 	}
 
-	$msg = request($url);
+	$msg = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1054,9 +1659,34 @@ function sendAudio($chatId, string $audio, string $caption = '', int $flags = 0,
 * 	DISABLE_NOTIFICATIONS: mutes notifications
 * @param int $messageId [Optional] The id of the message you want to respond to.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 0) {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
 	$mute = FALSE;
 
 	// Check if the message must be muted
@@ -1065,6 +1695,47 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 	}
 
 	foreach ($media as $singleMedia) {
+		/**
+		* Check if the media isn't a supported object
+		*
+		* empty() check if the argument is empty
+		* 	''
+		* 	""
+		* 	'0'
+		* 	"0"
+		* 	0
+		* 	0.0
+		* 	NULL
+		* 	FALSE
+		* 	[]
+		* 	array()
+		*/
+		if (empty($singleMedia['type']) || empty($singleMedia['media'])) {
+			// Check if function must be logged
+			if (LOG_LVL > 3){
+				sendLog(__FUNCTION__, [
+					'error' => "A media into the array isn't a supported object."
+				]);
+			}
+			continue;
+		/**
+		* Check if the media isn't a supported media
+		*
+		* in_array() Checks if a value exists in an array
+		*/
+		} else if (in_array($singleMedia['type'], [
+			'photo',
+			'video'
+		]) === FALSE) {
+			// Check if function must be logged
+			if (LOG_LVL > 3){
+				sendLog(__FUNCTION__, [
+					'error' => "The type of a media into the array isn't supported."
+				]);
+			}
+			continue;
+		}
+
 		/**
 		* Check if the media haven't already a parse_mode setted
 		*
@@ -1180,7 +1851,7 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 		$url .= "&reply_to_message_id=$messageId";
 	}
 
-	$msg = request($url);
+	$msg = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1209,9 +1880,34 @@ function sendMediaGroup($chatId, array $media, int $flags = 0, int $messageId = 
 * @param array $keyboard [Optional] The layout of the keyboard to send.
 * @param int $messageId [Optional] The id of the message you want to respond to.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = [], int $messageId = 0) {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
 	$parseMode = 'HTML';
 	$disablePreview = TRUE;
 	$mute = FALSE;
@@ -1296,7 +1992,7 @@ function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []
 		$url .= "&reply_markup=$keyboard";
 	}
 
-	$msg = request($url);
+	$msg = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL) {
@@ -1314,7 +2010,7 @@ function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []
 }
 
 /**
-* Sends a Photo (identified by a string that can be both a file_id or an HTTP URL of a pic on internet)
+* Sends a Photo (identified by a string that can be both a file_id or an HTTP URL of a photo on internet)
 * to the chat pointed from $chatId and returns the Message object of the sent message.
 *
 * @param int/string $chatId The id/username of the chat/channel/user to send the photo.
@@ -1324,9 +2020,34 @@ function sendMessage($chatId, string $text, int $flags = 0, array $keyboard = []
 * 	DISABLE_NOTIFICATIONS: mutes notifications
 * @param string $caption [Optional] The caption of the photo.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '') {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
 	$parseMode = 'HTML';
 	$mute = FALSE;
 
@@ -1389,7 +2110,7 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 		$url .= "&caption=$caption";
 	}
 
-	$msg = request($url);
+	$msg = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1407,7 +2128,7 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 }
 
 /**
-* Sends a Video (identified by a string that can be both a file_id or an HTTP URL of a pic on internet)
+* Sends a Video (identified by a string that can be both a file_id or an HTTP URL of a video on internet)
 * to the chat pointed from $chatId and returns the Message object of the sent message.
 * Bots can, currently, send video files of up to 50 MB in size, this limit may be changed in the future.
 *
@@ -1425,9 +2146,34 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 * @param int $messageId [Optional] The id of the message you want to respond to.
 * @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, int $height = 0, string $thumb = '', int $flags = 0, string $caption = '', int $messageId = 0, array $keyboard = []) {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
 	$parseMode = 'HTML';
 	$mute = FALSE;
 	$streaming = FALSE;
@@ -1633,7 +2379,7 @@ function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, in
 		$url .= "&reply_markup=$keyboard";
 	}
 
-	$msg = request($url);
+	$msg = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1653,7 +2399,7 @@ function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, in
 /**
 * Sends an Audio file, if you want Telegram clients to display the audio as a playable voice message,
 * to the chat pointed from $chatId and returns the Message object of the sent message.
-* The audio is identified by a string that can be both a file_id or an HTTP URL of a pic on internet.
+* The audio is identified by a string that can be both a file_id or an HTTP URL of an audio on internet.
 * Bots can, currently, send audio files of up to 50 MB in size, this limit may be changed in the future.
 *
 * @param int/string $chatId The id/username of the chat/channel/user to send the audio.
@@ -1666,9 +2412,34 @@ function sendVideo($chatId, string $video, int $duration = 0, int $width = 0, in
 * @param int $messageId [Optional] The id of the message you want to respond to.
 * @param array $keyboard [Optional] The layout of the keyboard to send.
 *
-* @return mixed On success, the Message edited by the method.
+* @return mixed On success, the Message sent by the method.
 */
 function sendVoice($chatId, string $voice, string $caption = '', int $flags = 0, int $duration = 0, int $messageId = 0, array $keyboard = []) {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
 	$parseMode = 'HTML';
 	$mute = FALSE;
 
@@ -1797,7 +2568,7 @@ function sendVoice($chatId, string $voice, string $caption = '', int $flags = 0,
 		$url .= "&reply_markup=$keyboard";
 	}
 
-	$msg = request($url);
+	$msg = requestBotAPI($url);
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1823,6 +2594,31 @@ function sendVoice($chatId, string $voice, string $caption = '', int $flags = 0,
 */
 function setMyCommands(array $commands) : bool {
 	foreach ($commands as $command) {
+		/**
+		* Check if the command isn't a supported object
+		*
+		* empty() check if the argument is empty
+		* 	''
+		* 	""
+		* 	'0'
+		* 	"0"
+		* 	0
+		* 	0.0
+		* 	NULL
+		* 	FALSE
+		* 	[]
+		* 	array()
+		*/
+		if (empty($command['command']) || empty($command['description'])) {
+			// Check if function must be logged
+			if (LOG_LVL > 3){
+				sendLog(__FUNCTION__, [
+					'error' => "A command into the array isn't a supported object."
+				]);
+			}
+			continue;
+		}
+
 		/**
 		* Check if the name of the command must be encoded
 		*
@@ -1859,7 +2655,7 @@ function setMyCommands(array $commands) : bool {
 	*/
 	$commands = json_encode($commands, JSON_UNESCAPED_SLASHES);
 
-	$result = request("setMyCommands?commands=$commands");
+	$result = requestBotAPI("setMyCommands?commands=$commands");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1885,7 +2681,55 @@ function setMyCommands(array $commands) : bool {
 * @return bool On success, TRUE.
 */
 function unbanChatMember($chatId, $userId) : bool {
-	$result = request("unbanChatMember?chat_id=$chatId&user_id=$userId");
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	/**
+	* Check if the id of the user isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	} else if (gettype($userId) !== 'integer' && gettype($userId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The user_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
+	$result = requestBotAPI("unbanChatMember?chat_id=$chatId&user_id=$userId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
@@ -1910,7 +2754,32 @@ function unbanChatMember($chatId, $userId) : bool {
 * @return bool On success, TRUE.
 */
 function unpinChatMessage($chatId) : bool {
-	$result = request("unpinChatMessage?chat_id=$chatId");
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
+	$result = requestBotAPI("unpinChatMessage?chat_id=$chatId");
 
 	// Check if function must be logged
 	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){

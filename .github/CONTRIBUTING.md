@@ -23,6 +23,7 @@ For contribute at this bot, open an Issue or a Pull request.
 * For declare a variable, use the symbol of the type instead of the constructor (_i.e._ use `[]` instead of `array()`)
 * Into the functions, insert a space after the comma (_i.e._ use `func($var1, $var2)` instead of `func($var1,$var2)`)
 * Specify the type of the parameter of a function (_i.e._ use `func($var1, int $var2)` instead of `func($var1, $var2)`)
+* Specify the type of the return of a function (_i.e._ use `func($var1) : int` instead of `func($var1)`)
 
 ### Util links
 
