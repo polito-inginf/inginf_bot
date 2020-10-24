@@ -3054,3 +3054,128 @@ function leaveChat($chatId) : bool {
 
 	return $result['result'];
 }
+
+function promoteChatMember($chatId, int $userId, int $flags) : bool {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return FALSE;
+	/**
+	* Check if the id of the user isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	} else if (gettype($userId) !== 'integer' && gettype($userId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The user_id isn't a supported object."
+			]);
+		}
+		return FALSE;
+	}
+
+	$canChangeInfo = FALSE;
+	$canPostMessages = FALSE;
+	$canEditMessages = FALSE;
+	$canDeleteMessages = FALSE;
+	$canInviteUsers = FALSE;
+	$canRestrictMembers = FALSE;
+	$canPinMessages = FALSE;
+	$canPromoteMembers = FALSE;
+
+	// Check if permission is setted 
+	if ($flags & CAN_CHANGE_INFO) {
+		$canChangeInfo = TRUE;
+	}
+
+	// Check if permission is setted 
+	if ($flags & CAN_POST_MESSAGES) {
+		$canPostMessages = TRUE;
+	}
+
+	// Check if permission is setted 
+	if ($flags & CAN_EDIT_MESSAGES) {
+		$canEditMessages = TRUE;
+	}
+
+	// Check if permission is setted 
+	if ($flags & CAN_DELETE_MESSAGES) {
+		$canDeleteMessages = TRUE;
+	}
+
+	// Check if permission is setted 
+	if ($flags & CAN_INVITE_USERS) {
+		$canInviteUsers = TRUE;
+	}
+
+	// Check if permission is setted 
+	if ($flags & CAN_RESTRICT_MEMBERS) {
+		$canRestrictMembers = TRUE;
+	}
+
+	// Check if permission is setted 
+	if ($flags & CAN_PIN_MESSAGES) {
+		$canPinMessages = TRUE;
+	}
+
+	// Check if permission is setted 
+	if ($flags & CAN_PROMOTE_MEMBERS) {
+		$canPromoteMembers = TRUE;
+	}
+
+	$url = "promoteChatMember?chat_id=$chatId&user_id=$userId";
+	$url .= "&can_change_info=" . $canChangeInfo;
+	$url .= "&can_post_messages=" . $canPostMessages;
+	$url .= "&can_edit_messages=" . $canEditMessages;
+	$url .= "&can_delete_messages=" . $canDeleteMessages;
+	$url .= "&can_invite_users=" . $canInviteUsers;
+	$url .= "&can_restrict_members=" . $canRestrictMembers;
+	$url .= "&can_pin_messages=" . $canPinMessages;
+	$url .= "&can_promote_members=" . $canPromoteMembers;
+
+	$result = requestBotAPI($url);
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $result);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$result = json_decode($result, TRUE);
+
+	return $result['result'];
+}
