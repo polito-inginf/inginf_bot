@@ -2881,7 +2881,7 @@ function sendDocument($chatId, string $document, int $flags = 0, string $caption
 
 	// Check if the document is a response to a message
 	if ($replyMessageId !== 0) {
-		$url .= "&reply_to_message_id=" . $replyMessageId;
+		$url .= "&reply_to_message_id=$replyMessageId";
 	}
 
 	/**
@@ -2982,11 +2982,12 @@ function kickChatMember($chatId, int $userId, int $untilDate = 0) : bool {
 	$url = "kickChatMember?chat_id=$chatId&user_id=$userId";
 
 	// Check if an untilDate has been set
-	if ($untilDate !== 0) {
+	if ($untilDate === 0) {
 		// Current Unix timestamp + 20 seconds, telegram will see this as a permanent ban (becouse under 30 seconds from the request)
-		$time = time() + 20;
-		$url .= "&until_date=" . $time;
+		$untilDate = time() + 20;
 	}
+
+	$url .= "&until_date=$untilDate";
 
 	$result = requestBotAPI($url);
 
@@ -3171,14 +3172,14 @@ function promoteChatMember($chatId, int $userId, int $flags) : bool {
 	}
 
 	$url = "promoteChatMember?chat_id=$chatId&user_id=$userId";
-	$url .= "&can_change_info=" . $canChangeInfo;
-	$url .= "&can_post_messages=" . $canPostMessages;
-	$url .= "&can_edit_messages=" . $canEditMessages;
-	$url .= "&can_delete_messages=" . $canDeleteMessages;
-	$url .= "&can_invite_users=" . $canInviteUsers;
-	$url .= "&can_restrict_members=" . $canRestrictMembers;
-	$url .= "&can_pin_messages=" . $canPinMessages;
-	$url .= "&can_promote_members=" . $canPromoteMembers;
+	$url .= "&can_change_info=$canChangeInfo";
+	$url .= "&can_post_messages=$canPostMessages";
+	$url .= "&can_edit_messages=$canEditMessages";
+	$url .= "&can_delete_messages=$canDeleteMessages";
+	$url .= "&can_invite_users=$canInviteUsers";
+	$url .= "&can_restrict_members=$canRestrictMembers";
+	$url .= "&can_pin_messages=$canPinMessages";
+	$url .= "&can_promote_members=$canPromoteMembers";
 
 	$result = requestBotAPI($url);
 
