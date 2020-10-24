@@ -138,7 +138,7 @@ function deleteMessage($chatId, int $messageId) : bool {
 				'error' => "The chat_id isn't a supported object."
 			]);
 		}
-		return;
+		return FALSE;
 	}
 
 	$response =  requestBotAPI("deleteMessage?chat_id=$chatId&message_id=$messageId");
@@ -679,7 +679,7 @@ function exportChatInviteLink($chatId) : ?string {
 				'error' => "The chat_id isn't a supported object."
 			]);
 		}
-		return;
+		return NULL;
 	}
 
 	$inviteLink = requestBotAPI("exportChatInviteLink?chat_id=$chatId");
@@ -1050,7 +1050,7 @@ function pinChatMessage($chatId, int $messageId, int $flag = 0) : bool {
 				'error' => "The chat_id isn't a supported object."
 			]);
 		}
-		return;
+		return FALSE;
 	}
 
 	$mute = FALSE;
@@ -2089,7 +2089,7 @@ function sendPhoto($chatId, string $photo, int $flags = 0, string $caption = '')
 		$mute = TRUE;
 	}
 
-	$url = "sendPhoto?chat_id=$chatId&photo=$photo&parse_mode=$parseMode&disable_notification=$mute"
+	$url = "sendPhoto?chat_id=$chatId&photo=$photo&parse_mode=$parseMode&disable_notification=$mute";
 
 	/**
 	* Check if the caption of the photo exists
@@ -2703,7 +2703,7 @@ function unbanChatMember($chatId, $userId) : bool {
 				'error' => "The chat_id isn't a supported object."
 			]);
 		}
-		return;
+		return FALSE;
 	/**
 	* Check if the id of the user isn't a supported object
 	*
@@ -2726,7 +2726,7 @@ function unbanChatMember($chatId, $userId) : bool {
 				'error' => "The user_id isn't a supported object."
 			]);
 		}
-		return;
+		return FALSE;
 	}
 
 	$result = requestBotAPI("unbanChatMember?chat_id=$chatId&user_id=$userId");
@@ -2776,7 +2776,7 @@ function unpinChatMessage($chatId) : bool {
 				'error' => "The chat_id isn't a supported object."
 			]);
 		}
-		return;
+		return FALSE;
 	}
 
 	$result = requestBotAPI("unpinChatMessage?chat_id=$chatId");
