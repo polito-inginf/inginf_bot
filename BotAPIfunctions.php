@@ -3004,3 +3004,53 @@ function kickChatMember($chatId, int $userId, int $untilDate = 0) : bool {
 
 	return $result['result'];
 }
+
+/**
+* Leave a specified group/supergroup/channel.
+*
+* @param int/string $chatId The id/username of the group/supergroup/channel that we want to leave.
+*
+* @return bool On success, TRUE.
+*/
+function leaveChat($chatId) : bool {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return FALSE;
+	}
+
+	$result = requestBotAPI("leaveChat?chat_id=$chatId");
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $result);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$result = json_decode($result, TRUE);
+
+	return $result['result'];
+}
