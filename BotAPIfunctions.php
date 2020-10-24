@@ -3317,3 +3317,90 @@ function restrictChatMember($chatId, int $userId, array $permissions, int $until
 
 	return $result['result'];
 }
+
+/**
+* Set chat permissions (if Bot is admin and has privileges).
+*
+* @param int/string $chatId The id/username of the group/supergroup
+* @param array $permissions The array of permissions we want to set
+*
+* @return bool On success, TRUE.
+*/
+function setChatPermissions($chatId, array $permissions) : bool {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return FALSE;
+	}
+
+	$url = "setChatPermissions?chat_id=$chatId";
+
+	/**
+	* Check if the message have a permission array
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($permissions) === FALSE) {
+		/**
+		* Encode the keyboard layout
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
+		$permissions = json_encode($permissions);
+
+		$url .= "&permissions=$permissions";
+	} else {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "Permissions parameter can't be empty."
+			]);
+		}
+		return FALSE;
+	}
+
+	$result = requestBotAPI($url);
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $result);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$result = json_decode($result, TRUE);
+
+	return $result['result'];
+}
