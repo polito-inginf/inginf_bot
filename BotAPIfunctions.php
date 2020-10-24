@@ -2919,3 +2919,88 @@ function sendDocument($chatId, string $document, int $flags = 0, string $caption
 
 	return $msg['ok'] == TRUE ? $msg['result'] : NULL ;
 }
+
+/**
+* Kick/Ban a member from a group, supergroup or a channel. In case of supergroups and channels, the user will not be able to 
+* return on their own using invite links, unless unbanned first.
+*
+* @param int/string $chatId The id/handle of the group/supergroup/channel
+* @param int $userId The id of the user to kick/ban
+* @param int $untilDate [Optional] The Unix timestamp of the date in which the user will be unbanned. If not used, the ban si permanent.
+* 
+* @return bool On success, returns TRUE. FALSE otherwise.
+*/
+function kickChatMember($chatId, int $userId, int $untilDate = 0) : bool {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return FALSE;
+	/**
+	* Check if the id of the user isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	} else if (gettype($userId) !== 'integer' && gettype($userId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The user_id isn't a supported object."
+			]);
+		}
+		return FALSE;
+	}
+
+	$url = "kickChatMember?chat_id=$chatId&user_id=$userId";
+
+	// Check if an untilDate has been set
+	if ($untilDate !== 0) {
+		// Current Unix timestamp + 20 seconds, telegram will see this as a permanent ban (becouse under 30 seconds from the request)
+		$time = time() + 20;
+		$url .= "&until_date=" . $time;
+	}
+
+	$result = requestBotAPI($url);
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $result);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$result = json_decode($result, TRUE);
+
+	return $result['result'];
+}
