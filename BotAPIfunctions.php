@@ -3055,6 +3055,23 @@ function leaveChat($chatId) : bool {
 	return $result['result'];
 }
 
+/**
+* Sets chat members privileges.
+*
+* @param int/string $chatId The id/username of the group/supergroup/channel
+* @param int $userId The id of the username we want to change the privileges to
+* @param int $flags Pipe to set more options
+*	CAN_CHANGE_INFO: User can change group/channel info
+*	CAN_POST_MESSAGES: User can post messages
+*	CAN_EDIT_MESSAGES: User can edit messages
+*	CAN_DELETE_MESSAGES: User can delete messages
+*	CAN_INVITE_USERS: User can invite other users to the chat
+*	CAN_RESTRICT_MEMBERS: User can restrict, ban or unban chat members
+*	CAN_PIN_MESSAGES: User can pin messages
+*	CAN_PROMOTE_MEMBERS: User can promote other users to administrator role, with a subset of his own privileges
+*
+* @return bool On success, TRUE.
+*/
 function promoteChatMember($chatId, int $userId, int $flags) : bool {
 	/**
 	* Check if the id of the chat isn't a supported object
