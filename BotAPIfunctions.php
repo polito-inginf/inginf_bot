@@ -2795,3 +2795,127 @@ function unpinChatMessage($chatId) : bool {
 
 	return $result['result'];
 }
+
+/**
+* Sends a Documment (identified by a string that can be both a file_id or an HTTP URL of a document on internet)
+* to the chat pointed from $chatId and returns the Message object of the sent message.
+*
+* @param int/string $chatId The id/username of the chat/channel/user to send the photo.
+* @param string $document The URL that points to a document from the web or a file_id of a document already on the Telegram's servers.
+* @param int $flag [Optional] Pipe to set more options
+* 	MARKDOWN: enables Markdown parse mode
+* 	DISABLE_NOTIFICATIONS: mutes notifications
+* @param string $caption [Optional] The caption of the document.
+* @param string $replyMessageId [Optional] The id of the message to respond to.
+* 
+* @return mixed On success, the Message sent by the method.
+*/
+function sendDocument($chatId, string $document, int $flags = 0, string $caption = '', int $replyMessageId = 0) {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return;
+	}
+
+	$parseMode = 'HTML';
+	$mute = FALSE;
+
+	/**
+	* Check if the photo must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($document, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$document = urlencode($document);
+	}
+
+	/**
+	* Check if the caption of the photo must be encoded
+	*
+	* strpos() Check if the '\n' character is into the string
+	*/
+	if (strpos($caption, "\n")) {
+		/**
+		* Encode the URL
+		*
+		* urlencode() Encode the URL, converting all the special character to its safe value
+		*/
+		$caption = urlencode($caption);
+	}
+
+	// Check if the parse mode must be setted to 'MarkdownV2'
+	if ($flags & MARKDOWN) {
+		$parseMode = 'MarkdownV2';
+	}
+
+	// Check if the message must be muted
+	if ($flags & DISABLE_NOTIFICATION) {
+		$mute = TRUE;
+	}
+
+	$url = "sendDocument?chat_id=$chatId&document=$document&parse_mode=$parseMode&disable_notification=$mute";
+
+	// Check if the document is a response to a message
+	if ($replyMessageId !== 0) {
+		$url .= "&reply_to_message_id=" . $replyMessageId;
+	}
+
+	/**
+	* Check if the caption of the photo exists
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if(empty($caption) === FALSE) {
+		$url .= "&caption=$caption";
+	}
+
+	$msg = requestBotAPI($url);
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $msg);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$msg = json_decode($msg, TRUE);
+
+	return $msg['ok'] == TRUE ? $msg['result'] : NULL ;
+}
