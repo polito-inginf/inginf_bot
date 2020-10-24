@@ -2800,7 +2800,7 @@ function unpinChatMessage($chatId) : bool {
 * Sends a Documment (identified by a string that can be both a file_id or an HTTP URL of a document on internet)
 * to the chat pointed from $chatId and returns the Message object of the sent message.
 *
-* @param int/string $chatId The id/username of the chat/channel/user to send the photo.
+* @param int/string $chatId The id/username of the chat/channel/user to send the document.
 * @param string $document The URL that points to a document from the web or a file_id of a document already on the Telegram's servers.
 * @param int $flag [Optional] Pipe to set more options
 * 	MARKDOWN: enables Markdown parse mode
@@ -2840,7 +2840,7 @@ function sendDocument($chatId, string $document, int $flags = 0, string $caption
 	$mute = FALSE;
 
 	/**
-	* Check if the photo must be encoded
+	* Check if the document must be encoded
 	*
 	* strpos() Check if the '\n' character is into the string
 	*/
@@ -2854,7 +2854,7 @@ function sendDocument($chatId, string $document, int $flags = 0, string $caption
 	}
 
 	/**
-	* Check if the caption of the photo must be encoded
+	* Check if the caption of the document must be encoded
 	*
 	* strpos() Check if the '\n' character is into the string
 	*/
@@ -2885,7 +2885,7 @@ function sendDocument($chatId, string $document, int $flags = 0, string $caption
 	}
 
 	/**
-	* Check if the caption of the photo exists
+	* Check if the caption of the document exists
 	*
 	* empty() check if the argument is empty
 	* 	''
