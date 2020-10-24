@@ -3196,3 +3196,123 @@ function promoteChatMember($chatId, int $userId, int $flags) : bool {
 
 	return $result['result'];
 }
+
+/**
+* Restrict chat member privileges.
+*
+* @param int/string $chatId The id/username of the supergroup
+* @param int $userId The id of the user we want to change the privileges to
+* @param array $permissions The array of permissions we want to set
+* @param int $untilDate [Optional] The Unix timestamp of the date in which the restrictions will cease. If not used, the restrictions will be permanent.
+*
+* @return bool On success, TRUE.
+*/
+function restrictChatMember($chatId, int $userId, array $permissions, int $untilDate = 0) : bool {
+	/**
+	* Check if the id of the chat isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	if (gettype($chatId) !== 'integer' && gettype($chatId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The chat_id isn't a supported object."
+			]);
+		}
+		return FALSE;
+	/**
+	* Check if the id of the user isn't a supported object
+	*
+	* gettype() return the type of its argument
+	* 	'boolean'
+    * 	'integer'
+    * 	'double' (for historical reasons 'double' is returned in case of a float, and not simply 'float')
+    * 	'string'
+    * 	'array'
+    * 	'object'
+    * 	'resource'
+    * 	'resource (closed)'
+    * 	'NULL'
+    * 	'unknown type'
+	*/
+	} else if (gettype($userId) !== 'integer' && gettype($userId) !== 'string') {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "The user_id isn't a supported object."
+			]);
+		}
+		return FALSE;
+	}
+
+	$url = "restrictChatMember?chat_id=$chatId&user_id=$userId";
+
+	/**
+	* Check if the message have a permission array
+	*
+	* empty() check if the argument is empty
+	* 	''
+	* 	""
+	* 	'0'
+	* 	"0"
+	* 	0
+	* 	0.0
+	* 	NULL
+	* 	FALSE
+	* 	[]
+	* 	array()
+	*/
+	if (empty($permissions) === FALSE) {
+		/**
+		* Encode the keyboard layout
+		*
+		* json_encode() Convert the PHP object to a JSON string
+		*/
+		$permissions = json_encode($permissions);
+
+		$url .= "&permissions=$permissions";
+	} else {
+		// Check if function must be logged
+		if (LOG_LVL > 3){
+			sendLog(__FUNCTION__, [
+				'error' => "Permissions parameter can't be empty."
+			]);
+		}
+		return FALSE;
+	}
+
+	// Check if an untilDate has been set
+	if ($untilDate === 0) {
+		// Current Unix timestamp + 20 seconds, telegram will see this as a permanent ban (becouse under 30 seconds from the request)
+		$untilDate = time() + 20;
+	}
+
+	$url .= "&until_date=$untilDate";
+
+	$result = requestBotAPI($url);
+
+	// Check if function must be logged
+	if (LOG_LVL > 3 && $chatId != LOG_CHANNEL){
+		sendLog(__FUNCTION__, $result);
+	}
+
+	/**
+	* Decode the output of the HTTPS query
+	*
+	* json_decode() Convert the output to a PHP object
+	*/
+	$result = json_decode($result, TRUE);
+
+	return $result['result'];
+}
