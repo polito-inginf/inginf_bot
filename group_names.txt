@@ -1,0 +1,320 @@
+Analisi I
+Chimica
+Informatica C (19/20)
+Informatica Matricole (20/21)
+Inglese (Esame)
+Italiano (Esame)
+Algebra Lineare e Geometria
+Fisica I
+Tecniche di Programmazione
+Mathematical Analysis I
+Chemistry
+Computer Sciences
+Linear Algebra and Geometry
+Physics I
+Programming techniques
+Arte e Scienza
+Automotive Evolution
+Chimica sperimentale per l'ingegneria
+Dai materiali ai componenti: storia ed analisi dei sistemi e processi produttivi
+Digital and Connected World
+Economia e organizzazione aziendale
+Etica delle Tecniche
+Evoluzione dei veicoli aerospaziali
+Filosofia dell'Ingegneria
+Il linguaggio grafico nell'ingegneria civile, edile ed ambientale
+Imprenditorialità e innovazione
+Introduction to Sustainable Engineering
+Laboratorio di sostenibilità ambientale
+Laboratorio tecnologico per l'industria tessile
+Nozioni di Economia
+Ontologia della progettazione
+Rivoluzione digitale
+Storia dell'energia
+Storia della Tecnologia
+Strumenti dell'Ingegneria per l'industria 4.0
+Tecniche di comunicazione e di scrittura
+Tecnologie per la disabilità
+Tecnologie, comunicazione e società
+Algoritmi e strutture dati
+Algoritmi e Programmazione
+Elettromagnetismo e teoria dei circuiti
+Elettrotecnica
+Calcolatori Elettronici
+Calcolatori Elettronici [CON REBAUDENGO]
+Analisi II
+Metodi Matematici per l'Ingegneria
+Metodi Matematici [CON TRIVELLATO]
+Fisica II
+Basi di Dati
+Basi di Dati [CON CHIUSANO]
+Programmazione a Oggetti
+Programmazione a Oggetti [CON DI CARLO]
+Elettronica Applicata
+Elettronica Applicata [CON CASU]
+Sistemi Operativi
+Reti di Calcolatori
+Teoria ed Elaborazione dei Segnali
+Controlli Automatici
+Sistemi Elettronici, Tecnologie e Misure
+Algorithms and Programming
+Circuit Theory
+Mathematical Analysis II
+Physics II
+Computer Architecture
+Introduction to Databases
+Mathematical Methods
+Object Oriented Programming
+Computer Networks
+Electronic Systems, Technologies and Measurements
+Operating Systems
+Signal Analysis and Processing
+Applied Electronics
+Automatic Control
+Onde coerenti: laser, olografia, teletrasporto
+Ambient Intelligence
+Calcolo numerico: metodi e software
+Energia, progresso e sostenibilità
+Gestione industriale della qualità
+Interazione uomo macchina
+Processi di re-impiego e valorizzazione energetica
+Science and technology studies
+Storia delle cose. Anatomia e antropologia degli oggetti
+Tecnologie ambientali s.p. (CON DOCENTE)
+Tecnologie ambientali s.p. (Studenti)
+Storia ed estetica delle tecnologie e della musica elettroacustica
+Affidabilità, sicurezza e manutenzione per l'azienda
+Applied signal processing laboratory
+Cambiamenti climatici e socio economici
+Company Economics
+Compatibilità elettromagnetica nell'integrazione dei sistemi
+Controllo dei sistemi meccanici
+Digital communication laboratory
+Droni per il rilievo territoriale e architettonico
+Elementi di fisica nucleare
+Generazione fotovoltaica ed eolica di energia elettrica
+Impostazione progettuale dell'autoveicolo
+Inclusive design nelle scienze dell'architettura e dell'ingegneria
+Introduzione all'informazione e calcolo quantistico
+Introduzione alle Nanotecnologie
+Laboratorio di Internet
+Matematica Applicata
+Open and virtualized networks
+Ottimizzazione per il Problem Solving
+Reti e sistemi complessi: fenomeni fisici e interazioni sociali
+Sistemi di propulsione elettrica per i trasporti
+Sperimentazione e progettazione di tecnologie energetiche
+Tecniche della rappresentazione digitale
+Tecnologie per IoT
+Visualizzazione dell'Informazione Quantitativa
+Architetture dei Sistemi di Elaborazione
+Computer Architectures
+Computer Architectures (PROF)
+Data Science e Tecnologie per le Basi di Dati
+Data Science and Database Technology
+Tecnologie e Servizi di Rete
+Computer Network Technologies and Services
+Software Engineering II
+Modelli e Sistemi a Eventi Discreti
+Convex Optimization and Engineering Applications
+Ingegneria del Software
+Software Engineering
+Nonlinear Control and Aerospace Applications
+Programmazione di Sistema
+System and Device Programming
+Automotive Control Systems
+Robotica
+Estimation, Filtering, and System Identification
+Digital Control Technologies and Architectures
+Modern Design of Control Systems
+Software Architecture for Automation
+Information Systems
+Big Data: Architectures and Data Analytics
+Programmazione Distribuita I - Distributed Programming I
+Distributed Programming I
+Sicurezza dei Sistemi Informativi
+Distributed Programming II
+Machine Learning and Artificial Intelligence
+Applicazioni Internet
+Interdisciplinary Software Design Project
+Mobile Application Development
+Electronics for Embedded Systems
+Electronics for Embedded Systems (PROF)
+Operating Systems for Embedded Systems
+Specification and Simulation of Digital Systems
+Microelectronic Systems
+Microelectronic Systems [WITH GRAZIANO]
+Synthesis and Optimization of Digital Systems
+Energy Management in Mobile Systems
+Modeling and Optimization of Embedded Systems
+System-on-Chip Architecture
+Testing and Fault Tolerance
+System Design Project
+Elaborazione e Trasmissione di Informazioni Multimediali
+Informatica Grafica
+Computer Animation
+Multimedia Signal Processing
+Data Spaces
+Optimization Methods and Algorithms
+Elaborazione dell'Audio Digitale
+Realtà virtuale
+Reti Locali e Data Center
+Software Networking
+Protocolli e Architetture di Routing
+Formal Languages and Compilers
+Sicurezza e legislazione dell'ambiente e del territorio
+Tirocinio
+TESI
+Informatica Medica
+Projects and laboratory on photonic networks
+Advanced Machine Learning
+Advanced design for signal integrity and compliance
+Automation and planning of production systems
+Bioinformatics
+Electromagnetic fields and biological tissues: effects and medical applications
+Innovative wireless platforms for the internet of things
+Model-based software design
+Projects and laboratory on communication systems
+Technologies for Autonomous Vehicles
+Tecnologie Digitali e Società
+Sistemi Robotici
+Modeling and Control of Cyberphysical Systems
+Image Processing and Computer Vision
+Internet video streaming
+Cybersecurity
+Progettazione di Software Medicali
+Processi musicali automatici e interattivi
+Sound and sonic interaction design
+Teoria e tecnica del segnale audio digitale
+Engineering Empathy
+Game Design
+Soluzioni di grafica 3D in applicazioni biometriche
+Information systems security
+Applicazioni Web I
+Web Applications I
+Distributed Systems Programming
+Energy management for IoT
+Human Computer Interaction
+Security verification and testing
+GPU programming
+Cryptography
+Cloud Computing
+Programming for IoT applications
+Web Applications II
+Electronic Systems Engineering
+Cybersecurity for Embedded Systems
+Data management and visualization
+Data science lab: process and methods
+Computational linear algebra for large scale problems
+Computational intelligence
+Statistical methods in data science
+Decision making and optimization
+Information Theory and Applications
+Numerical optimization for large scale problems and Stochastic Optimization
+Machine learning and Deep learning
+Machine learning in applications
+Distributed architectures for big data processing and analytics
+Mathematics in Machine Learning
+Data Ethics and Protection
+Innovation management
+Computer aided simulations and performance evaluation
+Dynamics on networks and graphs
+Stochastic processes and time series
+Bioinformatics [DSE]
+Machine learning for IoT
+Machine learning for vision and multimedia
+Applied data science project
+Electrical machines
+Applied mechanics and machine design
+Electronics Fundamentals and Applications
+Modelling and simulation of mechatronic systems
+Electronic systems for mechatronics
+Fluid Automation
+Open Optical Networks
+Robotics
+Dynamic design of machines
+Power electronics
+Laboratory of robust identification and control
+Challenge
+IPLabs
+Vodafone IoT Academy
+Advanced electronic drives
+Network technologies for mechatronics systems
+Additive Manufacturing Systems and materials
+Automatic Control
+Electrical Technologies for eMobility
+Optimization for Machine Learning
+Machine learning and pattern recognition
+Electronic Systems for Sensor Acquisition
+Industrial Photonics
+Networking technologies for connected vehicles
+Embedded Electronic Systems for AI/ML
+Electrical Drives for eMobility
+Mobile and sensor networks
+Modelli matematici per la Biomedicina
+Blockchain e Criptoeconomia
+Blockchain e Criptoeconomia (CON DOCENTE)
+Crediti liberi
+Crediti liberi
+Tecnologie ambientali dei siti produttivi
+Crediti liberi
+LM Automatica
+LM Data Science
+LM Embedded Systems
+LM Reti
+LM Software
+LM Software e Sistemi Digitali
+LM Grafica e Multimedia
+LM Automation and Intelligent Cyber-Physical Systems
+LM Computer Networks and Cloud Computing
+LM Cybersecurity
+LM Data Analytics
+LM Data Science and Engineering
+LM Artificial Intelligence and Data Analytics
+LM Mechatronic Engineering
+Ingegneria Informatica
+Computer Engineering
+INTRAPRENDENTI (PROF)
+INTRAPRENDENTI - Studenti
+Ingegneria Informatica
+LM Ingegneria Informatica
+Mechatronic Engineering
+Data Science and Engineering
+Bar Corinto
+Guida Telegram
+Estensione (gruppo)
+Guida Estensione
+Cerco/Offro casa
+Annunci (gruppo)
+Offerte di lavoro
+Lupus
+LoL/TFT
+Among Us
+Simutrans
+Xonotic
+Dungeons And Dragons
+BiliardinoPoli
+PoliPong
+PoliToAnime 
+GNU/Linux Torino
+Segnalazioni
+Collaboratori @inginf_bot
+Rappresentanti
+Mobilità
+Libri/appunti
+LaTeX PoliTo
+Ripetizioni
+BIT PoliTo (Blockchain)
+Sardi @PoliTo
+Siciliani @PoliTo
+Campani @PoliTo
+CANALE BOT
+Info Polito
+Codice bot
+Contatta admin
+Programmazione a Oggetti
+Basi di Dati
+Controlli Automatici
+Reti di Calcolatori
+Sistemi Operativi
+Computer Vision
