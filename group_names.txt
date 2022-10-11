@@ -1,7 +1,7 @@
 Analisi I
 Chimica
 Informatica C (19/20)
-Informatica Matricole (20/21)
+Informatica
 Inglese (Esame)
 Italiano (Esame)
 Algebra Lineare e Geometria
@@ -36,8 +36,8 @@ Strumenti dell'Ingegneria per l'industria 4.0
 Tecniche di comunicazione e di scrittura
 Tecnologie per la disabilità
 Tecnologie, comunicazione e società
-Algoritmi e strutture dati
 Algoritmi e Programmazione
+Algoritmi e strutture dati
 Elettromagnetismo e teoria dei circuiti
 Elettrotecnica
 Calcolatori Elettronici
@@ -83,6 +83,7 @@ Storia delle cose. Anatomia e antropologia degli oggetti
 Tecnologie ambientali s.p. (CON DOCENTE)
 Tecnologie ambientali s.p. (Studenti)
 Storia ed estetica delle tecnologie e della musica elettroacustica
+Storia delle scienze e delle tecniche
 Affidabilità, sicurezza e manutenzione per l'azienda
 Applied signal processing laboratory
 Cambiamenti climatici e socio economici
@@ -204,6 +205,7 @@ Web Applications II
 Electronic Systems Engineering
 Cybersecurity for Embedded Systems
 Data management and visualization
+Deep Natural Language Processing
 Data science lab: process and methods
 Computational linear algebra for large scale problems
 Computational intelligence
@@ -253,11 +255,32 @@ Electrical Drives for eMobility
 Mobile and sensor networks
 Modelli matematici per la Biomedicina
 Blockchain e Criptoeconomia
+Network Measurement Laboratory
 Blockchain e Criptoeconomia (CON DOCENTE)
-Crediti liberi
-Crediti liberi
-Tecnologie ambientali dei siti produttivi
-Crediti liberi
+Algoritmi e Democrazia
+Assistenza Sanitaria e Intelligenza Artificiale
+Benessere Digitale
+Bio e nano Tecnologie in Medicina
+Città, infrastrutture e cambiamento climatico
+Crisi climatica e bias cognitivi
+Cybersecurity and national defence
+Energy transition and society
+Evidenze, modelli e percezione del cambiamento climatico
+Future of Work
+Genere e Tecnica
+Il Mare e La Transizione Verde
+Infrastrutture intelligenti
+Internet e social media: tecnologie e derive della comunicazione in rete
+La società della sostenibilità
+Migrations and settlements
+Mobilità urbana sostenibile
+Neuroengineering and active aging
+Politica e tecnica
+Realtà virtuale e fragilità
+Smart city e inclusione
+Sostenibilità e responsabilità
+Storia Futura dell'energia
+The future E-mobility
 LM Automatica
 LM Data Science
 LM Embedded Systems
@@ -274,14 +297,22 @@ LM Artificial Intelligence and Data Analytics
 LM Mechatronic Engineering
 Ingegneria Informatica
 Computer Engineering
-INTRAPRENDENTI (PROF)
-INTRAPRENDENTI - Studenti
+PoliTo Students
+Future Matricole (TIL)
+Matricole
+PolitoAwards
+PoliTo Sports
+PoliTo Gaming
+SongsFromPolito
+FilmSerieTVPolito
+INTRAPRENDENTI
 Ingegneria Informatica
 LM Ingegneria Informatica
 Mechatronic Engineering
 Data Science and Engineering
 Bar Corinto
 Guida Telegram
+skeeep by WEEE Open
 Estensione (gruppo)
 Guida Estensione
 Cerco/Offro casa
@@ -295,7 +326,8 @@ Xonotic
 Dungeons And Dragons
 BiliardinoPoli
 PoliPong
-PoliToAnime 
+PoliToAnime
+PoliTo Scacchi
 GNU/Linux Torino
 Segnalazioni
 Collaboratori @inginf_bot
@@ -306,7 +338,6 @@ LaTeX PoliTo
 Ripetizioni
 BIT PoliTo (Blockchain)
 Sardi @PoliTo
-Siciliani @PoliTo
 Campani @PoliTo
 CANALE BOT
 Info Polito
